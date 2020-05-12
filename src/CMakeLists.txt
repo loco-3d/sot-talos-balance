@@ -68,6 +68,8 @@ FOREACH(plugin ${plugins})
   ENDIF(BUILD_PYTHON_INTERFACE)
 ENDFOREACH(plugin)
 
+TARGET_LINK_LIBRARIES(distribute-wrench eiquadprog::eiquadprog)
+
 IF(BUILD_PYTHON_INTERFACE)
   SOT_TALOS_BALANCE_PYTHON_MODULE("" ${PROJECT_NAME} wrap)
 
@@ -165,6 +167,12 @@ SET(${PROJECT_NAME}_SIMULATION_FILES
   appli_hip_flexibility_compensation.py
   )
 
+# simulation files
+SET(${PROJECT_NAME}_ROS_EXEC_FILES
+  test_dcmZmpControl_file.py
+  appli_dcmZmpControl_file.py
+  )
+
 IF(BUILD_PYTHON_INTERFACE)
   FOREACH(python ${${PROJECT_NAME}_PYTHON_FILES})
     PYTHON_INSTALL_ON_SITE(${PY_NAME} ${python})
@@ -181,4 +189,10 @@ IF(BUILD_PYTHON_INTERFACE)
   FOREACH(python ${${PROJECT_NAME}_SIMULATION_FILES})
     PYTHON_INSTALL_ON_SITE(${PY_NAME}/test ${python})
   ENDFOREACH(python ${${PROJECT_NAME}_SIMULATION_FILES})
+
+  FOREACH(python ${${PROJECT_NAME}_ROS_EXEC_FILES})
+    INSTALL(PROGRAMS ${PY_NAME}/test/${python}
+      DESTINATION ${CMAKE_BINARY_DIR}/lib/${PROJECT_NAME})
+  ENDFOREACH(python ${${PROJECT_NAME}_ROS_EXEC_FILES})
+
 ENDIF(BUILD_PYTHON_INTERFACE)
