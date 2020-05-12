@@ -393,6 +393,8 @@ create_topic(robot.publisher, robot.dynamic, 'zmp', robot=robot, data_type='vect
 create_topic(robot.publisher, robot.zmp_estimator, 'zmp', robot=robot, data_type='vector')  # estimated ZMP
 create_topic(robot.publisher, robot.dcm_control, 'zmpRef', robot=robot, data_type='vector')  # reference ZMP
 
+create_topic(robot.publisher, robot.m2qLF, 'sout', robot=robot, data_type='vector')  # reference ZMP
+create_topic(robot.publisher, robot.m2qRF, 'sout', robot=robot, data_type='vector')  # reference ZMP
 #create_topic(robot.publisher, robot.device, 'forceLLEG', robot = robot, data_type='vector')               # measured left wrench
 #create_topic(robot.publisher, robot.device, 'forceRLEG', robot = robot, data_type='vector')               # measured right wrench
 

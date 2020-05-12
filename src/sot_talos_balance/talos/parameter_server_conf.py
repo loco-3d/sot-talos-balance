@@ -9,7 +9,7 @@ rospack = RosPack()
 
 NJ = 32
 model_path = [rospack.get_path('talos_data') + "/../"]
-urdfFileName = rospack.get_path('talos_data') + "/urdf/talos_reduced.urdf"
+urdfFileName = rospack.get_path('talos_data') + "/urdf/talos_reduced_v2.urdf"
 ImuJointName = "imu_joint"
 
 mapJointNameToID = {

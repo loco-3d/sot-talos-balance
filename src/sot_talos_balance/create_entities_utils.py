@@ -279,11 +279,11 @@ def create_ankle_admittance_controller(gains, robot, side, name):
 def create_device_filters(robot, dt):
     robot.pselec = Selec_of_vector("pselec")
     robot.pselec.selec(6, 6 + N_JOINTS)
-    plug(robot.device.state, robot.pselec.sin)
+    plug(robot.device.robotState, robot.pselec.sin)
 
     robot.vselec = Selec_of_vector("vselec")
     robot.vselec.selec(6, 6 + N_JOINTS)
-    plug(robot.device.velocity, robot.vselec.sin)
+    plug(robot.device.robotVelocity, robot.vselec.sin)
 
     filters = Bunch()
     filters.joints_kin = filter_utils.create_chebi1_checby2_series_filter("joints_kin", dt, N_JOINTS)

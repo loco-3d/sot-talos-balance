@@ -46,6 +46,8 @@ SET(${PROJECT_NAME}_SIMULATION_FILES
   appli_hip_flexibility_compensation.py
   test_admittance_drill.py
   appli_admittance_drill.py
+  test_posture.py
+  appli_posture.py
   )
 
 FOREACH(python ${${PROJECT_NAME}_SIMULATION_FILES})

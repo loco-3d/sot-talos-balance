@@ -11,7 +11,7 @@ from dynamic_graph import plug
 from dynamic_graph.sot.core import SOT, Derivator_of_Vector, FeaturePosture, MatrixHomoToPoseQuaternion, Task
 from dynamic_graph.sot.core.matrix_util import matrixToTuple
 from dynamic_graph.sot.core.meta_tasks_kine import MetaTaskKine6d, MetaTaskKineCom, gotoNd
-from dynamic_graph.sot.dynamics_pinocchio import DynamicPinocchio
+from dynamic_graph.sot.dynamic_pinocchio import DynamicPinocchio
 from dynamic_graph.tracer_real_time import TracerRealTime
 from sot_talos_balance.create_entities_utils import *
 from dynamic_graph.sot.core.operator import Add_of_vector
@@ -346,6 +346,7 @@ robot.publisher = create_rospublish(robot, 'robot_publisher')
 
 create_topic(robot.publisher, robot.device, 'state', robot=robot, data_type='vector')
 create_topic(robot.publisher, robot.base_estimator, 'q', robot=robot, data_type='vector')
+create_topic(robot.publisher, robot.base_estimator, 'v', robot=robot, data_type='vector')
 #create_topic(robot.publisher, robot.stf, 'q', robot = robot, data_type='vector')
 
 create_topic(robot.publisher, robot.comTrajGen, 'x', robot=robot, data_type='vector')  # generated CoM
