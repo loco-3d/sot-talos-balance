@@ -55,7 +55,7 @@ DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(HipFlexibilityCompensation, "HipFlexibilityCo
 /* ------------------------------------------------------------------- */
 HipFlexibilityCompensation::HipFlexibilityCompensation(const std::string& name)
   : Entity(name)
-  , CONSTRUCT_SIGNAL_IN(phase, int)
+  , CONSTRUCT_SIGNAL_IN(phase, double)
   , CONSTRUCT_SIGNAL_IN(q_des, dynamicgraph::Vector)
   , CONSTRUCT_SIGNAL_IN(tau, dynamicgraph::Vector)
   , CONSTRUCT_SIGNAL_IN(K_l, double)
@@ -66,7 +66,8 @@ HipFlexibilityCompensation::HipFlexibilityCompensation(const std::string& name)
   , m_initSucceeded(false) 
   , m_torqueLowPassFilterFrequency(1)
   , m_delta_q_saturation(0.01)
-  , m_rate_limiter(0.003){
+  , m_rate_limiter(0.003)
+  , m_fix_comp(0.0){
 
   Entity::signalRegistration( JOINT_DES_SIGNALS << INPUT_SIGNALS << OUTPUT_SIGNALS );
 
@@ -86,6 +87,9 @@ HipFlexibilityCompensation::HipFlexibilityCompensation(const std::string& name)
                                                 docCommandVoid1("Set the rate for the rate limiter of delta_q.",
                                                                 "Value of the limiter")));
 
+  addCommand("setFixedCompensation", makeCommandVoid1(*this, &HipFlexibilityCompensation::setFixedCompensation,
+                                                docCommandVoid1("Set a fixed compensation.",
+                                                                "Value of the compensation (double)")));
   addCommand("getTorqueLowPassFilterFrequency",
              makeDirectGetter(*this, &m_torqueLowPassFilterFrequency,
                               docDirectGetter("Get the current value of the torque LowPassFilter frequency.",
@@ -99,6 +103,10 @@ HipFlexibilityCompensation::HipFlexibilityCompensation(const std::string& name)
   addCommand("getRateLimiter",
              makeDirectGetter(*this, &m_rate_limiter,
                               docDirectGetter("Get the current value of the rate limiter.", "rate (double)")));
+
+  addCommand("getFixedCompensation",
+             makeDirectGetter(*this, &m_fix_comp,
+                              docDirectGetter("Get the current value of the fixed compensation.", "compensation (double)")));
 }
 
 /* --- COMMANDS ---------------------------------------------------------- */
@@ -134,6 +142,8 @@ void HipFlexibilityCompensation::setTorqueLowPassFilterFrequency(const double& f
 void HipFlexibilityCompensation::setAngularSaturation(const double& saturation) { m_delta_q_saturation = saturation; }
 
 void HipFlexibilityCompensation::setRateLimiter(const double& rate) { m_rate_limiter = rate; }
+
+void HipFlexibilityCompensation::setFixedCompensation(const double& compensation) { m_fix_comp = compensation; }
 
 Vector HipFlexibilityCompensation::lowPassFilter(const double& frequency, const Vector& signal,
                                                  Vector& previous_signal) {
@@ -193,8 +203,8 @@ DEFINE_SIGNAL_OUT_FUNCTION(delta_q, dynamicgraph::Vector) {
   getProfiler().start(PROFILE_HIPFLEXIBILITYCOMPENSATION_DELTAQ_COMPUTATION);
 
   const Vector& tau = m_tau_filtSOUT(iter);
-  const int phase =
-      m_phaseSIN.isPlugged() ? m_phaseSIN(iter) : 1;  // always active if unplugged - actual phase unrelevant
+  const double phase =
+      m_phaseSIN.isPlugged() ? m_phaseSIN(iter) : 0.0;  // always inactive if unplugged
   const double K_r = m_K_rSIN(iter);
   const double K_l = m_K_lSIN(iter);
 
@@ -202,7 +212,7 @@ DEFINE_SIGNAL_OUT_FUNCTION(delta_q, dynamicgraph::Vector) {
 
   s.setZero();
 
-  if (phase != 0) {
+  if (phase != 0.0) {
     s[1] = tau[1] / K_l;  // torque/flexibility of left hip (roll)
     s[7] = tau[7] / K_r;  // torque/flexibility of right hip (roll)
   }
@@ -235,7 +245,7 @@ DEFINE_SIGNAL_OUT_FUNCTION(q_cmd, dynamicgraph::Vector) {
 
   const Vector &q_des = m_q_desSIN(iter);
   const Vector &delta_q = m_delta_qSOUT(iter);
-  const int phase = m_phaseSIN.isPlugged() ? m_phaseSIN(iter) : 1; // always active if unplugged - actual phase unrelevant
+  const double phase = m_phaseSIN.isPlugged() ? m_phaseSIN(iter) : 0.0; // always inactive if unplugged
 
   assert((q_des.size() == delta_q.size()) || (q_des.size() == delta_q.size() + 6));
 
@@ -249,10 +259,13 @@ DEFINE_SIGNAL_OUT_FUNCTION(q_cmd, dynamicgraph::Vector) {
     s = q_des;
   } else {
     s = q_des;
-    // s.tail(m_limitedSignal.size()) += m_limitedSignal;
-    if (phase != 0.0) {
-      s[7] += 0.020998; // set fixed flexibility
-      s[13] -= 0.020998; // set fixed flexibility
+    if (phase != 0.0){
+      if (m_fix_comp != 0.0){
+        s[7] += m_fix_comp;  //0.020998 set fixed flexibility
+        s[13] -= m_fix_comp; //0.020998 set fixed flexibility
+      } else {
+        s.tail(m_limitedSignal.size()) += m_limitedSignal;
+      }
     }
   }
 

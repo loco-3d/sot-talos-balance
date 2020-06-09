@@ -60,7 +60,7 @@ class HIPFLEXIBILITYCOMPENSATION_EXPORT HipFlexibilityCompensation : public ::dy
 
   /* --- SIGNALS --- */
   /// \brief Walking phase
-  DECLARE_SIGNAL_IN(phase, int);
+  DECLARE_SIGNAL_IN(phase, double);
 
   /// \brief  Desired joint configuration of the robot
   DECLARE_SIGNAL_IN(q_des, dynamicgraph::Vector);
@@ -93,6 +93,8 @@ class HIPFLEXIBILITYCOMPENSATION_EXPORT HipFlexibilityCompensation : public ::dy
   void setAngularSaturation(const double& saturation);
   /// \brief Set the value of the limiter for the the rate limiter of delta_q.
   void setRateLimiter(const double& rate);
+  /// \brief Set the value of the fixed compensation.
+  void setFixedCompensation(const double& compensation);
   /// \brief Compute the low pass filter of a signal given a frequency and the previous signal.
   dynamicgraph::Vector lowPassFilter(const double& frequency, const dynamicgraph::Vector& signal,
                                      dynamicgraph::Vector& previous_signal);
@@ -107,6 +109,7 @@ class HIPFLEXIBILITYCOMPENSATION_EXPORT HipFlexibilityCompensation : public ::dy
   double m_torqueLowPassFilterFrequency;
   double m_delta_q_saturation;
   double m_rate_limiter;
+  double m_fix_comp;
   dynamicgraph::Vector m_previous_delta_q;
   dynamicgraph::Vector m_previous_tau;
   dynamicgraph::Vector m_limitedSignal;
