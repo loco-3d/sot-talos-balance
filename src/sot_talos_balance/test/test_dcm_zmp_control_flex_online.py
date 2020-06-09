@@ -21,7 +21,7 @@ else:
     print('Not compensating flexibility')
     runCommandClient('flexi = False')
 
-run_test('appli_dcm_zmp_control_flex.py')
+run_test('appli_dcm_zmp_control_flex_online.py')
 
 run_ft_calibration('robot.ftc')
 
@@ -52,7 +52,9 @@ if test_folder is not None:
     c = ask_for_confirmation('Execute trajectory?')
     if c:
         print('Executing the trajectory')
-        runCommandClient('set_trigger(robot, True)')
+        runCommandClient('robot.triggerPG.sin.value = 1')
+        input("Wait before stopping the trajectory")
+        runCommandClient('robot.pg.velocitydes.value=(0.0,0.0,0.0)')
     else:
         print('Not executing the trajectory')
 else:
