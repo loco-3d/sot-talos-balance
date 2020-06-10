@@ -55,7 +55,7 @@ DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(HipFlexibilityCompensation, "HipFlexibilityCo
 /* ------------------------------------------------------------------- */
 HipFlexibilityCompensation::HipFlexibilityCompensation(const std::string& name)
   : Entity(name)
-  , CONSTRUCT_SIGNAL_IN(phase, double)
+  , CONSTRUCT_SIGNAL_IN(phase, int)
   , CONSTRUCT_SIGNAL_IN(q_des, dynamicgraph::Vector)
   , CONSTRUCT_SIGNAL_IN(tau, dynamicgraph::Vector)
   , CONSTRUCT_SIGNAL_IN(K_l, double)
@@ -203,8 +203,8 @@ DEFINE_SIGNAL_OUT_FUNCTION(delta_q, dynamicgraph::Vector) {
   getProfiler().start(PROFILE_HIPFLEXIBILITYCOMPENSATION_DELTAQ_COMPUTATION);
 
   const Vector& tau = m_tau_filtSOUT(iter);
-  const double phase =
-      m_phaseSIN.isPlugged() ? m_phaseSIN(iter) : 0.0;  // always inactive if unplugged
+  const int phase =
+      m_phaseSIN.isPlugged() ? m_phaseSIN(iter) : 0;  // always inactive if unplugged
   const double K_r = m_K_rSIN(iter);
   const double K_l = m_K_lSIN(iter);
 
@@ -212,7 +212,7 @@ DEFINE_SIGNAL_OUT_FUNCTION(delta_q, dynamicgraph::Vector) {
 
   s.setZero();
 
-  if (phase != 0.0) {
+  if (phase != 0) {
     s[1] = tau[1] / K_l;  // torque/flexibility of left hip (roll)
     s[7] = tau[7] / K_r;  // torque/flexibility of right hip (roll)
   }
@@ -245,7 +245,7 @@ DEFINE_SIGNAL_OUT_FUNCTION(q_cmd, dynamicgraph::Vector) {
 
   const Vector &q_des = m_q_desSIN(iter);
   const Vector &delta_q = m_delta_qSOUT(iter);
-  const double phase = m_phaseSIN.isPlugged() ? m_phaseSIN(iter) : 0.0; // always inactive if unplugged
+  const double phase = m_phaseSIN.isPlugged() ? m_phaseSIN(iter) : 0; // always inactive if unplugged
 
   assert((q_des.size() == delta_q.size()) || (q_des.size() == delta_q.size() + 6));
 
@@ -259,12 +259,17 @@ DEFINE_SIGNAL_OUT_FUNCTION(q_cmd, dynamicgraph::Vector) {
     s = q_des;
   } else {
     s = q_des;
-    if (phase != 0.0){
+    if (phase == 1){ //left foot support -> compensate on right (flying foot)
       if (m_fix_comp != 0.0){
-        s[7] += m_fix_comp;  //0.020998 set fixed flexibility
-        s[13] -= m_fix_comp; //0.020998 set fixed flexibility
+        s[13] -= m_fix_comp;  //0.020998 set fixed flexibility
       } else {
-        s.tail(m_limitedSignal.size()) += m_limitedSignal;
+        s[13] += m_limitedSignal[7];
+      }
+    } else if (phase == -1){ //right foot support -> compensate on left (flying foot)
+      if (m_fix_comp != 0.0){
+        s[7] += m_fix_comp; //0.020998 set fixed flexibility
+      } else {
+        s[7] += m_limitedSignal[1];
       }
     }
   }

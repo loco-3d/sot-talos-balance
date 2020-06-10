@@ -60,7 +60,7 @@ class HIPFLEXIBILITYCOMPENSATION_EXPORT HipFlexibilityCompensation : public ::dy
 
   /* --- SIGNALS --- */
   /// \brief Walking phase
-  DECLARE_SIGNAL_IN(phase, double);
+  DECLARE_SIGNAL_IN(phase, int);
 
   /// \brief  Desired joint configuration of the robot
   DECLARE_SIGNAL_IN(q_des, dynamicgraph::Vector);

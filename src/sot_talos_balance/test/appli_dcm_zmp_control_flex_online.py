@@ -361,7 +361,7 @@ create_topic(robot.publisher, robot.device, 'state', robot=robot, data_type='vec
 create_topic(robot.publisher, robot.base_estimator, 'q', robot=robot, data_type='vector')
 #create_topic(robot.publisher, robot.stf, 'q', robot = robot, data_type='vector')
 
-create_topic(robot.publisher, robot.pg, 'contactphase', robot = robot, data_type='double')
+create_topic(robot.publisher, robot.pg, 'contactphase', robot = robot, data_type='int')
 
 create_topic(robot.publisher, robot.pg, 'comref', robot=robot, data_type='vector')  # generated CoM
 create_topic(robot.publisher, robot.pg, 'dcomref', robot=robot, data_type='vector')  # generated CoM velocity

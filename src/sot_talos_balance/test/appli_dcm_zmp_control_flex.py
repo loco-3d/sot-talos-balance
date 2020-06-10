@@ -113,6 +113,8 @@ robot.phaseTrajGen.x.recompute(0)  # trigger computation of initial value
 robot.phaseScalar = Component_of_vector("phase_scalar")
 robot.phaseScalar.setIndex(0)
 plug(robot.phaseTrajGen.x, robot.phaseScalar.sin)
+robot.phaseInt = RoundDoubleToInt("phase_int")
+plug(robot.phaseScalar.sout, robot.phaseInt.sin)
 plug(robot.triggerTrajGen.sout, robot.phaseTrajGen.trigger)
 
 # --- Load files
@@ -320,7 +322,7 @@ robot.integrate.setVelocity(robot.dynamic.getDimension() * [0.])
 # --- Hip flexibility compensation --------------------------------
 
 robot.hipComp = create_hip_flexibility_compensation(robot, hipFlexCompConfig, robot_name)
-plug(robot.phaseScalar.sout, robot.hipComp.phase)
+plug(robot.phaseInt.sout, robot.hipComp.phase)
 if not flexi:
     robot.hipComp.K_l.value = float('inf')  #disable
     robot.hipComp.K_r.value = float('inf')  #disable

@@ -34,7 +34,7 @@ if flexi:
     cmd_r = 'robot.hipComp.K_r.value = hipFlexCompConfig.flexibility_right'
     runCommandClient(cmd_l + '; ' + cmd_r)
 else:
-    runCommandClient('robot.hipComp.phase.value = 0.0')
+    runCommandClient('robot.hipComp.phase.value = 0')
 
 input("Wait before running the test")
 
