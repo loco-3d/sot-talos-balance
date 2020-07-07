@@ -2,7 +2,7 @@
 from sys import argv
 from time import sleep
 
-from sot_talos_balance.utils.run_test_utils import (ask_for_confirmation, get_file_folder, run_ft_calibration,
+from sot_talos_balance.utils.run_test_utils import (ask_for_confirmation, run_ft_calibration,
                                                     run_test, runCommandClient)
 
 try:
@@ -11,7 +11,19 @@ try:
 except NameError:
     pass
 
-test_folder, sot_talos_balance_folder = get_file_folder(argv)
+walk_algo = "Naveau"
+
+if (len(argv) == 1) or (len(argv) == 2 and argv[1] == "Naveau"):
+    print("Starting script with Naveau walking algorithm.")
+elif len(argv) == 2 and argv[1] == "Kajita":
+    print("Starting script with with Kajita walking algorithm.")
+    walk_algo = "Kajita"
+else: 
+    print("Usage: python test_dcm_zmp_control_flex_online.py {walking_algo:=[Naveau|Kajita]}")
+    print("By default (no walking_algo given) the script starts using the Naveau algorithm")
+    raise ValueError("Bad options")
+
+runCommandClient('walk_algo = "' + walk_algo + '"')
 
 flexi = ask_for_confirmation('Compensate flexibility?')
 if flexi:
@@ -48,87 +60,34 @@ runCommandClient('robot.dcm_control.resetDcmIntegralError()')
 runCommandClient('robot.dcm_control.Ki.value = Ki_dcm')
 runCommandClient('robot.dcm_control.Kz.value = Kz_dcm')
 
-if test_folder is not None:
-    c = ask_for_confirmation('Execute trajectory?')
-    if c:
-        print('Executing the trajectory')
-        runCommandClient('robot.triggerPG.sin.value = 1')
+if walk_algo == "Naveau":
+    runCommandClient('robot.pg.parseCmd(":setVelReference  0.1 0.0 0.0")')
+    runCommandClient('robot.pg.parseCmd(":SetAlgoForZmpTrajectory Naveau")')
+    runCommandClient('robot.pg.parseCmd(":setDSFeetDistance 0.162")')
+    runCommandClient('robot.pg.parseCmd(":NaveauOnline")')
+    runCommandClient('robot.pg.parseCmd(":numberstepsbeforestop 2")')
+    runCommandClient('robot.pg.parseCmd(":setfeetconstraint XY 0.091 0.0489")')
+    runCommandClient('robot.pg.parseCmd(":deleteallobstacles")')
+    runCommandClient('robot.pg.parseCmd(":feedBackControl false")')
+    runCommandClient('robot.pg.velocitydes.value = (0.1, 0.0, 0.0)')
+elif walk_algo == "Kajita":
+    runCommandClient('robot.pg.parseCmd(":doublesupporttime 0.115")')
+    runCommandClient('robot.pg.parseCmd(":singlesupporttime 0.9")')
+    runCommandClient('robot.pg.parseCmd(":SetAlgoForZmpTrajectory Kajita")')
+    runCommandClient('robot.pg.parseCmd(":StartOnLineStepSequencing 0.0 -0.09 0.0 0.0 0.1 0.18 0.0 0.0 0.1 -0.18 0.0 0.0 0.0 0.18 0.0 0.0")')
+    runCommandClient('robot.pg.parseCmd(":StopOnLineStepSequencing")')
+
+runCommandClient('robot.pg.parseCmd(":useDynamicFilter true")')
+
+c = ask_for_confirmation('Execute trajectory?')
+if c:
+    print('Executing the trajectory')
+    runCommandClient('robot.triggerPG.sin.value = 1')
+    if walk_algo == "Naveau":
         input("Wait before stopping the trajectory")
         runCommandClient('robot.pg.velocitydes.value=(0.0,0.0,0.0)')
-    else:
-        print('Not executing the trajectory')
 else:
-    c = ask_for_confirmation("Execute a sinusoid?")
-    if c:
-        print("Putting the robot in position...")
-        runCommandClient('robot.comTrajGen.move(1,-0.025,1.0)')
-        sleep(1.0)
-        print("Robot is in position!")
-
-        c2 = ask_for_confirmation("Confirm executing the sinusoid?")
-        if c2:
-            print("Executing the sinusoid...")
-            runCommandClient('robot.comTrajGen.startSinusoid(1,0.025,2.0)')
-            print("Sinusoid started!")
-        else:
-            print("Not executing the sinusoid")
-
-        c3 = ask_for_confirmation("Put the robot back?")
-        if c3:
-            print("Stopping the robot...")
-            runCommandClient('robot.comTrajGen.stop(1)')
-            sleep(5.0)
-            print("Putting the robot back...")
-            runCommandClient('robot.comTrajGen.move(1,0.0,1.0)')
-            sleep(1.0)
-            print("The robot is back in position!")
-        else:
-            print("Not putting the robot back")
-    else:
-        print("Not executing the sinusoid")
-
-    c = ask_for_confirmation("Raise the foot?")
-    if c:
-        print("Putting the robot in position...")
-        runCommandClient('robot.comTrajGen.move(1,-0.08,10.0)')
-        sleep(10.0)
-        print("Robot is in position!")
-
-        foot_on_ground = True
-
-        c2 = ask_for_confirmation("Confirm raising the foot?")
-        if c2:
-            print("Raising the foot...")
-            runCommandClient('robot.phaseTrajGen.set(0,-1)')
-            runCommandClient('h = robot.dynamic.LF.value[2][3]')
-            runCommandClient('robot.lfTrajGen.move(2,h+0.05,10.0)')
-            sleep(10.0)
-            print("Foot has been raised!")
-            foot_on_ground = False
-            c3 = ask_for_confirmation("Put the foot back?")
-            if c3:
-                print("Putting the foot back...")
-                runCommandClient('robot.lfTrajGen.move(2,h,10.0)')
-                sleep(10.0)
-                runCommandClient('robot.phaseTrajGen.set(0,0)')
-                print("The foot is back in position!")
-                foot_on_ground = True
-            else:
-                print("Not putting the foot back")
-        else:
-            print("Not raising the foot")
-
-        if foot_on_ground:
-            c4 = ask_for_confirmation("Put the robot back?")
-            if c4:
-                print("Putting the robot back...")
-                runCommandClient('robot.comTrajGen.move(1,0.0,10.0)')
-                sleep(10.0)
-                print("The robot is back in position!")
-            else:
-                print("Not putting the robot back")
-    else:
-        print("Not raising the foot")
+    print('Not executing the trajectory')
 
 input("Wait before dumping the data")
 

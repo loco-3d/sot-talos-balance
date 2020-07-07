@@ -74,13 +74,9 @@ robot.pg.parseCmd(":ZMPShiftParameters 0.015 0.015 0.015 0.015")
 robot.pg.parseCmd(":TimeDistributeParameters 2.0 3.5 1.7 3.0")
 robot.pg.parseCmd(":UpperBodyMotionParameters -0.1 -1.0 0.0")
 robot.pg.parseCmd(":comheight 0.876681")
-robot.pg.parseCmd(":setVelReference  0.1 0.0 0.0")
-
-robot.pg.parseCmd(":SetAlgoForZmpTrajectory Naveau")
 
 plug(robot.dynamic.position, robot.pg.position)
 plug(robot.dynamic.com, robot.pg.com)
-#plug(robot.dynamic.com, robot.pg.comStateSIN)
 plug(robot.dynamic.LF, robot.pg.leftfootcurrentpos)
 plug(robot.dynamic.RF, robot.pg.rightfootcurrentpos)
 robotDim = len(robot.dynamic.velocity.value)
@@ -88,18 +84,6 @@ robot.pg.motorcontrol.value = robotDim * (0, )
 robot.pg.zmppreviouscontroller.value = (0, 0, 0)
 
 robot.pg.initState()
-
-robot.pg.parseCmd(':setDSFeetDistance 0.162')
-
-robot.pg.parseCmd(':NaveauOnline')
-robot.pg.parseCmd(':numberstepsbeforestop 2')
-robot.pg.parseCmd(':setfeetconstraint XY 0.091 0.0489')
-
-robot.pg.parseCmd(':deleteallobstacles')
-robot.pg.parseCmd(':feedBackControl false')
-robot.pg.parseCmd(':useDynamicFilter true')
-
-robot.pg.velocitydes.value = (0.1, 0.0, 0.0)  # DEFAULT VALUE (0.1,0.0,0.0)
 
 # -------------------------- TRIGGER --------------------------
 
