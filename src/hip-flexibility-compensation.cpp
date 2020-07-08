@@ -214,21 +214,35 @@ DEFINE_SIGNAL_OUT_FUNCTION(delta_q, dynamicgraph::Vector) {
 
   if (phase != 0) {
     s[1] = tau[1] / K_l;  // torque/flexibility of left hip (roll)
+    s[2] = tau[2] / K_l;  // torque/flexibility of left hip (pitch)
     s[7] = tau[7] / K_r;  // torque/flexibility of right hip (roll)
+    s[8] = tau[8] / K_r;  // torque/flexibility of right hip (pitch)
   }
 
   // Angular Saturation
-  // left hip
+  // left hip roll
   if (s[1] > m_delta_q_saturation) {
     s[1] = m_delta_q_saturation;
   } else if (s[1] < -m_delta_q_saturation) {
     s[1] = -m_delta_q_saturation;
   }
-  // right hip
+  // left hip pitch
+  if (s[2] > m_delta_q_saturation) {
+    s[2] = m_delta_q_saturation;
+  } else if (s[2] < -m_delta_q_saturation) {
+    s[2] = -m_delta_q_saturation;
+  }
+  // right hip roll
   if (s[7] > m_delta_q_saturation) {
     s[7] = m_delta_q_saturation;
   } else if (s[7] < -m_delta_q_saturation) {
     s[7] = -m_delta_q_saturation;
+  }
+  // right hip pitch
+  if (s[8] > m_delta_q_saturation) {
+    s[8] = m_delta_q_saturation;
+  } else if (s[8] < -m_delta_q_saturation) {
+    s[8] = -m_delta_q_saturation;
   }
 
   getProfiler().stop(PROFILE_HIPFLEXIBILITYCOMPENSATION_DELTAQ_COMPUTATION);
@@ -261,15 +275,19 @@ DEFINE_SIGNAL_OUT_FUNCTION(q_cmd, dynamicgraph::Vector) {
     s = q_des;
     if (phase == 1){ //left foot support -> compensate on right (flying foot)
       if (m_fix_comp != 0.0){
-        s[13] -= m_fix_comp;  //0.020998 set fixed flexibility
+        s[13] -= m_fix_comp;  //0.020998 set fixed flexibility on the roll
+        s[14] -= m_fix_comp;  //0.020998 set fixed flexibility on the pitch
       } else {
-        s[13] += m_limitedSignal[7];
+        s[13] -= m_limitedSignal[7];
+        s[14] -= m_limitedSignal[8];
       }
     } else if (phase == -1){ //right foot support -> compensate on left (flying foot)
       if (m_fix_comp != 0.0){
-        s[7] += m_fix_comp; //0.020998 set fixed flexibility
+        s[7] += m_fix_comp; //0.020998 set fixed flexibility on the roll
+        s[8] -= m_fix_comp; //0.020998 set fixed flexibility on the pitch
       } else {
         s[7] += m_limitedSignal[1];
+        s[8] -= m_limitedSignal[2];
       }
     }
   }
