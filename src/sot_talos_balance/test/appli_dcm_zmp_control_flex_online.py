@@ -324,8 +324,8 @@ robot.device.before.addSignal(robot.delay_vel.name + '.current')
 plug(robot.cm.u_safe, robot.delay_vel.sin)
 
 # --- Plug integrator instead of device
-plug(robot.delay_pos.previous, robot.pselec.sin)
-plug(robot.pselec.sout, robot.base_estimator.joint_positions)
+# plug(robot.delay_pos.previous, robot.pselec.sin)
+# plug(robot.pselec.sout, robot.base_estimator.joint_positions)
 plug(robot.delay_vel.previous, robot.vselec.sin)
 
 # --- Fix robot.dynamic inputs
