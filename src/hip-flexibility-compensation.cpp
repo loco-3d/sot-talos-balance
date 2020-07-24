@@ -36,12 +36,15 @@ using namespace dg::command;
   "HipFlexibilityCompensation: Angular correction computation   "
 #define PROFILE_HIPFLEXIBILITYCOMPENSATION_QCMD_COMPUTATION \
   "HipFlexibilityCompensation: Corrected joint configuration computation   "
+#define PROFILE_HIPFLEXIBILITYCOMPENSATION_QCMDENC_COMPUTATION \
+  "HipFlexibilityCompensation: Corrected encoders configuration computation   "
+  
 
-#define JOINT_DES_SIGNALS m_q_desSIN
+#define JOINT_SIGNALS m_q_desSIN << m_q_encSIN
 
 #define INPUT_SIGNALS m_phaseSIN << m_tauSIN << m_K_rSIN << m_K_lSIN  //<< m_K_dSIN
 
-#define OUTPUT_SIGNALS m_tau_filtSOUT << m_delta_qSOUT << m_q_cmdSOUT
+#define OUTPUT_SIGNALS m_tau_filtSOUT << m_delta_qSOUT << m_q_cmdSOUT << m_q_cmd_encSOUT
 
 /// Define EntityClassName here rather than in the header file
 /// so that it can be used by the macros DEFINE_SIGNAL_**_FUNCTION.
@@ -57,19 +60,21 @@ HipFlexibilityCompensation::HipFlexibilityCompensation(const std::string& name)
   : Entity(name)
   , CONSTRUCT_SIGNAL_IN(phase, int)
   , CONSTRUCT_SIGNAL_IN(q_des, dynamicgraph::Vector)
+  , CONSTRUCT_SIGNAL_IN(q_enc, dynamicgraph::Vector)
   , CONSTRUCT_SIGNAL_IN(tau, dynamicgraph::Vector)
   , CONSTRUCT_SIGNAL_IN(K_l, double)
   , CONSTRUCT_SIGNAL_IN(K_r, double)
   , CONSTRUCT_SIGNAL_OUT(tau_filt, dynamicgraph::Vector, m_tauSIN)
   , CONSTRUCT_SIGNAL_OUT(delta_q, dynamicgraph::Vector, INPUT_SIGNALS << m_tau_filtSOUT) 
-  , CONSTRUCT_SIGNAL_OUT(q_cmd, dynamicgraph::Vector, JOINT_DES_SIGNALS << m_delta_qSOUT << m_phaseSIN) 
+  , CONSTRUCT_SIGNAL_OUT(q_cmd, dynamicgraph::Vector, JOINT_SIGNALS << m_delta_qSOUT << m_phaseSIN)
+  , CONSTRUCT_SIGNAL_OUT(q_cmd_enc, dynamicgraph::Vector, JOINT_SIGNALS << m_delta_qSOUT << m_phaseSIN) 
   , m_initSucceeded(false) 
   , m_torqueLowPassFilterFrequency(1)
   , m_delta_q_saturation(0.01)
   , m_rate_limiter(0.003)
   , m_fix_comp(0.0){
 
-  Entity::signalRegistration( JOINT_DES_SIGNALS << INPUT_SIGNALS << OUTPUT_SIGNALS );
+  Entity::signalRegistration( JOINT_SIGNALS << INPUT_SIGNALS << OUTPUT_SIGNALS );
 
   /* Commands. */
   addCommand("init", makeCommandVoid2(*this, &HipFlexibilityCompensation::init,
@@ -293,6 +298,51 @@ DEFINE_SIGNAL_OUT_FUNCTION(q_cmd, dynamicgraph::Vector) {
   }
 
   getProfiler().stop(PROFILE_HIPFLEXIBILITYCOMPENSATION_QCMD_COMPUTATION);
+  return s;
+}
+
+DEFINE_SIGNAL_OUT_FUNCTION(q_cmd_enc, dynamicgraph::Vector) {
+  if (!m_initSucceeded) {
+    SEND_WARNING_STREAM_MSG("Cannot compute signal q_cmd_enc before initialization!");
+    return s;
+  }
+
+  getProfiler().start(PROFILE_HIPFLEXIBILITYCOMPENSATION_QCMDENC_COMPUTATION);
+
+  const Vector &q_enc = m_q_encSIN(iter);
+  const Vector &delta_q = m_delta_qSOUT(iter);
+  const double phase = m_phaseSIN.isPlugged() ? m_phaseSIN(iter) : 0; // always inactive if unplugged
+
+  assert((q_enc.size() == q_enc.size()));
+
+  if (s.size() != q_enc.size()) s.resize(q_enc.size());
+
+  if (m_limitedSignal.size() != delta_q.size()) m_limitedSignal.resize(delta_q.size());
+  rateLimiter(delta_q, m_previous_delta_q, m_limitedSignal);
+  m_previous_delta_q = m_limitedSignal;
+  s = q_enc;
+
+  if (iter > 5) {
+    if (phase == 1){ //left foot support -> remove compensation on right (flying foot)
+      if (m_fix_comp != 0.0){
+        s[7] += m_fix_comp;  //0.020998 remove fixed flexibility on the roll
+        s[8] += m_fix_comp;  //0.020998 remove fixed flexibility on the pitch
+      } else {
+        s[7] += m_limitedSignal[7];
+        s[8] += m_limitedSignal[8];
+      }
+    } else if (phase == -1){ //right foot support -> remove compensation on left (flying foot)
+      if (m_fix_comp != 0.0){
+        s[1] -= m_fix_comp; //0.020998 remove fixed flexibility on the roll
+        s[2] += m_fix_comp; //0.020998 remove fixed flexibility on the pitch
+      } else {
+        s[1] -= m_limitedSignal[1];
+        s[2] += m_limitedSignal[2];
+      }
+    }
+  }
+
+  getProfiler().stop(PROFILE_HIPFLEXIBILITYCOMPENSATION_QCMDENC_COMPUTATION);
   return s;
 }
 

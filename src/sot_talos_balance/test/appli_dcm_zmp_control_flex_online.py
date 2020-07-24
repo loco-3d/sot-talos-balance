@@ -56,7 +56,7 @@ robot.pg = PatternGenerator('pg')
 
 # MODIFIED WITH MY PATHS
 talos_data_folder = rospack.get_path('talos_data')
-robot.pg.setURDFpath(talos_data_folder + '/urdf/talos_reduced_wpg.urdf')
+robot.pg.setURDFpath(talos_data_folder + '/urdf/talos_reduced_v2_wpg.urdf')
 robot.pg.setSRDFpath(talos_data_folder + '/srdf/talos_wpg.srdf')
 ## END MODIFIED
 
@@ -73,7 +73,7 @@ robot.pg.parseCmd(":LimitsFeasibility 0.0")
 robot.pg.parseCmd(":ZMPShiftParameters 0.015 0.015 0.015 0.015")
 robot.pg.parseCmd(":TimeDistributeParameters 2.0 3.5 1.7 3.0")
 robot.pg.parseCmd(":UpperBodyMotionParameters -0.1 -1.0 0.0")
-robot.pg.parseCmd(":comheight 0.876681")
+robot.pg.parseCmd(":comheight 0.876681") #0.8926753
 
 plug(robot.dynamic.position, robot.pg.position)
 plug(robot.dynamic.com, robot.pg.com)
@@ -328,6 +328,10 @@ plug(robot.cm.u_safe, robot.delay_vel.sin)
 # plug(robot.pselec.sout, robot.base_estimator.joint_positions)
 plug(robot.delay_vel.previous, robot.vselec.sin)
 
+# Remove flexibility compensation of the encoders position for base estimator
+plug(robot.device.joint_angles, robot.hipComp.q_enc)
+plug(robot.hipComp.q_cmd_enc, robot.base_estimator.joint_positions)
+
 # --- Fix robot.dynamic inputs
 plug(robot.delay_pos.previous, robot.dynamic.position)
 plug(robot.delay_vel.previous, robot.dynamic.velocity)
@@ -392,6 +396,8 @@ create_topic(robot.publisher, robot.hipComp, 'q_cmd', robot=robot, data_type='ve
 create_topic(robot.publisher, robot.hipComp, 'q_des', robot=robot, data_type='vector')
 create_topic(robot.publisher, robot.hipComp, 'tau', robot=robot, data_type='vector')
 create_topic(robot.publisher, robot.hipComp, 'tau_filt', robot=robot, data_type='vector')
+create_topic(robot.publisher, robot.hipComp, 'q_enc', robot=robot, data_type='vector')
+create_topic(robot.publisher, robot.hipComp, 'q_cmd_enc', robot=robot, data_type='vector')
 
 # --- TRACER
 robot.tracer = TracerRealTime("com_tracer")

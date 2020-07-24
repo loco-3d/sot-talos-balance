@@ -64,6 +64,8 @@ class HIPFLEXIBILITYCOMPENSATION_EXPORT HipFlexibilityCompensation : public ::dy
 
   /// \brief  Desired joint configuration of the robot
   DECLARE_SIGNAL_IN(q_des, dynamicgraph::Vector);
+  /// \brief  Encoders joint configuration of the robot
+  DECLARE_SIGNAL_IN(q_enc, dynamicgraph::Vector);
   /// \brief  Current torque mesured at each joint
   DECLARE_SIGNAL_IN(tau, dynamicgraph::Vector);
   /// \brief Left flexibility correction for the angular computation
@@ -80,6 +82,9 @@ class HIPFLEXIBILITYCOMPENSATION_EXPORT HipFlexibilityCompensation : public ::dy
   /// \brief  Corrected desired joint configuration of the robot with flexibility joint configuration
   /// q_cmd = q_des + RateLimiter(delta_q)
   DECLARE_SIGNAL_OUT(q_cmd, dynamicgraph::Vector);
+  /// \brief  Corrected encoder joint configuration of the robot without flexibility joint configuration
+  /// q_cmd = q_enc - RateLimiter(delta_q)
+  DECLARE_SIGNAL_OUT(q_cmd_enc, dynamicgraph::Vector);
 
   /* --- COMMANDS --- */
   /* --- ENTITY INHERITANCE --- */

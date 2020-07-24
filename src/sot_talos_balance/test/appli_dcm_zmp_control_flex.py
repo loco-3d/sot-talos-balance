@@ -290,7 +290,7 @@ locals()['contactRF'] = robot.contactRF
 # --- COM height
 robot.taskComH = MetaTaskKineCom(robot.dynamic, name='comH')
 plug(robot.wp.comDes, robot.taskComH.featureDes.errorIN)
-robot.taskComH.task.controlGain.value = 1.
+robot.taskComH.task.controlGain.value = 100.
 robot.taskComH.feature.selec.value = '100'
 
 # --- COM
@@ -358,6 +358,10 @@ plug(robot.cm.u_safe, robot.delay_vel.sin)
 # plug(robot.pselec.sout, robot.base_estimator.joint_positions)
 plug(robot.delay_vel.previous, robot.vselec.sin)
 
+# Remove flexibility compensation of the encoders position for base estimator
+plug(robot.device.joint_angles, robot.hipComp.q_enc)
+plug(robot.hipComp.q_cmd_enc, robot.base_estimator.joint_positions)
+
 # --- Fix robot.dynamic inputs
 plug(robot.delay_pos.previous, robot.dynamic.position)
 plug(robot.delay_vel.previous, robot.dynamic.velocity)
@@ -420,6 +424,8 @@ create_topic(robot.publisher, robot.hipComp, 'q_cmd', robot=robot, data_type='ve
 create_topic(robot.publisher, robot.hipComp, 'q_des', robot=robot, data_type='vector')
 create_topic(robot.publisher, robot.hipComp, 'tau', robot=robot, data_type='vector')
 create_topic(robot.publisher, robot.hipComp, 'tau_filt', robot=robot, data_type='vector')
+create_topic(robot.publisher, robot.hipComp, 'q_cmd_enc', robot=robot, data_type='vector')
+create_topic(robot.publisher, robot.hipComp, 'q_enc', robot=robot, data_type='vector')
 
 # --- TRACER
 robot.tracer = TracerRealTime("com_tracer")
