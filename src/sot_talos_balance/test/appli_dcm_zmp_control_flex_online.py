@@ -20,7 +20,7 @@ from dynamic_graph.tracer_real_time import TracerRealTime
 from sot_talos_balance.create_entities_utils import *
 from dynamic_graph.sot.pattern_generator import PatternGenerator
 
-cm_conf.CTRL_MAX = 1000.0  # temporary hack
+cm_conf.CTRL_MAX = 10.0  # temporary hack
 
 robot.timeStep = robot.device.getTimeStep()
 dt = robot.timeStep
@@ -45,7 +45,8 @@ robot.dynamic.createOpPoint('WT', robot.OperationalPointsMap['waist'])
 robot.dynamic.LF.recompute(0)
 robot.dynamic.RF.recompute(0)
 robot.dynamic.WT.recompute(0)
-
+robot.dynamic.position.recompute(0)
+robot.dynamic.com.recompute(0)
 # -------------------------- DESIRED TRAJECTORY --------------------------
 
 rospack = RosPack()  
@@ -56,7 +57,7 @@ robot.pg = PatternGenerator('pg')
 
 # MODIFIED WITH MY PATHS
 talos_data_folder = rospack.get_path('talos_data')
-robot.pg.setURDFpath(talos_data_folder + '/urdf/talos_reduced_v2_wpg.urdf')
+# robot.pg.setURDFpath(talos_data_folder + '/urdf/talos_reduced_v2.urdf')
 robot.pg.setSRDFpath(talos_data_folder + '/srdf/talos_wpg.srdf')
 ## END MODIFIED
 

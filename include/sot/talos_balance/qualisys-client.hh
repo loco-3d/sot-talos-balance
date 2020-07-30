@@ -35,11 +35,11 @@
 /* --- INCLUDE --------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
+#include <sot/core/robot-utils.hh>
 #include <dynamic-graph/signal-helper.h>
 
 #include <map>
 #include "boost/assign.hpp"
-#include <sot/core/robot-utils.hh>
 #include <boost/thread.hpp>
 #include <boost/chrono.hpp>
 

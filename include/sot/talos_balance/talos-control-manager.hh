@@ -35,9 +35,9 @@
 /* --- INCLUDE --------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
+#include <sot/core/robot-utils.hh>
 #include <dynamic-graph/signal-helper.h>
 #include <sot/core/matrix-geometry.hh>
-#include <sot/core/robot-utils.hh>
 #include <map>
 #include "boost/assign.hpp"
 
