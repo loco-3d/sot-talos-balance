@@ -79,6 +79,7 @@ class DUMMYWALKINGPATTERNGENERATOR_EXPORT DummyWalkingPatternGenerator : public 
   DECLARE_SIGNAL_IN(zmp, dynamicgraph::Vector);
 
   DECLARE_SIGNAL_IN(referenceFrame, MatrixHomogeneous);
+  DECLARE_SIGNAL_IN(referenceFrameFeet, MatrixHomogeneous);
 
   DECLARE_SIGNAL_INNER(rf, MatrixHomogeneous);
 

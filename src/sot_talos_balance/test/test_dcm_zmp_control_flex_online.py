@@ -11,13 +11,13 @@ try:
 except NameError:
     pass
 
-walk_algo = "Naveau"
+walk_algo = "Kajita"
 
 if (len(argv) == 1) or (len(argv) == 2 and argv[1] == "Naveau"):
     print("Starting script with Naveau walking algorithm.")
+    walk_algo = "Naveau"
 elif len(argv) == 2 and argv[1] == "Kajita":
     print("Starting script with with Kajita walking algorithm.")
-    walk_algo = "Kajita"
 else: 
     print("Usage: python test_dcm_zmp_control_flex_online.py {walking_algo:=[Naveau|Kajita]}")
     print("By default (no walking_algo given) the script starts using the Naveau algorithm")
@@ -74,7 +74,7 @@ elif walk_algo == "Kajita":
     runCommandClient('robot.pg.parseCmd(":doublesupporttime 0.115")')
     runCommandClient('robot.pg.parseCmd(":singlesupporttime 0.9")')
     runCommandClient('robot.pg.parseCmd(":SetAlgoForZmpTrajectory Kajita")')
-    runCommandClient('robot.pg.parseCmd(":StartOnLineStepSequencing 0.0 -0.09 0.0 0.0 0.1 0.18 0.0 0.0 0.1 -0.18 0.0 0.0 0.0 0.18 0.0 0.0")')
+    runCommandClient('robot.pg.parseCmd(":StartOnLineStepSequencing 0.0 -0.085 0.0 0.0 0.2 0.17 0.0 0.0 0.2 -0.17 0.0 0.0 0.2 0.17 0.0 0.0 0.2 -0.17 0.0 0.0 0.2 0.17 0.0 0.0 0.2 -0.17 0.0 0.0 0.0 0.17 0.0 0.0")')
     runCommandClient('robot.pg.parseCmd(":StopOnLineStepSequencing")')
 
 runCommandClient('robot.pg.parseCmd(":useDynamicFilter true")')

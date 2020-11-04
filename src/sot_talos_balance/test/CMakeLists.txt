@@ -11,6 +11,8 @@ SET(${PROJECT_NAME}_SIMULATION_FILES
   appli_dcm_zmp_control_ffdc.py
   test_dcm_zmp_control_flex.py
   appli_dcm_zmp_control_flex.py
+  test_dcm_zmp_control_mlp.py
+  appli_dcm_zmp_control_mlp.py
   test_dcm_zmp_control_flex_online.py
   appli_dcm_zmp_control_flex_online.py
   test_ffSubscriber.py

@@ -35,7 +35,7 @@ using namespace dg::command;
 
 #define INPUT_SIGNALS                                                                                            \
   m_omegaSIN << m_rhoSIN << m_phaseSIN << m_footLeftSIN << m_footRightSIN << m_waistSIN << m_comSIN << m_vcomSIN \
-             << m_acomSIN << m_zmpSIN << m_referenceFrameSIN
+             << m_acomSIN << m_zmpSIN << m_referenceFrameSIN << m_referenceFrameFeetSIN
 
 #define INNER_SIGNALS m_rfSINNER
 
@@ -66,6 +66,7 @@ DummyWalkingPatternGenerator::DummyWalkingPatternGenerator(const std::string& na
       CONSTRUCT_SIGNAL_IN(acom, dynamicgraph::Vector),
       CONSTRUCT_SIGNAL_IN(zmp, dynamicgraph::Vector),
       CONSTRUCT_SIGNAL_IN(referenceFrame, MatrixHomogeneous),
+      CONSTRUCT_SIGNAL_IN(referenceFrameFeet, MatrixHomogeneous),
       CONSTRUCT_SIGNAL_INNER(rf, MatrixHomogeneous, m_referenceFrameSIN),
       CONSTRUCT_SIGNAL_OUT(comDes, dynamicgraph::Vector, m_comSIN << m_rfSINNER),
       CONSTRUCT_SIGNAL_OUT(vcomDes, dynamicgraph::Vector, m_vcomSIN << m_rfSINNER),
@@ -221,8 +222,7 @@ DEFINE_SIGNAL_OUT_FUNCTION(footLeftDes, MatrixHomogeneous) {
   }
 
   MatrixHomogeneous footLeft = m_footLeftSIN(iter);
-
-  const MatrixHomogeneous& referenceFrame = m_rfSINNER(iter);
+  const MatrixHomogeneous& referenceFrame = m_referenceFrameFeetSIN.isPlugged() ? m_referenceFrameFeetSIN(iter) : MatrixHomogeneous::Identity();
 
   s = actInv(referenceFrame, footLeft);
 
@@ -236,9 +236,8 @@ DEFINE_SIGNAL_OUT_FUNCTION(footRightDes, MatrixHomogeneous) {
   }
 
   MatrixHomogeneous footRight = m_footRightSIN(iter);
-
-  const MatrixHomogeneous& referenceFrame = m_rfSINNER(iter);
-
+  const MatrixHomogeneous& referenceFrame = m_referenceFrameFeetSIN.isPlugged() ? m_referenceFrameFeetSIN(iter) : MatrixHomogeneous::Identity();
+  
   s = actInv(referenceFrame, footRight);
 
   return s;

@@ -679,7 +679,10 @@ def load_folder(robot, folder, zmp=False):
         robot.rfTrajGen.playTrajectoryFile(folder + 'RightFoot.dat')
         if zmp:
             robot.zmpTrajGen.playTrajectoryFile(folder + 'ZMP.dat')
-        robot.waistTrajGen.playTrajectoryFile(folder + 'WaistOrientation.dat')
+        try:
+            robot.waistTrajGen.playTrajectoryFile(folder + 'WaistOrientation.dat')
+        except:
+            pass
         try:
             robot.rhoTrajGen.playTrajectoryFile(folder + 'Rho.dat')
         except AttributeError:
