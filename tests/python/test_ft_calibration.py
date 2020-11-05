@@ -1,11 +1,8 @@
+import dynamic_graph.sot_talos_balance.talos.ft_calibration_conf as conf
 import eigenpy
 import numpy as np
+from dynamic_graph.sot_talos_balance.ft_calibration import FtCalibration
 from numpy.testing import assert_almost_equal as assertApprox
-
-import sot_talos_balance.talos.ft_calibration_conf as conf
-from sot_talos_balance.ft_calibration import FtCalibration
-
-eigenpy.switchToNumpyArray()
 
 robot_name = 'robot'
 ftc = FtCalibration('ftc')
@@ -18,8 +15,8 @@ print('Weights of both feet set to {0}'.format(rfw))
 
 print('The robot should be in the air.')
 
-ftc.right_foot_force_in.value = [1, 1, 8, 1, 1, 1]
-ftc.left_foot_force_in.value = [1, 1, 6, 1, 1, 1]
+ftc.right_foot_force_in.value = np.array([1, 1, 8, 1, 1, 1])
+ftc.left_foot_force_in.value = np.array([1, 1, 6, 1, 1, 1])
 
 print("Let's calibrate the ft sensors...")
 ftc.calibrateFeetSensor()

@@ -32,7 +32,6 @@
 #include <dynamic-graph/signal-helper.h>
 #include <dynamic-graph/real-time-logger.h>
 #include <sot/core/matrix-geometry.hh>
-
 #include <map>
 #include "boost/assign.hpp"
 

@@ -1,19 +1,11 @@
+import dynamic_graph.sot_talos_balance.talos.base_estimator_conf as base_estimator_conf
+import dynamic_graph.sot_talos_balance.talos.parameter_server_conf as param_server_conf
 import numpy as np
 import pinocchio as pin
+from dynamic_graph.sot_talos_balance.create_entities_utils import (DcmEstimator, TalosBaseEstimator,
+                                                                   create_parameter_server, plug)
+from dynamic_graph.sot_talos_balance.euler_to_quat import EulerToQuat
 from numpy.testing import assert_almost_equal as assertApprox
-
-pin.switchToNumpyMatrix()
-
-import sot_talos_balance.talos.base_estimator_conf as base_estimator_conf
-import sot_talos_balance.talos.parameter_server_conf as param_server_conf
-from sot_talos_balance.create_entities_utils \
-    import (DcmEstimator,
-            TalosBaseEstimator,
-            create_parameter_server,
-            plug)
-
-from sot_talos_balance.euler_to_quat import EulerToQuat
-
 
 # --- General ---
 print("--- General ---")
@@ -21,7 +13,7 @@ print("--- General ---")
 dt = 0.001
 robot_name = 'robot'
 
-halfSitting = [
+halfSitting = np.array([
     0.0,
     0.0,
     1.018213,
@@ -61,14 +53,13 @@ halfSitting = [
     -0.005,  # Right Arm
     0.,
     0.  # Head
-]
+])
 
-q = np.matrix(halfSitting).T
-print("q:")
-print(q.flatten().tolist()[0])
+q = halfSitting
+print("q:", q)
 
-urdfPath= param_server_conf.urdfFileName
-urdfDir= param_server_conf.model_path
+urdfPath = param_server_conf.urdfFileName
+urdfDir = param_server_conf.model_path
 
 model = pin.buildModelFromUrdf(urdfPath, pin.JointModelFreeFlyer())
 data = model.createData()
@@ -97,12 +88,12 @@ forceLeft = [0.0, 0.0, fz]
 forceRight = [0.0, 0.0, fz]
 lever = float(com[0] - rightPos.translation[0])
 tauy = -fz * lever
-wrenchLeft = forceLeft + [0.0, tauy, 0.0]
-wrenchRight = forceRight + [0.0, tauy, 0.0]
+wrenchLeft = np.array(forceLeft + [0.0, tauy, 0.0])
+wrenchRight = np.array(forceRight + [0.0, tauy, 0.0])
 
 centerTranslation = (data.oMf[rightId].translation +
                      data.oMf[leftId].translation) / 2 + \
-                     np.matrix(param_server_conf.rightFootSoleXYZ).T
+                     np.array(param_server_conf.rightFootSoleXYZ)
 
 centerPos = pin.SE3(rightPos.rotation, centerTranslation)
 print("Center of feet:")
@@ -127,20 +118,20 @@ base_estimator.init(dt, robot_name)
 base_estimator.joint_positions.value = halfSitting[7:]
 base_estimator.forceLLEG.value = wrenchLeft
 base_estimator.forceRLEG.value = wrenchRight
-base_estimator.dforceLLEG.value = [0.0] * 6
-base_estimator.dforceRLEG.value = [0.0] * 6
-base_estimator.joint_velocities.value = [0.0] * (model.nv - 6)
-base_estimator.imu_quaternion.value = [0.0] * 3 + [1.0]
-base_estimator.gyroscope.value = [0.0] * 3
-base_estimator.accelerometer.value = [0.0] * 3
+base_estimator.dforceLLEG.value = np.array([0.0] * 6)
+base_estimator.dforceRLEG.value = np.array([0.0] * 6)
+base_estimator.joint_velocities.value = np.array([0.0] * (model.nv - 6))
+base_estimator.imu_quaternion.value = np.array([0.0] * 3 + [1.0])
+base_estimator.gyroscope.value = np.array([0.0] * 3)
+base_estimator.accelerometer.value = np.array([0.0] * 3)
 
 base_estimator.K_fb_feet_poses.value = conf.K_fb_feet_poses
 base_estimator.w_lf_in.value = conf.w_lf_in
 base_estimator.w_rf_in.value = conf.w_rf_in
 # base_estimator.set_imu_weight(conf.w_imu) # TEMP!
 base_estimator.set_imu_weight(0.)
-base_estimator.set_stiffness_right_foot(conf.K)
-base_estimator.set_stiffness_left_foot(conf.K)
+base_estimator.set_stiffness_right_foot(np.array(conf.K))
+base_estimator.set_stiffness_left_foot(np.array(conf.K))
 base_estimator.set_zmp_std_dev_right_foot(conf.std_dev_zmp)
 base_estimator.set_zmp_std_dev_left_foot(conf.std_dev_zmp)
 base_estimator.set_normal_force_std_dev_right_foot(conf.std_dev_fz)
@@ -149,8 +140,8 @@ base_estimator.set_zmp_margin_right_foot(conf.zmp_margin)
 base_estimator.set_zmp_margin_left_foot(conf.zmp_margin)
 base_estimator.set_normal_force_margin_right_foot(conf.normal_force_margin)
 base_estimator.set_normal_force_margin_left_foot(conf.normal_force_margin)
-base_estimator.set_right_foot_sizes(conf.RIGHT_FOOT_SIZES)
-base_estimator.set_left_foot_sizes(conf.LEFT_FOOT_SIZES)
+base_estimator.set_right_foot_sizes(np.array(conf.RIGHT_FOOT_SIZES))
+base_estimator.set_left_foot_sizes(np.array(conf.LEFT_FOOT_SIZES))
 
 base_estimator.q.recompute(0)
 print(base_estimator.q.value)
@@ -167,7 +158,7 @@ plug(base_estimator.q, e2q.euler)
 e2q.quaternion.recompute(0)
 print(e2q.quaternion.value)
 print(len(e2q.quaternion.value))
-q_est = np.matrix(e2q.quaternion.value).T
+q_est = np.array(e2q.quaternion.value)
 
 # --- Raw q difference ---
 print("--- Raw q difference ---")
@@ -197,12 +188,12 @@ print(com.flatten().tolist()[0])
 
 # --- Raw CoM difference ---
 print("--- Raw CoM difference ---")
-com_rawdiff = np.matrix(dcm_estimator.c.value).T - com
+com_rawdiff = np.array(dcm_estimator.c.value) - com
 print(com_rawdiff.flatten().tolist()[0])
 
 # --- Relative CoM difference ---
 print("--- Relative CoM difference ---")
-com_reldiff = np.matrix(dcm_estimator.c.value).T - comRel
+com_reldiff = np.array(dcm_estimator.c.value) - comRel
 print(com_reldiff.flatten().tolist()[0])
 
-assertApprox(np.matrix(dcm_estimator.c.value).T, comRel, 3)
+assertApprox(np.array(dcm_estimator.c.value), comRel, 3)

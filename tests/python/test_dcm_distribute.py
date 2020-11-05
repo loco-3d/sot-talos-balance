@@ -1,19 +1,12 @@
 from math import sqrt
 
+import dynamic_graph.sot_talos_balance.talos.distribute_conf as distribute_conf
+import dynamic_graph.sot_talos_balance.talos.parameter_server_conf as param_server_conf
 import numpy as np
 import pinocchio as pin
+from dynamic_graph.sot_talos_balance.create_entities_utils import (DcmController, create_distribute_wrench,
+                                                                   create_parameter_server, plug)
 from numpy.testing import assert_almost_equal as assertApprox
-
-pin.switchToNumpyMatrix()
-
-import sot_talos_balance.talos.distribute_conf as distribute_conf
-import sot_talos_balance.talos.parameter_server_conf as param_server_conf
-from sot_talos_balance.create_entities_utils import \
-    (DcmController,
-     create_distribute_wrench,
-     create_parameter_server,
-     plug)
-
 
 # --- General ---
 print("--- General ---")
@@ -21,7 +14,7 @@ print("--- General ---")
 dt = 0.001
 robot_name = 'robot'
 
-halfSitting = [
+halfSitting = np.array([
     0.0,
     0.0,
     1.018213,
@@ -61,14 +54,13 @@ halfSitting = [
     -0.005,  # Right Arm
     0.,
     0.  # Head
-]
+])
 
-q = np.matrix(halfSitting).T
-print("q:")
-print(q.flatten().tolist()[0])
+q = halfSitting
+print("q:", q)
 
-urdfPath= param_server_conf.urdfFileName
-urdfDir= param_server_conf.model_path
+urdfPath = param_server_conf.urdfFileName
+urdfDir = param_server_conf.model_path
 
 model = pin.buildModelFromUrdf(urdfPath, pin.JointModelFreeFlyer())
 data = model.createData()
@@ -89,7 +81,7 @@ rightId = model.getFrameId(rightName)
 rightPos = data.oMf[rightId]
 
 # centerTranslation = ((data.oMf[rightId].translation + data.oMf[leftId].translation) / 2 +
-# np.matrix(param_server_conf.rightFootSoleXYZ).T)
+# np.array(param_server_conf.rightFootSoleXYZ).T)
 # centerPos = pin.SE3(rightPos.rotation,centerTranslation)
 # comRel = centerPos.actInv(com)
 
@@ -97,7 +89,7 @@ fz = m * g
 force = [0.0, 0.0, fz]
 forceLeft = [0.0, 0.0, fz / 2]
 forceRight = [0.0, 0.0, fz / 2]
-tau = np.cross(com, np.matrix(force).T, axis=0)
+tau = np.cross(com, np.array(force), axis=0)
 wrench = force + tau.flatten().tolist()
 ly = float(leftPos.translation[1])
 taux = fz * ly / 2
@@ -109,9 +101,9 @@ print("expected left wrench: %s" % str(wrenchLeft))
 print("expected right wrench: %s" % str(wrenchRight))
 
 # --- Desired CoM, DCM and ZMP
-comDes = tuple(com.flatten().tolist()[0])
+comDes = com
 dcmDes = comDes
-zmpDes = comDes[:2] + (0.0, )
+zmpDes = np.array(comDes[:2].tolist() + [0.0])
 
 # --- Parameter server ---
 print("--- Parameter server ---")
@@ -119,8 +111,8 @@ print("--- Parameter server ---")
 param_server = create_parameter_server(param_server_conf, dt)
 
 # --- DCM controller
-Kp_dcm = [0.0, 0.0, 0.0]
-Ki_dcm = [0.0, 0.0, 0.0]
+Kp_dcm = np.array([0.0, 0.0, 0.0])
+Ki_dcm = np.array([0.0, 0.0, 0.0])
 gamma_dcm = 0.2
 
 dcm_controller = DcmController("dcmCtrl")

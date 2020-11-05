@@ -1,13 +1,9 @@
+import dynamic_graph.sot_talos_balance.talos.distribute_conf as distribute_conf
+import dynamic_graph.sot_talos_balance.talos.parameter_server_conf as param_server_conf
 import numpy as np
 import pinocchio as pin
+from dynamic_graph.sot_talos_balance.create_entities_utils import create_distribute_wrench, create_parameter_server
 from numpy.testing import assert_almost_equal as assertApprox
-
-pin.switchToNumpyMatrix()
-
-import sot_talos_balance.talos.distribute_conf as distribute_conf
-import sot_talos_balance.talos.parameter_server_conf as param_server_conf
-from sot_talos_balance.create_entities_utils import create_distribute_wrench, create_parameter_server
-
 
 # --- General ---
 print("--- General ---")
@@ -15,7 +11,7 @@ print("--- General ---")
 dt = 0.001
 robot_name = 'robot'
 
-halfSitting = [
+halfSitting = np.array([
     0.0,
     0.0,
     1.018213,
@@ -55,13 +51,13 @@ halfSitting = [
     -0.005,  # Right Arm
     0.,
     0.  # Head
-]
+])
 
-q = np.matrix(halfSitting).T
-print("q: %s\n" % str(q.flatten().tolist()[0]))
+q = halfSitting
+print("q: %s\n" % q)
 
-urdfPath= param_server_conf.urdfFileName
-urdfDir= param_server_conf.model_path
+urdfPath = param_server_conf.urdfFileName
+urdfDir = param_server_conf.model_path
 
 model = pin.buildModelFromUrdf(urdfPath, pin.JointModelFreeFlyer())
 data = model.createData()
@@ -92,7 +88,7 @@ fz = m * g
 force = [0.0, 0.0, fz]
 lx = float(com[0])
 tauy = -fz * lx
-wrench = force + [0.0, tauy, 0.0]
+wrench = np.array(force + [0.0, tauy, 0.0])
 
 print("total wrench: %s" % str(wrench))
 
@@ -183,7 +179,7 @@ distribute.phase.value = 1
 distribute.phase.time = 1
 
 wrenchLeft = wrench
-ankleWrenchLeft = list(leftPos.actInv(pin.Force(np.matrix(wrenchLeft).T)).vector.flat)
+ankleWrenchLeft = list(leftPos.actInv(pin.Force(np.array(wrenchLeft))).vector.flat)
 
 print("expected global wrench: %s" % str(wrench))
 print("expected global left wrench: %s" % str(wrenchLeft))
@@ -223,7 +219,7 @@ distribute.phase.value = -1
 distribute.phase.time = 2
 
 wrenchRight = wrench
-ankleWrenchRight = list(rightPos.actInv(pin.Force(np.matrix(wrenchRight).T)).vector.flat)
+ankleWrenchRight = list(rightPos.actInv(pin.Force(np.array(wrenchRight))).vector.flat)
 
 print("expected global wrench: %s" % str(wrench))
 print("expected global right wrench: %s" % str(wrenchRight))

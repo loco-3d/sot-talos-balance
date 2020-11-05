@@ -2,7 +2,7 @@ from __future__ import print_function
 
 import numpy as np
 
-from sot_talos_balance.round_double_to_int import RoundDoubleToInt
+from dynamic_graph.sot_talos_balance.round_double_to_int import RoundDoubleToInt
 
 
 rd = RoundDoubleToInt('round')

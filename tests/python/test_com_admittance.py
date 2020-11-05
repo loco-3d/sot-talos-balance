@@ -1,19 +1,18 @@
 from __future__ import print_function
 
-from sot_talos_balance.com_admittance_controller import ComAdmittanceController
+import numpy as np
+from dynamic_graph.sot_talos_balance.com_admittance_controller import ComAdmittanceController
+from numpy.testing import assert_almost_equal as assertApprox
 
 controller = ComAdmittanceController("ciao")
-
-print("Commands:")
-print(controller.commands())
 
 print("\nSignals (at creation):")
 controller.displaySignals()
 
-Kp = [10.0, 10.0, 0.0]
-ddcomDes = tuple(3 * [0.0])
-zmpDes = tuple(3 * [0.0])
-zmp = tuple(3 * [0.0])
+Kp = np.array([10.0, 10.0, 0.0])
+ddcomDes = np.array(3 * [0.0])
+zmpDes = np.array(3 * [0.0])
+zmp = np.array(3 * [0.0])
 
 controller.Kp.value = Kp
 controller.ddcomDes.value = ddcomDes
@@ -26,8 +25,8 @@ print("ddcomDes: %s" % (controller.ddcomDes.value, ))
 print("zmpDes:   %s" % (controller.zmpDes.value, ))
 print("zmp:      %s" % (controller.zmp.value, ))
 
-com = tuple(3 * [0.0])
-dcom = tuple(3 * [0.0])
+com = np.array(3 * [0.0])
+dcom = np.array(3 * [0.0])
 dt = 1
 
 controller.init(dt)
@@ -38,11 +37,11 @@ controller.dcomRef.recompute(0)
 
 print()
 print("comRef:  %s" % (controller.comRef.value, ))
-assert controller.comRef.value == com
+assertApprox(controller.comRef.value, com)
 print("dcomRef: %s" % (controller.dcomRef.value, ))
-assert controller.dcomRef.value == dcom
+assertApprox(controller.dcomRef.value, dcom)
 
-ddcomDes = tuple(3 * [1.0])
+ddcomDes = np.array(3 * [1.0])
 controller.ddcomDes.value = ddcomDes
 
 print()
@@ -54,13 +53,13 @@ controller.comRef.recompute(1)
 print()
 
 print("ddcomRef: %s" % (controller.ddcomRef.value, ))
-ddcomRef = tuple([ddcomDes[i] + Kp[i] * (zmp[i] - zmpDes[i]) for i in range(3)])
-assert controller.ddcomRef.value == ddcomRef
+ddcomRef = np.array([ddcomDes[i] + Kp[i] * (zmp[i] - zmpDes[i]) for i in range(3)])
+assertApprox(controller.ddcomRef.value, ddcomRef)
 
 print("dcomRef:  %s" % (controller.dcomRef.value, ))
-dcomRef = tuple([dcom[i] + ddcomRef[i] * dt for i in range(3)])
-assert controller.dcomRef.value == dcomRef
+dcomRef = np.array([dcom[i] + ddcomRef[i] * dt for i in range(3)])
+assertApprox(controller.dcomRef.value, dcomRef)
 
 print("comRef:   %s" % (controller.comRef.value, ))
-comRef = tuple([com[i] + dcom[i] * dt + 0.5 * ddcomRef[i] * dt * dt for i in range(3)])
-assert controller.comRef.value == comRef
+comRef = np.array([com[i] + dcom[i] * dt + 0.5 * ddcomRef[i] * dt * dt for i in range(3)])
+assertApprox(controller.comRef.value, comRef)

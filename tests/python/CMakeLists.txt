@@ -6,7 +6,7 @@ SET(${PROJECT_NAME}_PYTHON_TESTS
   test_com_admittance
   test_com_estimation
   test_control
-  test_ctrl_manager
+  #test_ctrl_manager TODO: ctrl_
   test_dcm_controller
   test_dcm_controller_talos
   test_dcm_distribute

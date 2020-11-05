@@ -1,23 +1,18 @@
 from math import sqrt
 
+import dynamic_graph.sot_talos_balance.talos.parameter_server_conf as param_server_conf
 import numpy as np
 import pinocchio as pin
+from dynamic_graph.sot_talos_balance.create_entities_utils import (DummyWalkingPatternGenerator, SimpleReferenceFrame,
+                                                                   create_parameter_server, plug)
 from numpy.testing import assert_almost_equal as assertApprox
-
-pin.switchToNumpyMatrix()
-
-import sot_talos_balance.talos.parameter_server_conf as param_server_conf
-from sot_talos_balance.create_entities_utils import \
-    (DummyWalkingPatternGenerator, SimpleReferenceFrame,
-     create_parameter_server, plug)
-
 
 # --- General ---
 print("--- General ---")
 
 dt = 0.001
 
-halfSitting = [
+halfSitting = np.array([
     0.0,
     0.0,
     1.018213,
@@ -57,23 +52,22 @@ halfSitting = [
     -0.005,  # Right Arm
     0.,
     0.  # Head
-]
+])
 
-q = np.matrix(halfSitting).T
-print("q:")
-print(q.flatten().tolist()[0])
+q = halfSitting
+print("q:", q)
 
-urdfPath= param_server_conf.urdfFileName
-urdfDir= param_server_conf.model_path
+urdfPath = param_server_conf.urdfFileName
+urdfDir = param_server_conf.model_path
 
 model = pin.buildModelFromUrdf(urdfPath, pin.JointModelFreeFlyer())
 data = model.createData()
 
 # --- Desired CoM
-com = tuple(pin.centerOfMass(model, data, q).flatten().tolist()[0])
+com = pin.centerOfMass(model, data, q)
 pin.updateFramePlacements(model, data)
-vcom = (0.0, 0.0, 0.0)
-acom = (0.0, 0.0, 0.0)
+vcom = np.array((0.0, 0.0, 0.0))
+acom = np.array((0.0, 0.0, 0.0))
 
 comDes = com
 
@@ -94,16 +88,15 @@ leftPos = data.oMf[leftId]
 rightName = param_server_conf.footFrameNames['Right']
 rightId = model.getFrameId(rightName)
 rightPos = data.oMf[rightId]
-centerTranslation = (data.oMf[rightId].translation + data.oMf[leftId].translation) / 2 + np.matrix(
+centerTranslation = (data.oMf[rightId].translation + data.oMf[leftId].translation) / 2 + np.array(
     param_server_conf.rightFootSoleXYZ).T
 centerPos = pin.SE3(rightPos.rotation, centerTranslation)
 
-comDes = centerPos.actInv(np.matrix(comDes).T)
-comDes = tuple(comDes.flatten().tolist()[0])
+comDes = centerPos.actInv(np.array(comDes))
 
 # --- Desired DCM and ZMP
 dcmDes = comDes
-zmpDes = comDes[:2] + (0.0, )
+zmpDes = np.array(comDes[:2].tolist() + [0.0])
 
 # --- Desired CoM velocity
 vcomDes = (0.0, 0.0, 0.0)
@@ -139,8 +132,8 @@ print("--- Reference frame ---")
 
 rf = SimpleReferenceFrame('rf')
 rf.init(robot_name)
-rf.footLeft.value = leftPos.homogeneous.tolist()
-rf.footRight.value = rightPos.homogeneous.tolist()
+rf.footLeft.value = leftPos.homogeneous
+rf.footRight.value = rightPos.homogeneous
 rf.reset.value = 1
 
 # --- Dummy Walking Pattern Generator ---
@@ -150,8 +143,8 @@ wp = DummyWalkingPatternGenerator('dummy_wp')
 wp.init()
 plug(rf.referenceFrame, wp.referenceFrame)
 wp.omega.value = omega
-wp.footLeft.value = leftPos.homogeneous.tolist()
-wp.footRight.value = rightPos.homogeneous.tolist()
+wp.footLeft.value = leftPos.homogeneous
+wp.footRight.value = rightPos.homogeneous
 wp.com.value = com
 wp.vcom.value = vcom
 wp.acom.value = acom

@@ -1,7 +1,7 @@
 from __future__ import print_function
 
-import sot_talos_balance.talos.parameter_server_conf as param_server_conf
-from sot_talos_balance.create_entities_utils import Example, create_parameter_server
+import dynamic_graph.sot_talos_balance.talos.parameter_server_conf as param_server_conf
+from dynamic_graph.sot_talos_balance.create_entities_utils import Example, create_parameter_server
 
 # --- Parameter server ---
 print("--- Parameter server ---")
@@ -14,9 +14,6 @@ param_server = create_parameter_server(param_server_conf, dt)
 print("--- Example ---")
 
 ex = Example("ciao")
-
-print("Commands:")
-print(ex.commands())
 
 print("\nSignals (at creation):")
 ex.displaySignals()

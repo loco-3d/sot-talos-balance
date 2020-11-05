@@ -25,11 +25,11 @@ ADD_DEFINITIONS(-DDEBUG=2)
 
 FOREACH(test ${tests})
   ADD_UNIT_TEST(${test} ${test}.cpp)
-  TARGET_LINK_LIBRARIES(${test} ${PROJECT_NAME} ${${test}_deps})
+  TARGET_LINK_LIBRARIES(${test} PRIVATE ${PROJECT_NAME} ${${test}_deps} Boost::unit_test_framework)
   TARGET_INCLUDE_DIRECTORIES(${test} PRIVATE $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>)
 ENDFOREACH(test)
 
-TARGET_LINK_LIBRARIES(test_distribute eiquadprog::eiquadprog)
+TARGET_LINK_LIBRARIES(test_distribute PRIVATE eiquadprog::eiquadprog)
 
 IF(BUILD_PYTHON_INTERFACE)
   ADD_SUBDIRECTORY(python)

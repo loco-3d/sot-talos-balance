@@ -1,9 +1,8 @@
 from __future__ import print_function
 
 import numpy as np
+from dynamic_graph.sot_talos_balance.foot_force_difference_controller import FootForceDifferenceController
 from numpy.testing import assert_almost_equal as assertApprox
-
-from sot_talos_balance.foot_force_difference_controller import FootForceDifferenceController
 
 controller = FootForceDifferenceController("footController")
 controller.init()
@@ -16,10 +15,10 @@ gainSwing = 1.
 gainStance = 2.
 gainDouble = 3.
 
-controller.wrenchRight.value = [0.] * 2 + [500.] + [0.] * 3
-controller.wrenchLeft.value = [0.] * 2 + [300.] + [0.] * 3
-controller.wrenchRightDes.value = [0.] * 2 + [400.] + [0.] * 3
-controller.wrenchLeftDes.value = [0.] * 2 + [400.] + [0.] * 3
+controller.wrenchRight.value = np.array([0.] * 2 + [500.] + [0.] * 3)
+controller.wrenchLeft.value = np.array([0.] * 2 + [300.] + [0.] * 3)
+controller.wrenchRightDes.value = np.array([0.] * 2 + [400.] + [0.] * 3)
+controller.wrenchLeftDes.value = np.array([0.] * 2 + [400.] + [0.] * 3)
 
 controller.gainSwing.value = gainSwing
 controller.gainStance.value = gainStance
@@ -41,10 +40,10 @@ print("---- Double support ----")
 
 controller.phase.value = 0
 
-controller.posRightDes.value = np.eye(4).tolist()
-controller.posLeftDes.value = np.eye(4).tolist()
-controller.posRight.value = np.eye(4).tolist()
-controller.posLeft.value = np.eye(4).tolist()
+controller.posRightDes.value = np.eye(4)
+controller.posLeftDes.value = np.eye(4)
+controller.posRight.value = np.eye(4)
+controller.posLeft.value = np.eye(4)
 
 controller.vRight.recompute(0)
 controller.vLeft.recompute(0)

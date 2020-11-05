@@ -1,14 +1,12 @@
 from __future__ import print_function
 
+import dynamic_graph.sot_talos_balance.talos.parameter_server_conf as param_server_conf
 import numpy as np
 import pinocchio as pin
+from dynamic_graph.sot_talos_balance.create_entities_utils import (create_parameter_server,
+                                                                   create_simple_distribute_wrench)
 from numpy.testing import assert_almost_equal as assertApprox
 from rospkg import RosPack
-
-import sot_talos_balance.talos.parameter_server_conf as param_server_conf
-from sot_talos_balance.create_entities_utils import create_parameter_server, create_simple_distribute_wrench
-
-pin.switchToNumpyMatrix()
 
 # --- General ---
 print("--- General ---")
@@ -16,7 +14,7 @@ print("--- General ---")
 dt = 0.001
 robot_name = 'robot'
 
-halfSitting = [
+halfSitting = np.array([
     0.0,
     0.0,
     1.018213,
@@ -56,13 +54,13 @@ halfSitting = [
     -0.005,  # Right Arm
     0.,
     0.  # Head
-]
+])
 
-q = np.matrix(halfSitting).T
+q = halfSitting
 print("q: %s\n" % str(q.flatten().tolist()[0]))
 
-urdfPath= param_server_conf.urdfFileName
-urdfDir= param_server_conf.model_path
+urdfPath = param_server_conf.urdfFileName
+urdfDir = param_server_conf.model_path
 
 model = pin.buildModelFromUrdf(urdfPath, pin.JointModelFreeFlyer())
 data = model.createData()
@@ -93,7 +91,7 @@ fz = m * g
 force = [0.0, 0.0, fz]
 lx = float(com[0])
 tauy = -fz * lx
-wrench = force + [0.0, tauy, 0.0]
+wrench = np.array(force + [0.0, tauy, 0.0])
 
 print("total wrench: %s" % str(wrench))
 
