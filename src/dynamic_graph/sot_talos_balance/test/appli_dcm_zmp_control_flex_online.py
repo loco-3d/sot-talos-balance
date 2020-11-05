@@ -12,7 +12,8 @@ from dynamic_graph import plug
 from dynamic_graph.sot.core.math_small_entities import Derivator_of_Vector
 from dynamic_graph.sot.core.feature_posture import FeaturePosture
 from dynamic_graph.sot.core.operator import MatrixHomoToPoseQuaternion
-from dynamic_graph.sot.core.sot import SOT, Task
+from dynamic_graph.sot.core.sot import SOT
+from dynamic_graph.sot.core.task import Task
 from dynamic_graph.sot.core.matrix_util import matrixToTuple
 from dynamic_graph.sot.core.meta_tasks_kine import MetaTaskKine6d, MetaTaskKineCom, gotoNd
 from dynamic_graph.sot.dynamic_pinocchio import DynamicPinocchio

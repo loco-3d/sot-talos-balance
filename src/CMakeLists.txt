@@ -130,11 +130,16 @@ SET(${PROJECT_NAME}_SIMULATION_FILES
   test_dcm_zmp_control_distribute.py
   appli_dcm_zmp_control_distribute.py
   test_dcm_zmp_control_ffdc.py
+  test_dcm_zmp_control_bellStep.py
+  appli_dcm_zmp_control_bellStep.py
   appli_dcm_zmp_control_ffdc.py
   test_dcm_zmp_control_flex.py
   appli_dcm_zmp_control_flex.py
+  test_dcm_zmp_control_mlp.py
+  appli_dcm_zmp_control_mlp.py
   test_dcm_zmp_control_flex_online.py
   appli_dcm_zmp_control_flex_online.py
+  test_ffSubscriber.py
   test_ffSubscriber.py
   appli_ffSubscriber.py
   test_zmpEstimator.py
@@ -152,6 +157,8 @@ SET(${PROJECT_NAME}_SIMULATION_FILES
   appli_admittance_single_joint.py
   test_admittance_end_effector.py
   appli_admittance_end_effector.py
+  test_admittance_drill.py
+  appli_admittance_drill.py
   test_simple_ankle_admittance.py
   appli_simple_ankle_admittance.py
   test_admittance_single_joint_velocity_based.py
@@ -167,6 +174,10 @@ SET(${PROJECT_NAME}_SIMULATION_FILES
   appli_dcm_estimator.py
   test_hip_flexibility_compensation.py
   appli_hip_flexibility_compensation.py
+  test_admittance_drill.py
+  appli_admittance_drill.py
+  test_posture.py
+  appli_posture.py
   )
 
 # simulation files
@@ -193,7 +204,7 @@ IF(BUILD_PYTHON_INTERFACE)
   ENDFOREACH(python ${${PROJECT_NAME}_SIMULATION_FILES})
 
   FOREACH(python ${${PROJECT_NAME}_ROS_EXEC_FILES})
-    INSTALL(PROGRAMS ${PY_NAME}/test/${python}
+    INSTALL(PROGRAMS dynamic_graph/${PY_NAME}/test/${python}
       DESTINATION lib/${PROJECT_NAME})
   ENDFOREACH(python ${${PROJECT_NAME}_ROS_EXEC_FILES})
 
