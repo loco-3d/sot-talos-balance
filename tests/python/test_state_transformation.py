@@ -2,11 +2,12 @@ import dynamic_graph.sot_talos_balance.talos.base_estimator_conf as base_estimat
 import dynamic_graph.sot_talos_balance.talos.parameter_server_conf as param_server_conf
 import numpy as np
 import pinocchio as pin
-from dynamic_graph.sot_talos_balance.create_entities_utils import (DcmEstimator, SimpleReferenceFrame,
-                                                                   StateTransformation, TalosBaseEstimator,
+from dynamic_graph.sot_talos_balance.create_entities_utils import (DcmEstimator, TalosBaseEstimator,
                                                                    create_parameter_server, plug)
 from dynamic_graph.sot_talos_balance.euler_to_quat import EulerToQuat
-from numpy.testing import assert_almost_equal as assertApprox
+from dynamic_graph.sot_talos_balance.simple_reference_frame import SimpleReferenceFrame
+from dynamic_graph.sot_talos_balance.state_transformation import StateTransformation
+from numpy.testing import assert_almost_equal
 
 # --- General ---
 print("--- General ---")
@@ -173,7 +174,7 @@ if q_est[6] < 0 and q[6] > 0:
     q_est[3:7] = -q_est[3:7]
 
 print(q_est.T)
-assertApprox(q, q_est, 3)
+assert_almost_equal(q, q_est, 3)
 
 # --- Raw q difference ---
 print("--- Raw q difference ---")
@@ -199,4 +200,4 @@ print("--- CoM difference ---")
 com_rawdiff = np.matrix(dcm_estimator.c.value).T - com
 print(com_rawdiff.flatten().tolist()[0])
 
-assertApprox(dcm_estimator.c.value, com, 3)
+assert_almost_equal(dcm_estimator.c.value, com, 3)

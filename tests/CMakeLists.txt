@@ -23,6 +23,8 @@ ENDIF(UNIX)
 
 ADD_DEFINITIONS(-DDEBUG=2)
 
+# find -lparameter-server. TODO: that's ugly, properly export a component for each plugin instead.
+LINK_DIRECTORIES("${sot-core_DIR}/../../../${DYNAMIC_GRAPH_PLUGINDIR}")
 FOREACH(test ${tests})
   ADD_UNIT_TEST(${test} ${test}.cpp)
   TARGET_LINK_LIBRARIES(${test} PRIVATE ${PROJECT_NAME} ${${test}_deps} Boost::unit_test_framework)

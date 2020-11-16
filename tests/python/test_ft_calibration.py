@@ -1,8 +1,7 @@
 import dynamic_graph.sot_talos_balance.talos.ft_calibration_conf as conf
-import eigenpy
 import numpy as np
 from dynamic_graph.sot_talos_balance.ft_calibration import FtCalibration
-from numpy.testing import assert_almost_equal as assertApprox
+from numpy.testing import assert_almost_equal
 
 robot_name = 'robot'
 ftc = FtCalibration('ftc')
@@ -26,8 +25,8 @@ for i in range(2, 1003):
     ftc.right_foot_force_out.recompute(i)
     ftc.left_foot_force_out.recompute(i)
 
-assertApprox(ftc.right_foot_force_out.value, np.array((0, 0, -rfw, 0, 0, 0)), 5)
-assertApprox(ftc.left_foot_force_out.value, np.array((0, 0, -lfw, 0, 0, 0)), 5)
+assert_almost_equal(ftc.right_foot_force_out.value, np.array((0, 0, -rfw, 0, 0, 0)), 5)
+assert_almost_equal(ftc.left_foot_force_out.value, np.array((0, 0, -lfw, 0, 0, 0)), 5)
 
 print("Ft sensors calibrated!")
 print("Value outputed after calibration:")

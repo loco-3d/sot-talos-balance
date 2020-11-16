@@ -6,7 +6,7 @@ import numpy as np
 import pinocchio as pin
 from dynamic_graph.sot_talos_balance.create_entities_utils import (DcmController, create_distribute_wrench,
                                                                    create_parameter_server, plug)
-from numpy.testing import assert_almost_equal as assertApprox
+from numpy.testing import assert_almost_equal
 
 # --- General ---
 print("--- General ---")
@@ -144,10 +144,10 @@ distribute.init(robot_name)
 distribute.zmpRef.recompute(0)
 
 print("reference wrench: %s" % str(dcm_controller.wrenchRef.value))
-assertApprox(wrench, dcm_controller.wrenchRef.value, 3)
+assert_almost_equal(wrench, dcm_controller.wrenchRef.value, 3)
 print("resulting wrench: %s" % str(distribute.wrenchRef.value))
-assertApprox(wrench, distribute.wrenchRef.value, 2)
+assert_almost_equal(wrench, distribute.wrenchRef.value, 2)
 print("resulting left wrench: %s" % str(distribute.wrenchLeft.value))
-assertApprox(wrenchLeft, distribute.wrenchLeft.value, 3)
+assert_almost_equal(wrenchLeft, distribute.wrenchLeft.value, 3)
 print("resulting right wrench: %s" % str(distribute.wrenchRight.value))
-assertApprox(wrenchRight, distribute.wrenchRight.value, 3)
+assert_almost_equal(wrenchRight, distribute.wrenchRight.value, 3)

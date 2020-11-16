@@ -5,7 +5,7 @@ import pinocchio as pin
 from dynamic_graph.sot_talos_balance.create_entities_utils import (DcmEstimator, TalosBaseEstimator,
                                                                    create_parameter_server, plug)
 from dynamic_graph.sot_talos_balance.euler_to_quat import EulerToQuat
-from numpy.testing import assert_almost_equal as assertApprox
+from numpy.testing import assert_almost_equal
 
 # --- General ---
 print("--- General ---")
@@ -91,9 +91,8 @@ tauy = -fz * lever
 wrenchLeft = np.array(forceLeft + [0.0, tauy, 0.0])
 wrenchRight = np.array(forceRight + [0.0, tauy, 0.0])
 
-centerTranslation = (data.oMf[rightId].translation +
-                     data.oMf[leftId].translation) / 2 + \
-                     np.array(param_server_conf.rightFootSoleXYZ)
+centerTranslation = (data.oMf[rightId].translation + data.oMf[leftId].translation) / 2 + np.array(
+    param_server_conf.rightFootSoleXYZ)
 
 centerPos = pin.SE3(rightPos.rotation, centerTranslation)
 print("Center of feet:")
@@ -196,4 +195,4 @@ print("--- Relative CoM difference ---")
 com_reldiff = np.array(dcm_estimator.c.value) - comRel
 print(com_reldiff.flatten().tolist()[0])
 
-assertApprox(np.array(dcm_estimator.c.value), comRel, 3)
+assert_almost_equal(np.array(dcm_estimator.c.value), comRel, 3)

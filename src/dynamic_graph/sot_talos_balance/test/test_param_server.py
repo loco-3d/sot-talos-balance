@@ -3,9 +3,8 @@
 from dynamic_graph import plug
 from dynamic_graph.sot.core import SOT
 from dynamic_graph.sot.core.meta_tasks_kine import MetaTaskKine6d, MetaTaskKineCom
-
 from dynamic_graph.sot_talos_balance.create_entities_utils import (create_com_trajectory_generator, create_example,
-                                                     create_parameter_server)
+                                                                   create_parameter_server)
 from dynamic_graph.sot_talos_balance.utils.sot_utils import Bunch
 
 

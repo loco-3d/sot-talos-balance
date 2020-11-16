@@ -2,7 +2,7 @@ from __future__ import print_function
 
 import numpy as np
 from dynamic_graph.sot_talos_balance.dcm_controller import DcmController
-from numpy.testing import assert_almost_equal as assertApprox
+from numpy.testing import assert_almost_equal
 
 controller = DcmController("ciao")
 
@@ -53,9 +53,9 @@ wrenchRef = np.array([0.0, 0.0, 9.81, 0.0, 0.0, 0.0])
 
 print()
 print("zmpRef:  %s" % (controller.zmpRef.value, ))
-assertApprox(controller.zmpRef.value, zmpRef)
+assert_almost_equal(controller.zmpRef.value, zmpRef)
 print("wrenchRef: %s" % (controller.wrenchRef.value, ))
-assertApprox(controller.wrenchRef.value, wrenchRef)
+assert_almost_equal(controller.wrenchRef.value, wrenchRef)
 
 print("\n--------------------")
 
@@ -71,9 +71,9 @@ wrenchRef = np.array([11.0, 0.0, 9.81, 0.0, float(com[2] * 11), 0.0])
 
 print()
 print("zmpRef:  %s" % (controller.zmpRef.value, ))
-assertApprox(controller.zmpRef.value, zmpRef)
+assert_almost_equal(controller.zmpRef.value, zmpRef)
 print("wrenchRef: %s" % (controller.wrenchRef.value, ))
-assertApprox(controller.wrenchRef.value, wrenchRef)
+assert_almost_equal(controller.wrenchRef.value, wrenchRef)
 
 print("\n--------------------")
 
@@ -87,6 +87,6 @@ wrenchRef = np.array([12.0, 0.0, 9.81, 0.0, float(com[2] * 12), 0.0])
 
 print()
 print("zmpRef:  %s" % (controller.zmpRef.value, ))
-assertApprox(controller.zmpRef.value, zmpRef)
+assert_almost_equal(controller.zmpRef.value, zmpRef)
 print("wrenchRef: %s" % (controller.wrenchRef.value, ))
-assertApprox(controller.wrenchRef.value, wrenchRef)
+assert_almost_equal(controller.wrenchRef.value, wrenchRef)

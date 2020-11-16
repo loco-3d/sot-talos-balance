@@ -2,7 +2,7 @@ from __future__ import print_function
 
 import numpy as np
 from dynamic_graph.sot_talos_balance.foot_force_difference_controller import FootForceDifferenceController
-from numpy.testing import assert_almost_equal as assertApprox
+from numpy.testing import assert_almost_equal
 
 controller = FootForceDifferenceController("footController")
 controller.init()
@@ -61,15 +61,15 @@ print("Expected vLeft:  %s" % str(vLeft))
 print("Actual vLeft:    %s" % str(controller.vLeft.value))
 print()
 
-assertApprox(vRight, controller.vRight.value)
-assertApprox(vLeft, controller.vLeft.value)
+assert_almost_equal(vRight, controller.vRight.value)
+assert_almost_equal(vLeft, controller.vLeft.value)
 
 print("gainRight:   %s" % str(controller.gainRight.value))
 print("gainLeft:    %s" % str(controller.gainLeft.value))
 print()
 
-assertApprox(gainDouble, controller.gainRight.value)
-assertApprox(gainDouble, controller.gainLeft.value)
+assert_almost_equal(gainDouble, controller.gainRight.value)
+assert_almost_equal(gainDouble, controller.gainLeft.value)
 
 print("---- Left support ----")
 controller.phase.value = 1
@@ -82,15 +82,15 @@ print("vRight:   %s" % str(controller.vRight.value))
 print("vLeft:    %s" % str(controller.vLeft.value))
 print()
 
-assertApprox([0.] * 6, controller.vRight.value)
-assertApprox([0.] * 6, controller.vLeft.value)
+assert_almost_equal([0.] * 6, controller.vRight.value)
+assert_almost_equal([0.] * 6, controller.vLeft.value)
 
 print("gainRight:   %s" % str(controller.gainRight.value))
 print("gainLeft:    %s" % str(controller.gainLeft.value))
 print()
 
-assertApprox(gainSwing, controller.gainRight.value)
-assertApprox(gainStance, controller.gainLeft.value)
+assert_almost_equal(gainSwing, controller.gainRight.value)
+assert_almost_equal(gainStance, controller.gainLeft.value)
 
 print("---- Right support ----")
 controller.phase.value = -1
@@ -103,12 +103,12 @@ print("vRight:   %s" % str(controller.vRight.value))
 print("vLeft:    %s" % str(controller.vLeft.value))
 print()
 
-assertApprox([0.] * 6, controller.vRight.value)
-assertApprox([0.] * 6, controller.vLeft.value)
+assert_almost_equal([0.] * 6, controller.vRight.value)
+assert_almost_equal([0.] * 6, controller.vLeft.value)
 
 print("gainRight:   %s" % str(controller.gainRight.value))
 print("gainLeft:    %s" % str(controller.gainLeft.value))
 print()
 
-assertApprox(gainStance, controller.gainRight.value)
-assertApprox(gainSwing, controller.gainLeft.value)
+assert_almost_equal(gainStance, controller.gainRight.value)
+assert_almost_equal(gainSwing, controller.gainLeft.value)

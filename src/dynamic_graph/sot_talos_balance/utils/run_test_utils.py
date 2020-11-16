@@ -54,7 +54,7 @@ def evalCommandClient(code):
     return eval(runCommandClient(code).result)
 
 
-def launch_script(code, title, description="", verbosity=1,interactive=True):
+def launch_script(code, title, description="", verbosity=1, interactive=True):
     if interactive:
         input(title + ':   ' + description)
     rospy.loginfo(title)
@@ -80,7 +80,7 @@ def launch_script(code, title, description="", verbosity=1,interactive=True):
     rospy.loginfo("...done with " + title)
 
 
-def run_test(appli, verbosity=1,interactive=True):
+def run_test(appli, verbosity=1, interactive=True):
     try:
         rospy.loginfo("Waiting for run_command")
         rospy.wait_for_service('/run_command')
@@ -96,9 +96,7 @@ def run_test(appli, verbosity=1,interactive=True):
 
         rospy.loginfo("Stack of Tasks launched")
 
-        launch_script(initCode, 'initialize SoT',
-                      verbosity=verbosity,
-                      interactive=interactive)
+        launch_script(initCode, 'initialize SoT', verbosity=verbosity, interactive=interactive)
         if interactive:
             input("Wait before starting the dynamic graph")
         runCommandStartDynamicGraph()

@@ -1,9 +1,9 @@
 from __future__ import print_function
 
-# TODO: print value ? since cpp11 branch, the getter doesn't seem to work
-
 import numpy as np
-from dynamic_graph.sot_talos_balance.create_entities_utils import AnkleJointSelector
+from dynamic_graph.sot_talos_balance.ankle_joint_selector import AnkleJointSelector
+
+# TODO: print value ? since cpp11 branch, the getter doesn't seem to work
 
 ajs = AnkleJointSelector('ajs')
 ajs.init(38)

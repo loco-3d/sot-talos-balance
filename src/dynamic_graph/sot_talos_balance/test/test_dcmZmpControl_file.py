@@ -1,7 +1,8 @@
 '''Test CoM admittance control as described in paper, with pre-loaded movements'''
 from sys import argv
 
-from dynamic_graph.sot_talos_balance.utils.run_test_utils import ask_for_confirmation, run_ft_calibration, run_test, runCommandClient
+from dynamic_graph.sot_talos_balance.utils.run_test_utils import (ask_for_confirmation, run_ft_calibration, run_test,
+                                                                  runCommandClient)
 
 try:
     # Python 2

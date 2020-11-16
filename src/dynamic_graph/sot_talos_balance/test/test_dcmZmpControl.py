@@ -3,7 +3,6 @@ from time import sleep
 
 import matplotlib.pyplot as plt
 import numpy as np
-
 from dynamic_graph.sot_talos_balance.utils.run_test_utils import evalCommandClient, run_test, runCommandClient
 
 try:
@@ -37,14 +36,15 @@ sleep(30.0)
 runCommandClient('dump_tracer(robot.tracer)')
 
 # --- DISPLAY
-comDes_data = np.loadtxt('/tmp/dg_' + evalCommandClient('robot.dcm_control.name') +
-                         '-dcmDes.dat')  # desired CoM (workaround)
-comEst_data = np.loadtxt('/tmp/dg_' + evalCommandClient('robot.dynamic.name') +
-                         '-com.dat')  # estimated CoM (workaround)
+# desired CoM (workaround)
+comDes_data = np.loadtxt('/tmp/dg_' + evalCommandClient('robot.dcm_control.name') + '-dcmDes.dat')
+# estimated CoM (workaround)
+comEst_data = np.loadtxt('/tmp/dg_' + evalCommandClient('robot.dynamic.name') + '-com.dat')
+# estimated CoM (to be modified)
 # comEst_data = np.loadtxt('/tmp/dg_' + evalCommandClient('robot.cdc_estimator.name') +
-# '-c.dat')  # estimated CoM (to be modified)
-comRef_data = np.loadtxt('/tmp/dg_' + evalCommandClient('robot.com_admittance_control.name') +
-                         '-comRef.dat')  # reference CoM
+# '-c.dat')
+# reference CoM
+comRef_data = np.loadtxt('/tmp/dg_' + evalCommandClient('robot.com_admittance_control.name') + '-comRef.dat')
 comSOT_data = np.loadtxt('/tmp/dg_' + evalCommandClient('robot.dynamic.name') + '-com.dat')  # resulting SOT CoM
 
 dcmDes_data = np.loadtxt('/tmp/dg_' + evalCommandClient('robot.dcm_control.name') + '-dcmDes.dat')  # desired DCM

@@ -9,7 +9,7 @@ from dynamic_graph.sot.core.meta_tasks_kine import MetaTaskKine6d, MetaTaskKineC
 from dynamic_graph.tracer_real_time import TracerRealTime
 
 from dynamic_graph.sot_talos_balance.create_entities_utils import (addTrace, create_com_admittance_controller,
-                                                     create_dummy_dcm_estimator, dump_tracer)
+                                                                   create_dummy_dcm_estimator, dump_tracer)
 
 
 def main(robot):
@@ -64,7 +64,7 @@ def main(robot):
 
     plug(robot.com_admittance_control.comRef, robot.taskCom.featureDes.errorIN)
     sleep(1.0)
-    os.system("rosservice call \start_dynamic_graph")
+    os.system("rosservice call /start_dynamic_graph")
     sleep(2.0)
 
     plug(robot.estimator.dcm, robot.com_admittance_control.zmpDes)

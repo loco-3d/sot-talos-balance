@@ -1,8 +1,9 @@
 import subprocess
 
+import yaml
+
 import rosbag
 import rospy
-import yaml
 
 bagname = '2017-07-24-08-04-30.bag'
 
@@ -64,9 +65,11 @@ def extract_data():
                 diff_nanosecs = 1000000000 + diff_nanosecs
                 diff_secs = diff_secs - 1
 
-            afile.write(
-                str(messages[jn].motorenc) + ' ' + str(messages[jn].jointenc) + ' ' + str(messages[jn].torquesensor) +
-                ' ' + str(messages[jn].current) + ' ' + str(diff_secs) + '.' + str(diff_nanosecs).zfill(9) + '\n')
+            afile.write(' '.join(
+                str(m) for m in [
+                    messages[jn].motorenc, messages[jn].jointenc, messages[jn].torquesensor, messages[jn].current,
+                    diff_secs
+                ]) + '.' + str(diff_nanosecs).zfill(9) + '\n')
     for jn in jointnames:
         files[jn].close()
 
@@ -83,11 +86,12 @@ def extract_batteries_data():
             diff_nanosecs = 1000000000 + diff_nanosecs
             diff_secs = diff_secs - 1
 
-        f.write(
-            str(aps.message.charge) + ' ' + str(aps.message.current) + ' ' + str(aps.message.input_voltage) + ' ' +
-            str(aps.message.battery_voltage) + ' ' + str(aps.message.regulator_voltage) + ' ' +
-            str(aps.message.lower_body_voltage) + ' ' + str(aps.message.charger_voltage) + ' ' +
-            str(aps.message.upper_body_voltage) + ' ' + str(diff_secs) + '.' + str(diff_nanosecs).zfill(9) + '\n')
+        f.write(' '.join(
+            str(m) for m in [
+                aps.message.charge, aps.message.current, aps.message.input_voltage, aps.message.battery_voltage,
+                aps.message.regulator_voltage, aps.message.lower_body_voltage, aps.message.charger_voltage,
+                aps.message.upper_body_voltage, diff_secs
+            ]) + '.' + str(diff_nanosecs).zfill(9) + '\n')
 
     f.close()
 

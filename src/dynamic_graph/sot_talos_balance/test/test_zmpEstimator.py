@@ -2,8 +2,8 @@ from time import sleep
 
 import matplotlib.pyplot as plt
 import numpy as np
-
-from dynamic_graph.sot_talos_balance.utils.run_test_utils import evalCommandClient, run_ft_calibration, run_test, runCommandClient
+from dynamic_graph.sot_talos_balance.utils.run_test_utils import (evalCommandClient, run_ft_calibration, run_test,
+                                                                  runCommandClient)
 
 try:
     # Python 2

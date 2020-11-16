@@ -4,8 +4,8 @@ import os
 from time import sleep
 
 from dynamic_graph import plug
-
-from dynamic_graph.sot_talos_balance.create_entities_utils import create_joint_controller, create_joint_trajectory_generator
+from dynamic_graph.sot_talos_balance.create_entities_utils import (create_joint_controller,
+                                                                   create_joint_trajectory_generator)
 
 
 def main(robot, gain):

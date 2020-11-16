@@ -2,43 +2,26 @@ from time import sleep
 import numpy as np
 from dynamic_graph import plug
 from dynamic_graph.sot.core.madgwickahrs import MadgwickAHRS
-from dynamic_graph.sot.core.operator import (Component_of_vector, MatrixHomoToPoseQuaternion,
-                                             MatrixHomoToPoseRollPitchYaw, Mix_of_vector, PoseRollPitchYawToMatrixHomo,
-                                             Selec_of_vector)
+from dynamic_graph.sot.core.operator import Mix_of_vector, Selec_of_vector
 from dynamic_graph.sot.core.parameter_server import ParameterServer
 from dynamic_graph.sot_talos_balance.admittance_controller_end_effector import AdmittanceControllerEndEffector
 from dynamic_graph.sot_talos_balance.ankle_admittance_controller import AnkleAdmittanceController
-from dynamic_graph.sot_talos_balance.ankle_joint_selector import AnkleJointSelector
-from dynamic_graph.sot_talos_balance.boolean_identity import BooleanIdentity
 from dynamic_graph.sot_talos_balance.com_admittance_controller import ComAdmittanceController
 from dynamic_graph.sot_talos_balance.dcm_com_controller import DcmComController
 from dynamic_graph.sot_talos_balance.dcm_controller import DcmController
 from dynamic_graph.sot_talos_balance.dcm_estimator import DcmEstimator
-from dynamic_graph.sot_talos_balance.delay import DelayVector
 from dynamic_graph.sot_talos_balance.distribute_wrench import DistributeWrench
 from dynamic_graph.sot_talos_balance.dummy_dcm_estimator import DummyDcmEstimator
-from dynamic_graph.sot_talos_balance.dummy_walking_pattern_generator import DummyWalkingPatternGenerator
-from dynamic_graph.sot_talos_balance.euler_to_quat import EulerToQuat
 from dynamic_graph.sot_talos_balance.example import Example
-from dynamic_graph.sot_talos_balance.foot_force_difference_controller import FootForceDifferenceController
 from dynamic_graph.sot_talos_balance.ft_calibration import FtCalibration
 from dynamic_graph.sot_talos_balance.ft_wrist_calibration import FtWristCalibration
 from dynamic_graph.sot_talos_balance.hip_flexibility_compensation import HipFlexibilityCompensation
-from dynamic_graph.sot_talos_balance.int_identity import IntIdentity
 from dynamic_graph.sot_talos_balance.joint_position_controller import JointPositionController
 from dynamic_graph.sot_talos_balance.nd_trajectory_generator import NdTrajectoryGenerator
-from dynamic_graph.sot_talos_balance.pose_quaternion_to_matrix_homo import PoseQuaternionToMatrixHomo
 from dynamic_graph.sot_talos_balance.qualisys_client import QualisysClient
-from dynamic_graph.sot_talos_balance.quat_to_euler import QuatToEuler
-from dynamic_graph.sot_talos_balance.round_double_to_int import RoundDoubleToInt
 from dynamic_graph.sot_talos_balance.simple_admittance_controller import SimpleAdmittanceController
 from dynamic_graph.sot_talos_balance.simple_distribute_wrench import SimpleDistributeWrench
-from dynamic_graph.sot_talos_balance.simple_pid import SimplePID
-from dynamic_graph.sot_talos_balance.simple_pidd import SimplePIDD
-from dynamic_graph.sot_talos_balance.simple_reference_frame import SimpleReferenceFrame
-from dynamic_graph.sot_talos_balance.simple_state_integrator import SimpleStateIntegrator
 from dynamic_graph.sot_talos_balance.simple_zmp_estimator import SimpleZmpEstimator
-from dynamic_graph.sot_talos_balance.state_transformation import StateTransformation
 from dynamic_graph.sot_talos_balance.talos_base_estimator import TalosBaseEstimator
 from dynamic_graph.sot_talos_balance.talos_control_manager import TalosControlManager
 # python

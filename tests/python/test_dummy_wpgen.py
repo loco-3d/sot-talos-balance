@@ -3,9 +3,10 @@ from math import sqrt
 import dynamic_graph.sot_talos_balance.talos.parameter_server_conf as param_server_conf
 import numpy as np
 import pinocchio as pin
-from dynamic_graph.sot_talos_balance.create_entities_utils import (DummyWalkingPatternGenerator, SimpleReferenceFrame,
-                                                                   create_parameter_server, plug)
-from numpy.testing import assert_almost_equal as assertApprox
+from dynamic_graph.sot_talos_balance.create_entities_utils import create_parameter_server, plug
+from dynamic_graph.sot_talos_balance.dummy_walking_pattern_generator import DummyWalkingPatternGenerator
+from dynamic_graph.sot_talos_balance.simple_reference_frame import SimpleReferenceFrame
+from numpy.testing import assert_almost_equal
 
 # --- General ---
 print("--- General ---")
@@ -156,16 +157,16 @@ wp.zmpDes.recompute(0)
 # --- Output
 print("Desired CoM:")
 print(wp.comDes.value)
-assertApprox(comDes, wp.comDes.value, 3)
+assert_almost_equal(comDes, wp.comDes.value, 3)
 print("Desired CoM velocity:")
 print(wp.vcomDes.value)
-assertApprox(vcomDes, wp.vcomDes.value, 3)
+assert_almost_equal(vcomDes, wp.vcomDes.value, 3)
 print("Desired CoM acceleration:")
 print(wp.acomDes.value)
-assertApprox(acomDes, wp.acomDes.value, 3)
+assert_almost_equal(acomDes, wp.acomDes.value, 3)
 print("Desired DCM:")
 print(wp.dcmDes.value)
-assertApprox(dcmDes, wp.dcmDes.value, 3)
+assert_almost_equal(dcmDes, wp.dcmDes.value, 3)
 print("Desired ZMP:")
 print(wp.zmpDes.value)
-assertApprox(zmpDes, wp.zmpDes.value, 3)
+assert_almost_equal(zmpDes, wp.zmpDes.value, 3)

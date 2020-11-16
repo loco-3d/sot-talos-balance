@@ -2,7 +2,7 @@ from __future__ import print_function
 
 import numpy as np
 from dynamic_graph.sot_talos_balance.simple_admittance_controller import SimpleAdmittanceController
-from numpy.testing import assert_almost_equal as assertApprox
+from numpy.testing import assert_almost_equal
 
 controller = SimpleAdmittanceController("ciao")
 
@@ -35,7 +35,7 @@ controller.setPosition(q)
 controller.qRef.recompute(0)
 
 print("\nqRef: %s" % (controller.qRef.value, ))
-assertApprox(controller.qRef.value, q)
+assert_almost_equal(controller.qRef.value, q)
 
 tauDes = np.array(N_JOINTS * [1.0])
 controller.tauDes.value = tauDes
@@ -44,4 +44,4 @@ controller.qRef.recompute(1)
 
 print("\nqRef: %s" % (controller.qRef.value, ))
 qRef = np.array([q[i] + Kp[i] * (tauDes[i] - tau[i]) * dt for i in range(len(q))])
-assertApprox(controller.qRef.value, qRef)
+assert_almost_equal(controller.qRef.value, qRef)

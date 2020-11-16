@@ -4,7 +4,6 @@ import numpy as np
 
 from dynamic_graph.sot_talos_balance.round_double_to_int import RoundDoubleToInt
 
-
 rd = RoundDoubleToInt('round')
 time = 0
 

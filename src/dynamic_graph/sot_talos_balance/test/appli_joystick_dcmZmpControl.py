@@ -58,8 +58,8 @@ robot.pg = PatternGenerator('pg')
 # DO USE FILE ANYMORE
 rospack = RosPack()
 talos_data_folder = rospack.get_path('talos_data')
-robot.pg.setURDFpath(talos_data_folder+'/urdf/talos_reduced_wpg.urdf')
-robot.pg.setSRDFpath(talos_data_folder+'/srdf/talos_wpg.srdf')
+robot.pg.setURDFpath(talos_data_folder + '/urdf/talos_reduced_wpg.urdf')
+robot.pg.setSRDFpath(talos_data_folder + '/srdf/talos_wpg.srdf')
 
 robot.pg.buildModel()
 
@@ -79,13 +79,13 @@ robot.pg.parseCmd(":setVelReference  0.1 0.0 0.0")
 
 robot.pg.parseCmd(":SetAlgoForZmpTrajectory Naveau")
 
-plug(robot.dynamic.position,robot.pg.position)
+plug(robot.dynamic.position, robot.pg.position)
 plug(robot.dynamic.com, robot.pg.com)
 plug(robot.dynamic.LF, robot.pg.leftfootcurrentpos)
 plug(robot.dynamic.RF, robot.pg.rightfootcurrentpos)
 robotDim = len(robot.dynamic.velocity.value)
-robot.pg.motorcontrol.value = robotDim*(0,)
-robot.pg.zmppreviouscontroller.value = (0,0,0)
+robot.pg.motorcontrol.value = robotDim * (0, )
+robot.pg.zmppreviouscontroller.value = (0, 0, 0)
 
 robot.pg.initState()
 
@@ -99,14 +99,13 @@ robot.pg.parseCmd(':deleteallobstacles')
 robot.pg.parseCmd(':feedBackControl false')
 robot.pg.parseCmd(':useDynamicFilter true')
 
-robot.pg.velocitydes.value=(0.1,0.0,0.0) # DEFAULT VALUE (0.1,0.0,0.0)
-
+robot.pg.velocitydes.value = (0.1, 0.0, 0.0)  # DEFAULT VALUE (0.1,0.0,0.0)
 
 # -------------------------- TRIGGER --------------------------
 
-robot.triggerPG= BooleanIdentity('triggerPG')
+robot.triggerPG = BooleanIdentity('triggerPG')
 robot.triggerPG.sin.value = 0
-plug(robot.triggerPG.sout,robot.pg.trigger)
+plug(robot.triggerPG.sout, robot.pg.trigger)
 
 # -------------------------- Interface with controller entities --------------------------
 
@@ -306,10 +305,9 @@ robot.taskCom.feature.selec.value = '011'
 robot.keepWaist = MetaTaskKine6d('keepWaist', robot.dynamic, 'WT', robot.OperationalPointsMap['waist'])
 robot.keepWaist.feature.frame('desired')
 robot.keepWaist.gain.setConstant(300)
-plug(robot.wp.waistDes, robot.keepWaist.featureDes.position) #de base
+plug(robot.wp.waistDes, robot.keepWaist.featureDes.position)  #de base
 robot.keepWaist.feature.selec.value = '111000'
 locals()['keepWaist'] = robot.keepWaist
-
 
 # --- SOT solver
 robot.sot = SOT('sot')
@@ -342,17 +340,18 @@ plug(robot.dvdt.sout, robot.dynamic.acceleration)
 robot.publisher = create_rospublish(robot, 'robot_publisher')
 
 ## ADDED
-create_topic(robot.publisher, robot.pg, 'comref', robot = robot, data_type='vector')                      # desired CoM
-create_topic(robot.publisher, robot.pg, 'dcomref', robot = robot, data_type='vector')
-create_topic(robot.publisher, robot.wp, 'waist', robot = robot, data_type='matrixHomo')
-create_topic(robot.publisher, robot.keepWaist.featureDes, 'position', robot = robot, data_type='matrixHomo')
-create_topic(robot.publisher, robot.dynamic, 'WT', robot = robot, data_type='matrixHomo')
-create_topic(robot.publisher, robot.pg, 'waistattitudematrixabsolute', robot = robot, data_type='matrixHomo') ## que font ces lignes exactement ??
+create_topic(robot.publisher, robot.pg, 'comref', robot=robot, data_type='vector')  # desired CoM
+create_topic(robot.publisher, robot.pg, 'dcomref', robot=robot, data_type='vector')
+create_topic(robot.publisher, robot.wp, 'waist', robot=robot, data_type='matrixHomo')
+create_topic(robot.publisher, robot.keepWaist.featureDes, 'position', robot=robot, data_type='matrixHomo')
+create_topic(robot.publisher, robot.dynamic, 'WT', robot=robot, data_type='matrixHomo')
+create_topic(robot.publisher, robot.pg, 'waistattitudematrixabsolute', robot=robot,
+             data_type='matrixHomo')  ## que font ces lignes exactement ??
 
-create_topic(robot.publisher, robot.pg, 'leftfootref', robot = robot, data_type ='matrixHomo')
-create_topic(robot.publisher, robot.wp, 'footLeft', robot = robot, data_type ='matrixHomo')
-create_topic(robot.publisher, robot.pg, 'rightfootref', robot = robot, data_type ='matrixHomo')
-create_topic(robot.publisher, robot.wp, 'footRight', robot = robot, data_type ='matrixHomo')
+create_topic(robot.publisher, robot.pg, 'leftfootref', robot=robot, data_type='matrixHomo')
+create_topic(robot.publisher, robot.wp, 'footLeft', robot=robot, data_type='matrixHomo')
+create_topic(robot.publisher, robot.pg, 'rightfootref', robot=robot, data_type='matrixHomo')
+create_topic(robot.publisher, robot.wp, 'footRight', robot=robot, data_type='matrixHomo')
 
 #create_topic(robot.publisher, robot.pg, 'leftfootref', robot = robot, data_type='vector')
 #plug(robot.pg.leftfootref, wp.footLeft)
@@ -409,7 +408,6 @@ robot.tracer = TracerRealTime("com_tracer")
 robot.tracer.setBufferSize(80 * (2**20))
 robot.tracer.open('/tmp', 'dg_', '.dat')
 
-
 robot.device.after.addSignal('{0}.triger'.format(robot.tracer.name))
 addTrace(robot.tracer, robot.pg, 'waistattitudeabsolute')
 
@@ -430,7 +428,6 @@ addTrace(robot.tracer, robot.pg, 'leftfootref')
 addTrace(robot.tracer, robot.pg, 'rightfootcontact')
 addTrace(robot.tracer, robot.pg, 'leftfootcontact')
 addTrace(robot.tracer, robot.pg, 'SupportFoot')
-
 
 addTrace(robot.tracer, robot.dynamic, 'com')  # resulting SOT CoM
 addTrace(robot.tracer, robot.dynamic, 'LF')  # left foot

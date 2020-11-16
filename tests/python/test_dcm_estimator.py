@@ -4,7 +4,7 @@ import dynamic_graph.sot_talos_balance.talos.parameter_server_conf as param_serv
 import numpy as np
 import pinocchio as pin
 from dynamic_graph.sot_talos_balance.create_entities_utils import Bunch, DcmEstimator, ParameterServer
-from numpy.testing import assert_almost_equal as assertApprox
+from numpy.testing import assert_almost_equal
 
 dt = 0.001
 conf = Bunch()
@@ -39,6 +39,6 @@ dcm_estimator.c.recompute(1)
 dcm_estimator.dc.recompute(1)
 print("Computed:")
 print("CoM position value: {0}".format(dcm_estimator.c.value))
-assertApprox(data.com[0], np.array(dcm_estimator.c.value), 3)
+assert_almost_equal(data.com[0], np.array(dcm_estimator.c.value), 3)
 print("CoM velocity value: {0}".format(dcm_estimator.dc.value))
-assertApprox(data.vcom[0], np.array(dcm_estimator.dc.value), 3)
+assert_almost_equal(data.vcom[0], np.array(dcm_estimator.dc.value), 3)

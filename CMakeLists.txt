@@ -40,7 +40,6 @@ IF(INITIALIZE_WITH_NAN)
 ENDIF(INITIALIZE_WITH_NAN)
 
 # Project dependencies
-#SET(BOOST_COMPONENTS thread filesystem program_options unit_test_framework system regex)
 IF(BUILD_TESTING)
   FIND_PACKAGE(Boost REQUIRED COMPONENTS unit_test_framework)
 ENDIF(BUILD_TESTING)

@@ -1,6 +1,6 @@
 import numpy as np
 from dynamic_graph.sot_talos_balance.dummy_dcm_estimator import DummyDcmEstimator
-from numpy.testing import assert_almost_equal as assertApprox
+from numpy.testing import assert_almost_equal
 
 dummy = DummyDcmEstimator('dummy')
 
@@ -14,9 +14,9 @@ dummy.init()
 dummy.dcm.recompute(0)
 
 print(dummy.dcm.value)
-assertApprox(dummy.dcm.value, np.array([3.] * 3))
+assert_almost_equal(dummy.dcm.value, np.array([3.] * 3))
 
 dummy.momenta.value = np.array([3.] * 6)
 dummy.dcm.recompute(1)
 print(dummy.dcm.value)
-assertApprox(dummy.dcm.value, np.array([4.] * 3))
+assert_almost_equal(dummy.dcm.value, np.array([4.] * 3))

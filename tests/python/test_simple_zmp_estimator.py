@@ -3,7 +3,7 @@ from __future__ import print_function
 import numpy as np
 import pinocchio as pin
 from dynamic_graph.sot_talos_balance.simple_zmp_estimator import SimpleZmpEstimator
-from numpy.testing import assert_almost_equal as assertApprox
+from numpy.testing import assert_almost_equal
 
 # --- Create estimator
 
@@ -43,11 +43,11 @@ zmp = np.array((0.5, 0.5, 0.0))
 
 print()
 print("copLeft:  %s" % (estimator.copLeft.value, ))
-assertApprox(estimator.copLeft.value, copLeft)
+assert_almost_equal(estimator.copLeft.value, copLeft)
 print("copRight: %s" % (estimator.copRight.value, ))
-assertApprox(estimator.copRight.value, copRight)
+assert_almost_equal(estimator.copRight.value, copRight)
 print("zmp:      %s" % (estimator.zmp.value, ))
-assertApprox(estimator.zmp.value, zmp)
+assert_almost_equal(estimator.zmp.value, zmp)
 
 # --- Test emergency stop
 
@@ -125,4 +125,4 @@ print("copRight: %s" % (estimator.copRight.value, ))
 print("zmp:      %s" % (estimator.zmp.value, ))
 print("com:      %s" % (com, ))
 
-assertApprox(estimator.zmp.value[0], com)
+assert_almost_equal(estimator.zmp.value[0], com)

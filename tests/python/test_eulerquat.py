@@ -4,7 +4,7 @@ import numpy as np
 from dynamic_graph.sot_talos_balance.euler_to_quat import EulerToQuat
 from dynamic_graph.sot_talos_balance.pose_quaternion_to_matrix_homo import PoseQuaternionToMatrixHomo
 from dynamic_graph.sot_talos_balance.quat_to_euler import QuatToEuler
-from numpy.testing import assert_almost_equal as assertApprox
+from numpy.testing import assert_almost_equal
 
 # --- Euler to quat ---
 print("--- Euler to quat ---")
@@ -16,7 +16,7 @@ print(e2q.euler.value)
 e2q.quaternion.recompute(0)
 print(e2q.quaternion.value)
 
-assertApprox(e2q.quaternion.value, np.array([0.0, 0.0, 0.5, 0.0, 0.0, 1.0, 0.0, 0.2, 0.6]), 6)
+assert_almost_equal(e2q.quaternion.value, np.array([0.0, 0.0, 0.5, 0.0, 0.0, 1.0, 0.0, 0.2, 0.6]), 6)
 
 # --- Quat to Euler ---
 print("--- Quat to Euler ---")
@@ -28,7 +28,7 @@ print(q2e.quaternion.value)
 q2e.euler.recompute(0)
 print(q2e.euler.value)
 
-assertApprox(q2e.euler.value, np.array([0.0, 0.0, 0.5, 0.0, 0.0, np.pi, 0.2, 0.6]), 6)
+assert_almost_equal(q2e.euler.value, np.array([0.0, 0.0, 0.5, 0.0, 0.0, np.pi, 0.2, 0.6]), 6)
 
 # --- Quat to homogeneous ---
 print("--- Quat to homogeneous ---")
@@ -41,4 +41,4 @@ q2m.sout.recompute(0)
 print(q2m.sout.value)
 
 expected = np.array(((-1.0, 0.0, 0.0, 0.0), (0.0, -1.0, 0.0, 0.0), (0.0, 0.0, 1.0, 0.5), (0.0, 0.0, 0.0, 1.0)))
-assertApprox(q2m.sout.value, expected, 6)
+assert_almost_equal(q2m.sout.value, expected, 6)

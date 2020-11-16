@@ -2,7 +2,8 @@
 from sys import argv
 from time import sleep
 
-from dynamic_graph.sot_talos_balance.utils.run_test_utils import ask_for_confirmation, get_file_folder, run_test, runCommandClient
+from dynamic_graph.sot_talos_balance.utils.run_test_utils import (ask_for_confirmation, get_file_folder, run_test,
+                                                                  runCommandClient)
 
 test_folder, sot_talos_balance_folder = get_file_folder(argv)
 

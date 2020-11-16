@@ -4,7 +4,7 @@ import dynamic_graph.sot_talos_balance.talos.parameter_server_conf as param_serv
 import numpy as np
 import pinocchio as pin
 from dynamic_graph.sot_talos_balance.create_entities_utils import DcmController, create_parameter_server
-from numpy.testing import assert_almost_equal as assertApprox
+from numpy.testing import assert_almost_equal
 
 # --- General ---
 print("--- General ---")
@@ -123,4 +123,4 @@ dcm_controller.init(dt)
 dcm_controller.wrenchRef.recompute(0)
 
 print("reference wrench: %s" % str(dcm_controller.wrenchRef.value))
-assertApprox(wrench, dcm_controller.wrenchRef.value, 3)
+assert_almost_equal(wrench, dcm_controller.wrenchRef.value, 3)

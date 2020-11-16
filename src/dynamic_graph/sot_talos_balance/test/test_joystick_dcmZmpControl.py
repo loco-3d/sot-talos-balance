@@ -1,15 +1,12 @@
 '''Test CoM admittance control as described in paper, with a Reference Velocity provided'''
 
-## File adapted from appli_dcmZmpControl_file.py and
-## appli_dcmZmpControl_online_ISA.py written by Isabelle Maroger
-## ALL THINGS ADDED OR CHANGED ARE COMMENTED IN CAPITAL LETTERS
+# File adapted from appli_dcmZmpControl_file.py and
+# appli_dcmZmpControl_online_ISA.py written by Isabelle Maroger
+# ALL THINGS ADDED OR CHANGED ARE COMMENTED IN CAPITAL LETTERS
 
-from sys import argv
-
-from dynamic_graph.sot_talos_balance.utils.run_test_utils import *
-from time import sleep
-
-from dynamic_graph import * # for entity graph display
+# from dynamic_graph import *  # for entity graph display
+from dynamic_graph.sot_talos_balance.utils.run_test_utils import (ask_for_confirmation, run_ft_calibration, run_test,
+                                                                  runCommandClient)
 
 run_test('appli_joystick_dcmZmpControl.py')
 

@@ -5,8 +5,7 @@ import numpy as np
 import pinocchio as pin
 from dynamic_graph.sot_talos_balance.create_entities_utils import (create_parameter_server,
                                                                    create_simple_distribute_wrench)
-from numpy.testing import assert_almost_equal as assertApprox
-from rospkg import RosPack
+from numpy.testing import assert_almost_equal
 
 # --- General ---
 print("--- General ---")
@@ -143,27 +142,27 @@ print()
 distribute.zmpRef.recompute(0)
 
 print("resulting global wrench: %s" % str(distribute.wrenchRef.value))
-assertApprox(wrench, distribute.wrenchRef.value, 2)
+assert_almost_equal(wrench, distribute.wrenchRef.value, 2)
 print("resulting global left wrench: %s" % str(distribute.wrenchLeft.value))
-assertApprox(wrenchLeft, distribute.wrenchLeft.value, 3)
+assert_almost_equal(wrenchLeft, distribute.wrenchLeft.value, 3)
 print("resulting global right wrench: %s" % str(distribute.wrenchRight.value))
-assertApprox(wrenchRight, distribute.wrenchRight.value, 3)
+assert_almost_equal(wrenchRight, distribute.wrenchRight.value, 3)
 
 distribute.ankleWrenchLeft.recompute(0)
 distribute.ankleWrenchRight.recompute(0)
 
 print("resulting ankle left wrench: %s" % str(distribute.ankleWrenchLeft.value))
-assertApprox(ankleWrenchLeft, distribute.ankleWrenchLeft.value, 3)
+assert_almost_equal(ankleWrenchLeft, distribute.ankleWrenchLeft.value, 3)
 print("resulting ankle right wrench: %s" % str(distribute.ankleWrenchRight.value))
-assertApprox(ankleWrenchRight, distribute.ankleWrenchRight.value, 3)
+assert_almost_equal(ankleWrenchRight, distribute.ankleWrenchRight.value, 3)
 
 distribute.copLeft.recompute(0)
 distribute.copRight.recompute(0)
 
 print("resulting sole left CoP: %s" % str(distribute.copLeft.value))
-assertApprox(copLeft, distribute.copLeft.value, 3)
+assert_almost_equal(copLeft, distribute.copLeft.value, 3)
 print("resulting sole right CoP: %s" % str(distribute.copRight.value))
-assertApprox(copRight, distribute.copRight.value, 3)
+assert_almost_equal(copRight, distribute.copRight.value, 3)
 
 distribute.emergencyStop.recompute(0)
 stop = distribute.emergencyStop.value
@@ -195,20 +194,20 @@ print()
 distribute.zmpRef.recompute(1)
 
 print("resulting global wrench: %s" % str(distribute.wrenchRef.value))
-assertApprox(wrench, distribute.wrenchRef.value, 2)
+assert_almost_equal(wrench, distribute.wrenchRef.value, 2)
 print("resulting global left wrench: %s" % str(distribute.wrenchLeft.value))
-assertApprox(wrenchLeft, distribute.wrenchLeft.value, 3)
+assert_almost_equal(wrenchLeft, distribute.wrenchLeft.value, 3)
 
 distribute.ankleWrenchLeft.recompute(1)
 
 print("resulting ankle left wrench: %s" % str(distribute.ankleWrenchLeft.value))
-assertApprox(ankleWrenchLeft, distribute.ankleWrenchLeft.value, 3)
+assert_almost_equal(ankleWrenchLeft, distribute.ankleWrenchLeft.value, 3)
 
 distribute.copLeft.recompute(1)
 distribute.copRight.recompute(1)
 
 print("resulting sole left CoP: %s" % str(distribute.copLeft.value))
-assertApprox(copLeft, distribute.copLeft.value, 3)
+assert_almost_equal(copLeft, distribute.copLeft.value, 3)
 
 distribute.emergencyStop.recompute(0)
 stop = distribute.emergencyStop.value
@@ -235,20 +234,20 @@ print()
 distribute.zmpRef.recompute(2)
 
 print("resulting global wrench: %s" % str(distribute.wrenchRef.value))
-assertApprox(wrench, distribute.wrenchRef.value, 2)
+assert_almost_equal(wrench, distribute.wrenchRef.value, 2)
 print("resulting global right wrench: %s" % str(distribute.wrenchRight.value))
-assertApprox(wrenchRight, distribute.wrenchRight.value, 3)
+assert_almost_equal(wrenchRight, distribute.wrenchRight.value, 3)
 
 distribute.ankleWrenchRight.recompute(2)
 
 print("resulting ankle right wrench: %s" % str(distribute.ankleWrenchRight.value))
-assertApprox(ankleWrenchRight, distribute.ankleWrenchRight.value, 3)
+assert_almost_equal(ankleWrenchRight, distribute.ankleWrenchRight.value, 3)
 
 distribute.copLeft.recompute(2)
 distribute.copRight.recompute(2)
 
 print("resulting sole right CoP: %s" % str(distribute.copRight.value))
-assertApprox(copRight, distribute.copRight.value, 3)
+assert_almost_equal(copRight, distribute.copRight.value, 3)
 
 distribute.emergencyStop.recompute(0)
 stop = distribute.emergencyStop.value
