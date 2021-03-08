@@ -7,7 +7,8 @@ ADD_DEFINITIONS(-DBOOST_TEST_DYN_LINK -DBOOST_TEST_MAIN)
 
 SET(test_distribute_deps
   distribute-wrench
-  sot-core::sot-core parameter-server
+  sot-core::sot-core
+  sot-core::parameter-server
   )
 
 #test paths and names (without .cpp extension)
@@ -16,15 +17,8 @@ SET(tests
   test_distribute
   )
 
-
-IF(UNIX)
-  LINK_DIRECTORIES(${DYNAMIC_GRAPH_PLUGINDIR})
-ENDIF(UNIX)
-
 ADD_DEFINITIONS(-DDEBUG=2)
 
-# find -lparameter-server. TODO: that's ugly, properly export a component for each plugin instead.
-LINK_DIRECTORIES("${sot-core_DIR}/../../../${DYNAMIC_GRAPH_PLUGINDIR}")
 FOREACH(test ${tests})
   ADD_UNIT_TEST(${test} ${test}.cpp)
   TARGET_LINK_LIBRARIES(${test} PRIVATE ${PROJECT_NAME} ${${test}_deps} Boost::unit_test_framework)
