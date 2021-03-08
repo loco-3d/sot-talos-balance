@@ -267,7 +267,12 @@ void TalosControlManager::setCtrlMode(const string& jointName, const string& ctr
     unsigned int i;
     while (std::getline(ss, item, '-')) {
       SEND_MSG("parsed joint : " + item, MSG_TYPE_INFO);
-      if (convertJointNameToJointId(item, i)) jIdList.push_back(i);
+      if (item == "freeflyer") {
+        for (unsigned int j = 0; j < 6; j++) jIdList.push_back(j);
+      } else {
+        convertJointNameToJointId(item, i);
+        jIdList.push_back(i);
+      }
     }
     for (std::list<int>::iterator it = jIdList.begin(); it != jIdList.end(); ++it) setCtrlMode(*it, cm);
   }
