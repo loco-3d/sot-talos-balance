@@ -3,22 +3,28 @@ from math import sqrt
 
 import numpy as np
 from rospkg import RosPack
-import sot_talos_balance.talos.base_estimator_conf as base_estimator_conf
-import sot_talos_balance.talos.control_manager_conf as cm_conf
-import sot_talos_balance.talos.ft_calibration_conf as ft_conf
-import sot_talos_balance.talos.hip_flexibility_compensation_conf as hipFlexCompConfig
-import sot_talos_balance.talos.parameter_server_conf as param_server_conf
+import dynamic_graph.sot_talos_balance.talos.base_estimator_conf as base_estimator_conf
+import dynamic_graph.sot_talos_balance.talos.control_manager_conf as cm_conf
+import dynamic_graph.sot_talos_balance.talos.ft_calibration_conf as ft_conf
+import dynamic_graph.sot_talos_balance.talos.hip_flexibility_compensation_conf as hipFlexCompConfig
+import dynamic_graph.sot_talos_balance.talos.parameter_server_conf as param_server_conf
 from dynamic_graph import plug
 from dynamic_graph.sot.core.math_small_entities import Derivator_of_Vector
 from dynamic_graph.sot.core.feature_posture import FeaturePosture
 from dynamic_graph.sot.core.operator import MatrixHomoToPoseQuaternion
 from dynamic_graph.sot.core.sot import SOT
 from dynamic_graph.sot.core.task import Task
+from dynamic_graph.sot.core import Flags
 from dynamic_graph.sot.core.matrix_util import matrixToTuple
 from dynamic_graph.sot.core.meta_tasks_kine import MetaTaskKine6d, MetaTaskKineCom, gotoNd
 from dynamic_graph.sot.dynamic_pinocchio import DynamicPinocchio
 from dynamic_graph.tracer_real_time import TracerRealTime
-from sot_talos_balance.create_entities_utils import *
+from dynamic_graph.sot_talos_balance.create_entities_utils import *
+from dynamic_graph.sot_talos_balance.boolean_identity import BooleanIdentity
+from dynamic_graph.sot_talos_balance.dummy_walking_pattern_generator import DummyWalkingPatternGenerator
+from dynamic_graph.sot_talos_balance.delay import DelayVector
+from dynamic_graph.sot_talos_balance.simple_state_integrator import SimpleStateIntegrator
+from dynamic_graph.sot_talos_balance.euler_to_quat import EulerToQuat
 from dynamic_graph.sot.pattern_generator import PatternGenerator
 
 cm_conf.CTRL_MAX = 100.0  # temporary hack
@@ -43,9 +49,9 @@ fill_parameter_server(robot.param_server,param_server_conf, dt)
 robot.dynamic.createOpPoint('LF', robot.OperationalPointsMap['left-ankle'])
 robot.dynamic.createOpPoint('RF', robot.OperationalPointsMap['right-ankle'])
 robot.dynamic.createOpPoint('WT', robot.OperationalPointsMap['waist'])
-robot.dynamic.LF.recompute(0)
-robot.dynamic.RF.recompute(0)
-robot.dynamic.WT.recompute(0)
+robot.dynamic.signal("LF").recompute(0)
+robot.dynamic.signal("RF").recompute(0)
+robot.dynamic.signal("WT").recompute(0)
 robot.dynamic.position.recompute(0)
 robot.dynamic.com.recompute(0)
 # -------------------------- DESIRED TRAJECTORY --------------------------
@@ -80,11 +86,11 @@ robot.pg.parseCmd(":setVelReference  0.1 0.0 0.0")
 
 plug(robot.dynamic.position, robot.pg.position)
 plug(robot.dynamic.com, robot.pg.com)
-plug(robot.dynamic.LF, robot.pg.leftfootcurrentpos)
-plug(robot.dynamic.RF, robot.pg.rightfootcurrentpos)
+plug(robot.dynamic.signal("LF"), robot.pg.leftfootcurrentpos)
+plug(robot.dynamic.signal("RF"), robot.pg.rightfootcurrentpos)
 robotDim = len(robot.dynamic.velocity.value)
-robot.pg.motorcontrol.value = robotDim * (0, )
-robot.pg.zmppreviouscontroller.value = (0, 0, 0)
+robot.pg.motorcontrol.value = np.zeros(robotDim)
+robot.pg.zmppreviouscontroller.value = np.zeros(3)
 
 robot.pg.initState()
 
@@ -122,10 +128,10 @@ robot.imu_filters = create_imu_filters(robot, dt)
 robot.base_estimator = create_base_estimator(robot, dt, base_estimator_conf)
 
 robot.m2qLF = MatrixHomoToPoseQuaternion('m2qLF')
-plug(robot.dynamic.LF, robot.m2qLF.sin)
+plug(robot.dynamic.signal("LF"), robot.m2qLF.sin)
 plug(robot.m2qLF.sout, robot.base_estimator.lf_ref_xyzquat)
 robot.m2qRF = MatrixHomoToPoseQuaternion('m2qRF')
-plug(robot.dynamic.RF, robot.m2qRF.sin)
+plug(robot.dynamic.signal("RF"), robot.m2qRF.sin)
 plug(robot.m2qRF.sout, robot.base_estimator.rf_ref_xyzquat)
 
 # robot.be_filters              = create_be_filters(robot, dt)
@@ -139,9 +145,9 @@ robot.e2q = e2q
 robot.rdynamic = DynamicPinocchio("real_dynamics")
 robot.rdynamic.setModel(robot.dynamic.model)
 robot.rdynamic.setData(robot.rdynamic.model.createData())
-plug(robot.base_estimator.q, robot.rdynamic.position)
-robot.rdynamic.velocity.value = [0.0] * robotDim
-robot.rdynamic.acceleration.value = [0.0] * robotDim
+plug(robot.base_estimator.q, robot.rdynamic.signal("position"))
+robot.rdynamic.signal("velocity").value = np.zeros(robotDim)
+robot.rdynamic.signal("acceleration").value = np.zeros(robotDim)
 
 # --- CoM Estimation
 cdc_estimator = DcmEstimator('cdc_estimator')
@@ -166,8 +172,8 @@ robot.ftc = create_ft_calibrator(robot, ft_conf)
 zmp_estimator = SimpleZmpEstimator("zmpEst")
 robot.rdynamic.createOpPoint('sole_LF', 'left_sole_link')
 robot.rdynamic.createOpPoint('sole_RF', 'right_sole_link')
-plug(robot.rdynamic.sole_LF, zmp_estimator.poseLeft)
-plug(robot.rdynamic.sole_RF, zmp_estimator.poseRight)
+plug(robot.rdynamic.signal("sole_LF"), zmp_estimator.poseLeft)
+plug(robot.rdynamic.signal("sole_RF"), zmp_estimator.poseRight)
 plug(robot.ftc.left_foot_force_out, zmp_estimator.wrenchLeft)
 plug(robot.ftc.right_foot_force_out, zmp_estimator.wrenchRight)
 zmp_estimator.init()
@@ -183,9 +189,9 @@ gamma_dcm = 0.2
 
 dcm_controller = DcmController("dcmCtrl")
 
-dcm_controller.Kp.value = Kp_dcm
-dcm_controller.Ki.value = Ki_dcm
-dcm_controller.Kz.value = Kz_dcm
+dcm_controller.Kp.value = np.array(Kp_dcm)
+dcm_controller.Ki.value = np.array(Ki_dcm)
+dcm_controller.Kz.value = np.array(Kz_dcm)
 dcm_controller.decayFactor.value = gamma_dcm
 dcm_controller.mass.value = mass
 plug(robot.wp.omegaDes, dcm_controller.omega)
@@ -202,12 +208,12 @@ dcm_controller.init(dt)
 
 robot.dcm_control = dcm_controller
 
-Ki_dcm = [1.0, 1.0, 1.0]  # this value is employed later
+Ki_dcm = np.array([1.0, 1.0, 1.0])  # this value is employed later
 
-Kz_dcm = [0.0, 0.0, 0.0]  # this value is employed later
+Kz_dcm = np.array([0.0, 0.0, 0.0])  # this value is employed later
 
 # --- CoM admittance controller
-Kp_adm = [0.0, 0.0, 0.0]  # zero (to be set later)
+Kp_adm = np.array([0.0, 0.0, 0.0])  # zero (to be set later)
 
 com_admittance_control = ComAdmittanceController("comAdmCtrl")
 com_admittance_control.Kp.value = Kp_adm
@@ -216,11 +222,11 @@ com_admittance_control.zmpDes.value = robot.wp.zmpDes.value  # should be plugged
 plug(robot.wp.acomDes, com_admittance_control.ddcomDes)
 
 com_admittance_control.init(dt)
-com_admittance_control.setState(robot.wp.comDes.value, [0.0, 0.0, 0.0])
+com_admittance_control.setState(robot.wp.comDes.value, np.zeros(3))
 
 robot.com_admittance_control = com_admittance_control
 
-Kp_adm = [15.0, 15.0, 0.0]  # this value is employed later
+Kp_adm = np.array([15.0, 15.0, 0.0])  # this value is employed later
 
 # --- Control Manager
 robot.cm = create_ctrl_manager(cm_conf, dt, robot_name='robot')
@@ -234,7 +240,7 @@ robot.cm.addEmergencyStopSIN('zmp')
 robot.taskUpperBody = Task('task_upper_body')
 robot.taskUpperBody.feature = FeaturePosture('feature_upper_body')
 
-q = list(robot.dynamic.position.value)
+q = robot.dynamic.position.value
 robot.taskUpperBody.feature.state.value = q
 robot.taskUpperBody.feature.posture.value = q
 
@@ -264,7 +270,7 @@ locals()['contactRF'] = robot.contactRF
 robot.taskComH = MetaTaskKineCom(robot.dynamic, name='comH')
 plug(robot.wp.comDes, robot.taskComH.featureDes.errorIN)
 robot.taskComH.task.controlGain.value = 2.
-robot.taskComH.feature.selec.value = '100'
+robot.taskComH.feature.selec.value = Flags('001')
 
 # --- COM
 robot.taskCom = MetaTaskKineCom(robot.dynamic)
@@ -272,14 +278,14 @@ plug(robot.com_admittance_control.comRef, robot.taskCom.featureDes.errorIN)
 plug(robot.com_admittance_control.dcomRef, robot.taskCom.featureDes.errordotIN)
 robot.taskCom.task.controlGain.value = 100.
 robot.taskCom.task.setWithDerivative(True)
-robot.taskCom.feature.selec.value = '011'
+robot.taskCom.feature.selec.value = Flags('110')
 
 # --- Waist
 robot.keepWaist = MetaTaskKine6d('keepWaist', robot.dynamic, 'WT', robot.OperationalPointsMap['waist'])
 robot.keepWaist.feature.frame('desired')
 robot.keepWaist.gain.setConstant(300)
 plug(robot.wp.waistDes, robot.keepWaist.featureDes.position)
-robot.keepWaist.feature.selec.value = '111000'
+robot.keepWaist.feature.selec.value = Flags('000111')
 locals()['keepWaist'] = robot.keepWaist
 
 # --- SOT solver
@@ -290,7 +296,7 @@ robot.sot.setSize(robot.dynamic.getDimension())
 robot.integrate = SimpleStateIntegrator("integrate")
 robot.integrate.init(dt)
 robot.integrate.setState(robot.device.state.value)
-robot.integrate.setVelocity(robot.dynamic.getDimension() * [0.])
+robot.integrate.setVelocity(np.zeros(robot.dynamic.getDimension()))
 
 # --- Hip flexibility compensation --------------------------------
 
@@ -301,8 +307,8 @@ if not flexi:
     robot.hipComp.K_r.value = float('inf')  #disable
 
 # --- Plug SOT control to device through control manager, state integrator and hip flexibility compensation
-plug(robot.sot.control, robot.cm.ctrl_sot_input)
-plug(robot.cm.u_safe, robot.integrate.control)
+plug(robot.sot.control, robot.cm.signal('ctrl_sot_input'))
+plug(robot.cm.signal('u_safe'), robot.integrate.control)
 plug(robot.integrate.state, robot.hipComp.q_des)
 plug(robot.hipComp.q_cmd, robot.device.control)
 
@@ -316,13 +322,13 @@ robot.sot.push(robot.keepWaist.task.name)
 # --- Delay
 robot.delay_pos = DelayVector("delay_pos")
 robot.delay_pos.setMemory(robot.device.state.value)
-robot.device.before.addSignal(robot.delay_pos.name + '.current')
+robot.device.before.addSignal('{0}.current'.format(robot.delay_pos.name))
 plug(robot.integrate.state, robot.delay_pos.sin)
 
 robot.delay_vel = DelayVector("delay_vel")
-robot.delay_vel.setMemory(robot.dynamic.getDimension() * [0.])
-robot.device.before.addSignal(robot.delay_vel.name + '.current')
-plug(robot.cm.u_safe, robot.delay_vel.sin)
+robot.delay_vel.setMemory(np.zeros(robot.dynamic.getDimension()))
+robot.device.before.addSignal('{0}.current'.format(robot.delay_vel.name))
+plug(robot.cm.signal('u_safe'), robot.delay_vel.sin)
 
 # --- Plug integrator instead of device
 plug(robot.delay_vel.previous, robot.vselec.sin)

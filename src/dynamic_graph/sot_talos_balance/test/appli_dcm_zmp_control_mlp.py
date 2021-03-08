@@ -3,11 +3,11 @@ from math import sqrt
 
 import numpy as np
 
-import sot_talos_balance.talos.base_estimator_conf as base_estimator_conf
-import sot_talos_balance.talos.control_manager_conf as cm_conf
-import sot_talos_balance.talos.ft_calibration_conf as ft_conf
-import sot_talos_balance.talos.hip_flexibility_compensation_conf as hipFlexCompConfig
-import sot_talos_balance.talos.parameter_server_conf as param_server_conf
+import dynamic_graph.sot_talos_balance.talos.base_estimator_conf as base_estimator_conf
+import dynamic_graph.sot_talos_balance.talos.control_manager_conf as cm_conf
+import dynamic_graph.sot_talos_balance.talos.ft_calibration_conf as ft_conf
+import dynamic_graph.sot_talos_balance.talos.hip_flexibility_compensation_conf as hipFlexCompConfig
+import dynamic_graph.sot_talos_balance.talos.parameter_server_conf as param_server_conf
 from dynamic_graph import plug
 from dynamic_graph.sot.core.math_small_entities import Derivator_of_Vector
 from dynamic_graph.sot.core.feature_posture import FeaturePosture
@@ -17,8 +17,8 @@ from dynamic_graph.sot.core.matrix_util import matrixToTuple
 from dynamic_graph.sot.core.meta_tasks_kine import MetaTaskKine6d, MetaTaskKineCom, gotoNd
 from dynamic_graph.sot.dynamic_pinocchio import DynamicPinocchio
 from dynamic_graph.tracer_real_time import TracerRealTime
-from sot_talos_balance.create_entities_utils import *
-from sot_talos_balance.nd_trajectory_generator import NdTrajectoryGenerator
+from dynamic_graph.sot_talos_balance.create_entities_utils import *
+from dynamic_graph.sot_talos_balance.nd_trajectory_generator import NdTrajectoryGenerator
 cm_conf.CTRL_MAX = 1000.0  # temporary hack
 
 robot.timeStep = robot.device.getTimeStep()

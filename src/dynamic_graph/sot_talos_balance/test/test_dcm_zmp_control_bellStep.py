@@ -3,7 +3,7 @@
 from time import sleep
 from sys import argv
 
-from sot_talos_balance.utils.run_test_utils import run_test, run_ft_calibration, runCommandClient, ask_for_confirmation, get_file_folder
+from dynamic_graph.sot_talos_balance.utils.run_test_utils import run_test, run_ft_calibration, runCommandClient, ask_for_confirmation, get_file_folder
 
 try:
     # Python 2

@@ -219,7 +219,7 @@ def create_hip_flexibility_compensation(robot, conf, robot_name='robot'):
     hipComp = HipFlexibilityCompensation("hipFlexCompensation")
     hipComp.K_l.value = conf.flexibility_left
     hipComp.K_r.value = conf.flexibility_right
-    hipComp.q_des.value = robot.dynamic.getDimension() * [0.]
+    hipComp.q_des.value = np.zeros(robot.dynamic.getDimension())
     plug(robot.device.ptorque, hipComp.tau)
     hipComp.init(timeStep, robot_name)
 

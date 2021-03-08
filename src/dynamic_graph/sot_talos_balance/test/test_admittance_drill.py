@@ -1,6 +1,6 @@
 from time import sleep
 
-from sot_talos_balance.utils.run_test_utils import run_ft_wrist_calibration, run_test, runCommandClient
+from dynamic_graph.sot_talos_balance.utils.run_test_utils import run_ft_wrist_calibration, run_test, runCommandClient
 
 try:
     # Python 2
