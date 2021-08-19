@@ -532,6 +532,7 @@ robot.sot.push(robot.keepWaist.task.name)
 # --- Fix robot.dynamic inputs
 plug(robot.device.velocity, robot.dynamic.velocity)
 from dynamic_graph.sot.core import Derivator_of_Vector
+
 robot.dvdt = Derivator_of_Vector("dv_dt")
 robot.dvdt.dt.value = dt
 plug(robot.device.velocity, robot.dvdt.sin)
