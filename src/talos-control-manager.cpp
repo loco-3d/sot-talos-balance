@@ -36,7 +36,7 @@ using namespace dg::sot::talos_balance;
 #define PROFILE_PWM_DESIRED_COMPUTATION "Control manager                                        "
 #define PROFILE_DYNAMIC_GRAPH_PERIOD "Control period                                         "
 
-#define INPUT_SIGNALS m_u_maxSIN
+#define INPUT_SIGNALS m_u_maxSIN << m_q_predictedSIN << m_tau_predictedSIN
 #define OUTPUT_SIGNALS m_uSOUT << m_u_safeSOUT
 
 /// Define EntityClassName here rather than in the header file
@@ -52,6 +52,8 @@ DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(TalosControlManager, "TalosControlManager");
 TalosControlManager::TalosControlManager(const std::string& name)
     : Entity(name),
       CONSTRUCT_SIGNAL_IN(u_max, dynamicgraph::Vector),
+      CONSTRUCT_SIGNAL_IN(q_predicted, dynamicgraph::Vector),
+      CONSTRUCT_SIGNAL_IN(tau_predicted, dynamicgraph::Vector),
       CONSTRUCT_SIGNAL_OUT(u, dynamicgraph::Vector, m_u_maxSIN),
       CONSTRUCT_SIGNAL_OUT(u_safe, dynamicgraph::Vector, m_uSOUT << m_u_maxSIN),
       m_robot_util(RefVoidRobotUtil()),
@@ -75,9 +77,10 @@ TalosControlManager::TalosControlManager(const std::string& name)
   addCommand("ctrlModes", makeCommandVoid0(*this, &TalosControlManager::ctrlModes,
                                            docCommandVoid0("Get a list of all the available control modes.")));
 
-  addCommand("setCtrlMode", makeCommandVoid2(*this, &TalosControlManager::setCtrlMode,
-                                             docCommandVoid2("Set the control mode for a joint.",
-                                                             "(string) joint name", "(string) control mode")));
+  addCommand("setCtrlMode", makeCommandVoid3(*this, &TalosControlManager::setCtrlMode,
+                                             docCommandVoid3("Set the control mode for a joint.",
+                                                             "(string) joint name", "(string) control name",
+                                                             "(string) control mode")));
 
   addCommand("getCtrlMode",
              makeCommandVoid1(*this, &TalosControlManager::getCtrlMode,
@@ -205,13 +208,56 @@ DEFINE_SIGNAL_OUT_FUNCTION(u_safe, dynamicgraph::Vector) {
   }
 
   if (!m_emergency_stop_triggered) {
+    dynamicgraph::Vector tau_pred, q_pred;
+    if (m_tau_predictedSIN.isPlugged()){
+      tau_pred = m_tau_predictedSIN(iter);
+    }
+    if (m_q_predictedSIN.isPlugged()){
+      q_pred = m_q_predictedSIN(iter);
+    }
+
     for (unsigned int i = 0; i < m_numDofs; i++) {
-      if (fabs(u(i)) > ctrl_max(i)) {
-        m_emergency_stop_triggered = true;
-        SEND_MSG("t = " + toString(iter) + ": Joint " + toString(i) +
-                     " desired control is too large: " + toString(u(i)) + " > " + toString(ctrl_max(i)),
-                 MSG_TYPE_ERROR_STREAM);
-        break;
+      if (m_jointCtrlModes_current[i].ctrl == CONTROL_OUTPUT_POSITION){
+        double upperLim = m_robot_util->get_joint_limits_from_id(i-6).upper; // no freeflyer in joint_limits
+        double lowerLim = m_robot_util->get_joint_limits_from_id(i-6).lower; // no freeflyer in joint_limits
+        if ((u(i) < lowerLim) || (upperLim < u(i))) {
+          m_emergency_stop_triggered = true;
+          SEND_MSG("t = " + toString(iter) + ": Joint " + toString(i) +
+                   " desired position control is too large: " + toString(u(i)) + " > " + toString(upperLim)
+                   + " or " + toString(u(i)) + " < " + toString(lowerLim),
+                   MSG_TYPE_ERROR_STREAM);
+          break;
+        }
+        if ((tau_pred.size() != 0) && (fabs(tau_pred[i]) > ctrl_max(i))) {
+          m_emergency_stop_triggered = true;
+          SEND_MSG("t = " + toString(iter) + ": Joint " + toString(i) +
+                   " predicted torque from position control is too large: " + 
+                   toString(tau_pred[i]) + " > " + toString(ctrl_max(i)),
+                   MSG_TYPE_ERROR_STREAM);
+          break;
+        }
+      } 
+      // TODO: Add check on velocities -> No limits accessible in robotUtils -> Had to be added
+      else if (m_jointCtrlModes_current[i].ctrl == CONTROL_OUTPUT_TORQUE){
+        if (fabs(u(i)) > ctrl_max(i)) {
+          m_emergency_stop_triggered = true;
+          SEND_MSG("t = " + toString(iter) + ": Joint " + toString(i) +
+                   " desired torque control is too large: " + toString(u(i)) + " > " + toString(ctrl_max(i)),
+                   MSG_TYPE_ERROR_STREAM);
+          break;
+        }
+        if (q_pred.size() != 0) {
+          double upperLim = m_robot_util->get_joint_limits_from_id(i-6).upper; // no freeflyer in joint_limits
+          double lowerLim = m_robot_util->get_joint_limits_from_id(i-6).lower; // no freeflyer in joint_limits
+          if ((q_pred[i] < lowerLim) || (upperLim < q_pred[i])) {
+            m_emergency_stop_triggered = true;
+            SEND_MSG("t = " + toString(iter) + ": Joint " + toString(i) +
+                     " predicted position from torque control is too large: " + toString(q_pred[i]) + " > " + toString(upperLim)
+                     + " or " + toString(q_pred[i]) + " < " + toString(lowerLim),
+                     MSG_TYPE_ERROR_STREAM);
+            break;
+          }
+        }
       }
     }
   }
@@ -253,9 +299,9 @@ void TalosControlManager::addCtrlMode(const string& name) {
 
 void TalosControlManager::ctrlModes() { SEND_MSG(toString(m_ctrlModes), MSG_TYPE_INFO); }
 
-void TalosControlManager::setCtrlMode(const string& jointName, const string& ctrlMode) {
+void TalosControlManager::setCtrlMode(const string& jointName, const string& ctrlName, const string& ctrlMode) {
   CtrlMode cm;
-  if (convertStringToCtrlMode(ctrlMode, cm) == false) return;
+  if (convertStringToCtrlMode(ctrlName, ctrlMode, cm) == false) return;
 
   if (jointName == "all") {
     for (unsigned int i = 0; i < m_numDofs; i++) setCtrlMode(i, cm);
@@ -267,7 +313,12 @@ void TalosControlManager::setCtrlMode(const string& jointName, const string& ctr
     unsigned int i;
     while (std::getline(ss, item, '-')) {
       SEND_MSG("parsed joint : " + item, MSG_TYPE_INFO);
-      if (convertJointNameToJointId(item, i)) jIdList.push_back(i);
+      if (item == "freeflyer") {
+        for (unsigned int j = 0; j < 6; j++) jIdList.push_back(j);
+      } else {
+        convertJointNameToJointId(item, i);
+        jIdList.push_back(i);
+      }
     }
     for (std::list<int>::iterator it = jIdList.begin(); it != jIdList.end(); ++it) setCtrlMode(*it, cm);
   }
@@ -358,15 +409,20 @@ void TalosControlManager::updateJointCtrlModesOutputSignal() {
   }
 }
 
-bool TalosControlManager::convertStringToCtrlMode(const std::string& name, CtrlMode& cm) {
+bool TalosControlManager::convertStringToCtrlMode(const std::string& name, const std::string& type, CtrlMode& cm) {
   // Check if the ctrl mode name exists
-  for (unsigned int i = 0; i < m_ctrlModes.size(); i++)
+  for (unsigned int i = 0; i < m_ctrlModes.size(); i++) {
     if (name == m_ctrlModes[i]) {
-      cm = CtrlMode(i, name);
-      return true;
+      const auto it = std::find(std::begin(m_controlOutput_s), std::end(m_controlOutput_s), type);
+      if(it != std::end(m_controlOutput_s)){
+          cm = CtrlMode(i, name, static_cast<ControlOutput>(std::distance(std::begin(m_controlOutput_s), it)));
+          return true;
+      }
     }
-  SEND_MSG("The specified control mode does not exist", MSG_TYPE_ERROR);
-  SEND_MSG("Possible control modes are: " + toString(m_ctrlModes), MSG_TYPE_INFO);
+  }
+  SEND_MSG("The specified control name or mode does not exist", MSG_TYPE_ERROR);
+  SEND_MSG("Possible control names are: " + toString(m_ctrlModes), MSG_TYPE_INFO);
+  SEND_MSG("Possible control modes are: position, velocity, torque, freeflyer", MSG_TYPE_INFO);
   return false;
 }
 

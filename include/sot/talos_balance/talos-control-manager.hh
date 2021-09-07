@@ -52,13 +52,19 @@ namespace talos_balance {
 /// Number of time step to transition from one ctrl mode to another
 #define CTRL_MODE_TRANSITION_TIME_STEP 1000.0
 
+enum ControlOutput { CONTROL_OUTPUT_POSITION = 0, CONTROL_OUTPUT_VELOCITY = 1, 
+                     CONTROL_OUTPUT_TORQUE = 2, NO_CONTROL = 3, CONTROL_OUTPUT_SIZE = 4 };
+
+const std::string m_controlOutput_s[] = {"position", "velocity", "torque", "freeflyer"};
+
 class CtrlMode {
  public:
   int id;
   std::string name;
+  ControlOutput ctrl;
 
-  CtrlMode() : id(-1), name("None") {}
-  CtrlMode(int id, const std::string& name) : id(id), name(name) {}
+  CtrlMode() : id(-1), name("None"), ctrl(CONTROL_OUTPUT_POSITION) {}
+  CtrlMode(int id, const std::string& name, const ControlOutput& ctrl) : id(id), name(name), ctrl(ctrl) {}
 };
 
 std::ostream& operator<<(std::ostream& os, const CtrlMode& s) {
@@ -87,6 +93,8 @@ class TALOS_CONTROL_MANAGER_EXPORT TalosControlManager : public ::dynamicgraph::
   std::vector<dynamicgraph::Signal<dynamicgraph::Vector, int>*> m_jointsCtrlModesSOUT;
 
   DECLARE_SIGNAL_IN(u_max, dynamicgraph::Vector);    /// max motor control
+  DECLARE_SIGNAL_IN(q_predicted, dynamicgraph::Vector); // (optional) position predicted from torque command
+  DECLARE_SIGNAL_IN(tau_predicted, dynamicgraph::Vector); // (optional) torque predicted from position command
   DECLARE_SIGNAL_OUT(u, dynamicgraph::Vector);       /// raw motor control
   DECLARE_SIGNAL_OUT(u_safe, dynamicgraph::Vector);  /// safe motor control
 
@@ -96,7 +104,7 @@ class TALOS_CONTROL_MANAGER_EXPORT TalosControlManager : public ::dynamicgraph::
   void addCtrlMode(const std::string& name);
   void ctrlModes();
   void getCtrlMode(const std::string& jointName);
-  void setCtrlMode(const std::string& jointName, const std::string& ctrlMode);
+  void setCtrlMode(const std::string& jointName, const std::string& ctrlName, const std::string& ctrlMode);
   void setCtrlMode(const int jid, const CtrlMode& cm);
 
   void resetProfiler();
@@ -132,7 +140,7 @@ class TALOS_CONTROL_MANAGER_EXPORT TalosControlManager : public ::dynamicgraph::
   std::vector<CtrlMode> m_jointCtrlModes_previous;  /// previous control mode of the joints
   std::vector<int> m_jointCtrlModesCountDown;       /// counters used for the transition between two ctrl modes
 
-  bool convertStringToCtrlMode(const std::string& name, CtrlMode& cm);
+  bool convertStringToCtrlMode(const std::string& name, const std::string& mode, CtrlMode& cm);
   bool convertJointNameToJointId(const std::string& name, unsigned int& id);
   // bool isJointInRange(unsigned int id, double q);
   void updateJointCtrlModesOutputSignal();
