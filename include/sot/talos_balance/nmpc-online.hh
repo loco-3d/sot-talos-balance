@@ -57,15 +57,21 @@ class NMPC_EXPORT NmpcOnline : public ::dynamicgraph::Entity {
   /* --- CONSTRUCTOR ---- */
   NmpcOnline(const std::string& name);
 
-  void init(const double& com_ref, const int& N);
+  void init(const dynamicgraph::Vector& com,const float& footx,const float& footy,
+    const float& footq,const std::string& foot,const std::string& state);
 
-  void set_comref(double comx);
+/*  void set_comref(double comx);*/
 
   /* --- SIGNALS --- */
   DECLARE_SIGNAL_IN(velocityref, dynamicgraph::Vector);
   DECLARE_SIGNAL_IN(trigger, bool);
 
   DECLARE_SIGNAL_OUT(comref, dynamicgraph::Vector);
+  DECLARE_SIGNAL_OUT(dcomref, dynamicgraph::Vector);
+  DECLARE_SIGNAL_OUT(ddcomref, dynamicgraph::Vector);
+  DECLARE_SIGNAL_OUT(rightfootref,MatrixHomogeneous);
+  DECLARE_SIGNAL_OUT(leftfootref,MatrixHomogeneous);  
+  DECLARE_SIGNAL_OUT(waistref,MatrixHomogeneous);
 
   /* --- COMMANDS --- */
   /* --- ENTITY INHERITANCE --- */
@@ -73,7 +79,18 @@ class NMPC_EXPORT NmpcOnline : public ::dynamicgraph::Entity {
 
  protected:
   bool m_initSucceeded;  /// true if the entity has been successfully initialized
-  dynamicgraph::Vector m_com_ref;
+
+  dynamicgraph::Vector m_comref;
+  dynamicgraph::Vector m_dcomref;
+  dynamicgraph::Vector m_ddcomref;
+  MatrixHomogeneous m_rightfootref;
+  MatrixHomogeneous m_leftfootref;
+  MatrixHomogeneous m_waistref;
+  float m_footx;
+  float m_footy;  
+  float m_footq;  
+  std::string m_foot;
+  std::string m_state;
 
 };  // class NmpcOnline
 

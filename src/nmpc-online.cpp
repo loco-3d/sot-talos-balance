@@ -34,8 +34,7 @@ using namespace dg::command;
 
 #define INPUT_SIGNALS m_velocityrefSIN << m_triggerSIN
 
-#define OUTPUT_SIGNALS m_comrefSOUT //<<  m_dcomrefSOUT  m_ddcomrefSOUT <<
-  //m_rightfootrefSOUT << m_leftfootrefSOUT << m_waistrefSOUT
+#define OUTPUT_SIGNALS m_comrefSOUT << m_dcomrefSOUT << m_ddcomrefSOUT << m_rightfootrefSOUT << m_leftfootrefSOUT << m_waistrefSOUT
 
 /// Define EntityClassName here rather than in the header file
 /// so that it can be used by the macros DEFINE_SIGNAL_**_FUNCTION.
@@ -51,35 +50,45 @@ NmpcOnline::NmpcOnline(const std::string& name)
     : Entity(name),
       CONSTRUCT_SIGNAL_IN(velocityref, dynamicgraph::Vector),
       CONSTRUCT_SIGNAL_IN(trigger, bool),      
-      CONSTRUCT_SIGNAL_OUT(comref, dynamicgraph::Vector, INPUT_SIGNALS),
-/*      CONSTRUCT_SIGNAL_OUT(dcomref, dynamicgraph::Vector, INPUT_SIGNALS),
+      CONSTRUCT_SIGNAL_OUT(comref, dynamicgraph::Vector, INPUT_SIGNALS),     
+      CONSTRUCT_SIGNAL_OUT(dcomref, dynamicgraph::Vector, INPUT_SIGNALS),
       CONSTRUCT_SIGNAL_OUT(ddcomref, dynamicgraph::Vector, INPUT_SIGNALS),
       CONSTRUCT_SIGNAL_OUT(rightfootref, MatrixHomogeneous, INPUT_SIGNALS),
       CONSTRUCT_SIGNAL_OUT(leftfootref, MatrixHomogeneous, INPUT_SIGNALS),
       CONSTRUCT_SIGNAL_OUT(waistref, MatrixHomogeneous, INPUT_SIGNALS),
-*/    m_initSucceeded(false) {
+    m_initSucceeded(false) {
   Entity::signalRegistration(INPUT_SIGNALS << OUTPUT_SIGNALS);
 
   /* Commands. */
-  addCommand("init", makeCommandVoid2(*this, &NmpcOnline::init, docCommandVoid2("Initialize the entity.", "com","size")));
-
-  //addCommand("set_comref", makeCommandVoid1(*this, &NmpcOnline::set_comref, docCommandVoid1("Set the com ref.", "comx")));
+  addCommand("init", makeCommandVoid6(*this, &NmpcOnline::init, docCommandVoid6(
+    "initialize the entity.","Initial com","Initial foot (x)","Initial foot (y)",
+    "Initial foot (q)","Initial foot (name)","Initial state (D,L,R)")));
 
 }
 
-void NmpcOnline::init(const double& com_ref, const int& N) {
-  if (!m_velocityrefSIN.isPlugged()) return SEND_MSG("Init failed: signal velocityref is not plugged", MSG_TYPE_ERROR);
+void NmpcOnline::init(const dynamicgraph::Vector& com,const float& footx,
+    const float& footy,const float& footq,const std::string& foot,
+    const std::string& state) {
+  if (!m_velocityrefSIN.isPlugged()) return SEND_MSG("init failed: signal velocityref is not plugged", MSG_TYPE_ERROR);
   if (!m_triggerSIN.isPlugged())
-    return SEND_MSG("Init failed: signal trigger is not plugged", MSG_TYPE_ERROR);
+    return SEND_MSG("init failed: signal trigger is not plugged", MSG_TYPE_ERROR);
 
-  m_com_ref.setZero(N);
-  m_com_ref(0) = com_ref;
+  m_comref = com;
+  m_dcomref.setZero(3);
+  m_ddcomref.setZero(3); 
+  m_rightfootref.setIdentity();
+  m_leftfootref.setIdentity(); 
+  m_waistref.setIdentity(); 
+
+  m_footx = footx;
+  m_footy = footy;  
+  m_footq = footq;  
+  m_foot = foot;
+  m_state = state;
+
   m_initSucceeded = true;
 }
 
-void NmpcOnline::set_comref(double comx){
-  m_com_ref(1) = comx;
-}
 
 /* ------------------------------------------------------------------- */
 /* --- SIGNALS ------------------------------------------------------- */
@@ -90,16 +99,63 @@ DEFINE_SIGNAL_OUT_FUNCTION(comref, dynamicgraph::Vector) {
     SEND_WARNING_STREAM_MSG("Cannot compute output signal before initialization!");
     return s;
   }
-
-  if (m_triggerSIN(iter)) {
+/*  if (m_triggerSIN(iter)) {
     set_comref(0.1);
   } else {
     set_comref(0.2);
+  }*/
+  s = m_comref;
+  return s;
+}
+
+DEFINE_SIGNAL_OUT_FUNCTION(dcomref, dynamicgraph::Vector) {
+  if (!m_initSucceeded) {
+    SEND_WARNING_STREAM_MSG("Cannot compute output signal before initialization!");
+    return s;
   }
-  s = m_com_ref;
+  s = m_dcomref;
+  return s;
+}
+
+DEFINE_SIGNAL_OUT_FUNCTION(ddcomref, dynamicgraph::Vector) {
+  if (!m_initSucceeded) {
+    SEND_WARNING_STREAM_MSG("Cannot compute output signal before initialization!");
+    return s;
+  }
+  s = m_ddcomref;
+  return s;
+}
+
+DEFINE_SIGNAL_OUT_FUNCTION(rightfootref, MatrixHomogeneous) {
+  if (!m_initSucceeded) {
+    SEND_WARNING_STREAM_MSG("Cannot compute output signal before initialization!");
+    return s;
+  }
+  s = m_rightfootref;
 
   return s;
 }
+
+DEFINE_SIGNAL_OUT_FUNCTION(leftfootref, MatrixHomogeneous) {
+  if (!m_initSucceeded) {
+    SEND_WARNING_STREAM_MSG("Cannot compute output signal before initialization!");
+    return s;
+  }
+  s = m_leftfootref;
+
+  return s;
+}
+
+DEFINE_SIGNAL_OUT_FUNCTION(waistref, MatrixHomogeneous) {
+  if (!m_initSucceeded) {
+    SEND_WARNING_STREAM_MSG("Cannot compute output signal before initialization!");
+    return s;
+  }
+  s = m_waistref;
+
+  return s;
+}
+
 
 /* --- COMMANDS ---------------------------------------------------------- */
 
