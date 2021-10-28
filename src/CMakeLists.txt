@@ -3,6 +3,7 @@
 
 SET(plugins
   example
+  nmpc-online
   delay
   boolean-identity
   round-double-to-int

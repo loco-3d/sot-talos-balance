@@ -13,6 +13,7 @@ from dynamic_graph.sot_talos_balance.dcm_estimator import DcmEstimator
 from dynamic_graph.sot_talos_balance.distribute_wrench import DistributeWrench
 from dynamic_graph.sot_talos_balance.dummy_dcm_estimator import DummyDcmEstimator
 from dynamic_graph.sot_talos_balance.example import Example
+from dynamic_graph.sot_talos_balance.nmpc_online import NmpcOnline
 from dynamic_graph.sot_talos_balance.ft_calibration import FtCalibration
 from dynamic_graph.sot_talos_balance.ft_wrist_calibration import FtWristCalibration
 from dynamic_graph.sot_talos_balance.hip_flexibility_compensation import HipFlexibilityCompensation
@@ -565,6 +566,12 @@ def create_example(robot_name='robot', firstAdd=0., secondAdd=0.):
     example.init(robot_name)
     return example
 
+def create_nmpc_online(robot_name='robot', firstAdd=0., secondAdd=0.):
+    nmpc_online = NmpcOnline('nmpc_online')
+    nmpc_online.firstAddend.value = firstAdd
+    nmpc_online.secondAddend.value = secondAdd
+    nmpc_online.init(robot_name)
+    return nmpc_online
 
 def create_dcm_estimator(robot, dt, robot_name='robot'):
     dcm_estimator = DcmEstimator('dcm_estimator')
