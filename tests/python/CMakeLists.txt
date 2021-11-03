@@ -24,6 +24,7 @@ SET(${PROJECT_NAME}_PYTHON_TESTS
   test_simple_state_integrator
   test_state_transformation
   test_nmpc_online
+  test_cython
   )
 
 FOREACH(TEST ${${PROJECT_NAME}_PYTHON_TESTS})

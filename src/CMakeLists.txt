@@ -4,6 +4,7 @@
 SET(plugins
   example
   nmpc-online
+  test-cython
   delay
   boolean-identity
   round-double-to-int
@@ -45,6 +46,10 @@ SET(plugins
   )
 
 # set(feature-task_deps feature-generic task)
+find_package(PythonLibs REQUIRED)
+include_directories(${PYTHON_INCLUDE_DIRS})
+add_executable(nmpc embedded_main_class.cpp nmpc_vel_ref_class.cpp)
+target_link_libraries(nmpc ${PYTHON_LIBRARIES})
 
 
 FOREACH(plugin ${plugins})
