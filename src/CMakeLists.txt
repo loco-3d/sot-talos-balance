@@ -46,10 +46,36 @@ SET(plugins
   )
 
 # set(feature-task_deps feature-generic task)
-find_package(PythonLibs REQUIRED)
-include_directories(${PYTHON_INCLUDE_DIRS})
-add_executable(nmpc embedded_main_class.cpp nmpc_vel_ref_class.cpp)
-target_link_libraries(nmpc ${PYTHON_LIBRARIES})
+
+add_custom_command(OUTPUT
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/__init__.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/__init__${PYTHON_SOABI}
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/sum.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/sum${PYTHON_SOABI}
+    ${CMAKE_CURRENT_SOURCE_DIR}/fooClass_api.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/fooClass.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/fooClass${PYTHON_SOABI}
+    ${CMAKE_CURRENT_SOURCE_DIR}/fooClass.h
+    COMMAND ${PYTHON_EXECUTABLE} setup.py build_ext --inplace
+    DEPENDS
+    libs/__init__.pxd
+    libs/__init__.py
+    libs/sum.pxd
+    libs/sum.py
+    fooClass.pyx
+    setup.py
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    )
+
+set(nmpc_SOURCES
+    fooClass_api.h
+    fooClass.cpp
+    embedded_main.cpp
+    )
+
+add_executable(nmpc ${nmpc_SOURCES})
+target_include_directories(nmpc PRIVATE ${PYTHON_INCLUDE_DIRS} ${NUMPY_INCLUDE_DIRS})
+target_link_libraries(nmpc PUBLIC ${PYTHON_LIBRARIES})
 
 
 FOREACH(plugin ${plugins})
@@ -80,6 +106,9 @@ FOREACH(plugin ${plugins})
     endif()
   ENDIF(BUILD_PYTHON_INTERFACE)
 ENDFOREACH(plugin)
+
+target_include_directories(test-cython PRIVATE ${PYTHON_INCLUDE_DIRS} ${NUMPY_INCLUDE_DIRS})
+target_link_libraries(test-cython PUBLIC ${PYTHON_LIBRARIES})
 
 TARGET_LINK_LIBRARIES(distribute-wrench PUBLIC eiquadprog::eiquadprog)
 

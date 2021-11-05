@@ -1,0 +1,6 @@
+fooClass.cpp
+fooClass.h
+fooClass_api.h
+libs/__init__.c
+libs/sum.c
+**.so
