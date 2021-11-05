@@ -49,12 +49,12 @@ SET(plugins
 
 add_custom_command(OUTPUT
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/__init__.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/__init__${PYTHON_SOABI}
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/__init__${PYTHON_SOABI}.so
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/sum.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/sum${PYTHON_SOABI}
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/sum${PYTHON_SOABI}.so
     ${CMAKE_CURRENT_SOURCE_DIR}/fooClass_api.h
     ${CMAKE_CURRENT_SOURCE_DIR}/fooClass.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/fooClass${PYTHON_SOABI}
+    ${CMAKE_CURRENT_SOURCE_DIR}/fooClass${PYTHON_SOABI}.so
     ${CMAKE_CURRENT_SOURCE_DIR}/fooClass.h
     COMMAND ${PYTHON_EXECUTABLE} setup.py build_ext --inplace
     DEPENDS
@@ -112,6 +112,7 @@ FOREACH(plugin ${plugins})
   ENDIF(BUILD_PYTHON_INTERFACE)
 ENDFOREACH(plugin)
 
+target_sources(test-cython PRIVATE fooClass_api.h fooClass.cpp)
 target_include_directories(test-cython PRIVATE ${PYTHON_INCLUDE_DIRS} ${NUMPY_INCLUDE_DIRS})
 target_link_libraries(test-cython PUBLIC ${PYTHON_LIBRARIES})
 
