@@ -63,10 +63,10 @@ class NMPC_EXPORT TestCython : public ::dynamicgraph::Entity {
   TestCython(const std::string& name);
 
   void init();
-  
+
   double sum(double d);
 
-  //double sumCython(int argc, char *argv[]);
+  double sumCython(int argc, char *argv[]);
 
 
   /* --- SIGNALS --- */
@@ -83,7 +83,7 @@ class NMPC_EXPORT TestCython : public ::dynamicgraph::Entity {
   bool m_initSucceeded;  /// true if the entity has been successfully initialized
 
   double m_a;
-  double m_b;  
+  double m_b;
 
 };  // class TestCython
 

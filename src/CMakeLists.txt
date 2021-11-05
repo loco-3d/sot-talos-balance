@@ -77,6 +77,7 @@ add_executable(nmpc ${nmpc_SOURCES})
 target_include_directories(nmpc PRIVATE ${PYTHON_INCLUDE_DIRS} ${NUMPY_INCLUDE_DIRS})
 target_link_libraries(nmpc PUBLIC ${PYTHON_LIBRARIES})
 
+
 FOREACH(plugin ${plugins})
   GET_FILENAME_COMPONENT(LIBRARY_NAME ${plugin} NAME)
   ADD_LIBRARY(${LIBRARY_NAME} SHARED "${plugin}.cpp")
@@ -105,6 +106,9 @@ FOREACH(plugin ${plugins})
     endif()
   ENDIF(BUILD_PYTHON_INTERFACE)
 ENDFOREACH(plugin)
+
+target_include_directories(test-cython PRIVATE ${PYTHON_INCLUDE_DIRS} ${NUMPY_INCLUDE_DIRS})
+target_link_libraries(test-cython PUBLIC ${PYTHON_LIBRARIES})
 
 TARGET_LINK_LIBRARIES(distribute-wrench PUBLIC eiquadprog::eiquadprog)
 

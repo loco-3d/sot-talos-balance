@@ -20,6 +20,7 @@
 #include <dynamic-graph/factory.h>
 #include <dynamic-graph/all-commands.h>
 #include <sot/core/stop-watch.hh>
+#include "fooClass_api.h"
 
 namespace dynamicgraph {
 namespace sot {
@@ -34,7 +35,7 @@ using namespace dg::command;
 
 #define INPUT_SIGNALS m_aSIN << m_bSIN
 
-#define OUTPUT_SIGNALS m_cSOUT 
+#define OUTPUT_SIGNALS m_cSOUT
 
 /// Define EntityClassName here rather than in the header file
 /// so that it can be used by the macros DEFINE_SIGNAL_**_FUNCTION.
@@ -49,7 +50,7 @@ DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(TestCython, "TestCython");
 TestCython::TestCython(const std::string& name)
     : Entity(name),
       CONSTRUCT_SIGNAL_IN(a, double),
-      CONSTRUCT_SIGNAL_IN(b, double),      
+      CONSTRUCT_SIGNAL_IN(b, double),
       CONSTRUCT_SIGNAL_OUT(c, double, INPUT_SIGNALS),
     m_initSucceeded(false) {
   Entity::signalRegistration(INPUT_SIGNALS << OUTPUT_SIGNALS);
@@ -65,7 +66,7 @@ void TestCython::init() {
     return SEND_MSG("init failed: signal trigger is not plugged", MSG_TYPE_ERROR);
 
   m_a = m_aSIN;
-  m_b = m_bSIN; 
+  m_b = m_bSIN;
 
   m_initSucceeded = true;
 }
@@ -74,7 +75,7 @@ double TestCython::sum(double d){
   return m_a+m_b+d;
 }
 
-/*double TestCython::sumCython(int argc, char *argv[]){
+double TestCython::sumCython(int argc, char *argv[]){
     wchar_t *program;
 
     program = Py_DecodeLocale(argv[0], NULL);
@@ -83,22 +84,22 @@ double TestCython::sum(double d){
         exit(1);
     }
 
-    // Add a built-in module, before Py_Initialize 
+    // Add a built-in module, before Py_Initialize
     if (PyImport_AppendInittab("fooClass", PyInit_fooClass) == -1) {
         fprintf(stderr, "Error: could not extend in-built modules table\n");
         exit(1);
     }
 
-    // Pass argv[0] to the Python interpreter 
+    // Pass argv[0] to the Python interpreter
     Py_SetProgramName(program);
 
     // Initialize the Python interpreter.  Required.
-    //   If this step fails, it will be a fatal error. 
+    //   If this step fails, it will be a fatal error.
     Py_Initialize();
 
     // Optionally import the module; alternatively,
     //   import can be deferred until the b script
-    //   imports it. 
+    //   imports it.
     PyRun_SimpleString(
        "import sys\n"
        "sys.path.append('')\n"
@@ -109,13 +110,12 @@ double TestCython::sum(double d){
     Foo *foo = buildFoo(m_a,m_b);
     double d = foobar(foo,2.0);
 
-    // Clean up after using CPython. 
+    // Clean up after using CPython.
     PyMem_RawFree(program);
     Py_Finalize();
 
-    return d
+    return d;
 }
-*/
 
 /* ------------------------------------------------------------------- */
 /* --- SIGNALS ------------------------------------------------------- */
