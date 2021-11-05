@@ -66,6 +66,11 @@ add_custom_command(OUTPUT
     setup.py
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     )
+install(
+    DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/libs
+    DESTINATION ${PYTHON_SITELIB}
+    FILES_MATCHING REGEX ".*\.(so|py)$"
+    )
 
 set(nmpc_SOURCES
     fooClass_api.h
@@ -76,7 +81,7 @@ set(nmpc_SOURCES
 add_executable(nmpc ${nmpc_SOURCES})
 target_include_directories(nmpc PRIVATE ${PYTHON_INCLUDE_DIRS} ${NUMPY_INCLUDE_DIRS})
 target_link_libraries(nmpc PUBLIC ${PYTHON_LIBRARIES})
-
+install(TARGETS nmpc EXPORT ${TARGETS_EXPORT_NAME} DESTINATION bin)
 
 FOREACH(plugin ${plugins})
   GET_FILENAME_COMPONENT(LIBRARY_NAME ${plugin} NAME)
