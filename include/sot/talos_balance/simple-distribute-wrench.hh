@@ -35,10 +35,11 @@
 /* --- INCLUDE --------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
+#include <pinocchio/fwd.hpp>
+// include pinocchio first
 #include <dynamic-graph/signal-helper.h>
 
 #include <map>
-#include <pinocchio/fwd.hpp>
 #include <pinocchio/multibody/data.hpp>
 #include <pinocchio/multibody/model.hpp>
 #include <sot/core/robot-utils.hh>

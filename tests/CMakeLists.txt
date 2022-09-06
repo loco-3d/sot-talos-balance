@@ -1,6 +1,7 @@
 # Copyright 2010, François Bleibel, Olivier Stasse, JRL, CNRS/AIST
 
-config_files_cmake(test-paths.h)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/test-paths.h.in
+               ${CMAKE_CURRENT_BINARY_DIR}/test-paths.h)
 
 # Make Boost.Test generates the main function in test cases.
 add_definitions(-DBOOST_TEST_DYN_LINK -DBOOST_TEST_MAIN)

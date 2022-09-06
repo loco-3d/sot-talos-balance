@@ -28,11 +28,12 @@
 /* --- INCLUDE --------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
+#include <pinocchio/fwd.hpp>
+// include pinocchio first
 #include <dynamic-graph/signal-helper.h>
 
 #include <boost/math/distributions/normal.hpp>  // for normal_distribution
 #include <map>
-#include <pinocchio/fwd.hpp>
 #include <sot/core/matrix-geometry.hh>
 #include <sot/core/robot-utils.hh>
 

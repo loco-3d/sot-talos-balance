@@ -34,6 +34,10 @@
 /* --------------------------------------------------------------------- */
 /* --- INCLUDE --------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
+#include <pinocchio/fwd.hpp>
+
+// include pinocchio first
+
 #include <dynamic-graph/linear-algebra.h>
 #include <dynamic-graph/signal-helper.h>
 

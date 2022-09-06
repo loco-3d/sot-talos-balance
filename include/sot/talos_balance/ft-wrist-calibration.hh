@@ -27,6 +27,8 @@
 /* --- INCLUDE --------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
+#include <pinocchio/fwd.hpp>
+// include pinocchio first
 #include <dynamic-graph/real-time-logger.h>
 #include <dynamic-graph/signal-helper.h>
 
@@ -34,7 +36,6 @@
 #include <pinocchio/algorithm/center-of-mass.hpp>
 #include <pinocchio/algorithm/frames.hpp>
 #include <pinocchio/algorithm/kinematics.hpp>
-#include <pinocchio/fwd.hpp>
 #include <pinocchio/multibody/model.hpp>
 #include <pinocchio/parsers/urdf.hpp>
 #include <pinocchio/spatial/motion.hpp>

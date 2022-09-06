@@ -26,11 +26,14 @@
 /* --- INCLUDE --------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
+#include <pinocchio/fwd.hpp>
+
+// include pinocchio first
+
 #include <dynamic-graph/real-time-logger.h>
 #include <dynamic-graph/signal-helper.h>
 
 #include <map>
-#include <pinocchio/fwd.hpp>
 #include <sot/core/matrix-geometry.hh>
 #include <sot/core/robot-utils.hh>
 #include <sot/talos_balance/robot/robot-wrapper.hh>
