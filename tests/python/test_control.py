@@ -1,7 +1,9 @@
 from __future__ import print_function
 
 import numpy as np
-from dynamic_graph.sot_talos_balance.joint_position_controller import JointPositionController
+from dynamic_graph.sot_talos_balance.joint_position_controller import (
+    JointPositionController,
+)
 
 controller = JointPositionController("ciao")
 
@@ -22,9 +24,9 @@ controller.init(N_JOINTS)
 
 controller.dqRef.recompute(1)
 
-print("\nKp: %s" % (controller.Kp.value, ))
-print("\nq: %s" % (controller.state.value, ))
-print("qDes: %s" % (controller.qDes.value, ))
-print("dqDes: %s" % (controller.dqDes.value, ))
+print("\nKp: %s" % (controller.Kp.value,))
+print("\nq: %s" % (controller.state.value,))
+print("qDes: %s" % (controller.qDes.value,))
+print("dqDes: %s" % (controller.dqDes.value,))
 
-print("\ndqRef: %s" % (controller.dqRef.value, ))
+print("\ndqRef: %s" % (controller.dqRef.value,))

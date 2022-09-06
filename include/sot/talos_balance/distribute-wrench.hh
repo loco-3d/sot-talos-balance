@@ -35,17 +35,16 @@
 /* --- INCLUDE --------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-#include <pinocchio/fwd.hpp>
-#include <sot/core/robot-utils.hh>
 #include <dynamic-graph/signal-helper.h>
 
-#include <map>
-#include "boost/assign.hpp"
-
-#include <pinocchio/multibody/model.hpp>
-#include <pinocchio/multibody/data.hpp>
-
 #include <eiquadprog/eiquadprog-fast.hpp>
+#include <map>
+#include <pinocchio/fwd.hpp>
+#include <pinocchio/multibody/data.hpp>
+#include <pinocchio/multibody/model.hpp>
+#include <sot/core/robot-utils.hh>
+
+#include "boost/assign.hpp"
 
 namespace dynamicgraph {
 namespace sot {
@@ -55,7 +54,8 @@ namespace talos_balance {
 /* --- CLASS ----------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-class DISTRIBUTE_WRENCH_EXPORT DistributeWrench : public ::dynamicgraph::Entity {
+class DISTRIBUTE_WRENCH_EXPORT DistributeWrench
+    : public ::dynamicgraph::Entity {
   DYNAMIC_GRAPH_ENTITY_DECL();
 
  public:
@@ -99,7 +99,8 @@ class DISTRIBUTE_WRENCH_EXPORT DistributeWrench : public ::dynamicgraph::Entity 
   /* --- ENTITY INHERITANCE --- */
   virtual void display(std::ostream& os) const;
 
-  Eigen::Vector3d computeCoP(const dynamicgraph::Vector& wrench, const pinocchio::SE3& pose) const;
+  Eigen::Vector3d computeCoP(const dynamicgraph::Vector& wrench,
+                             const pinocchio::SE3& pose) const;
 
   void set_right_foot_sizes(const dynamicgraph::Vector& s);
   void set_left_foot_sizes(const dynamicgraph::Vector& s);
@@ -107,12 +108,14 @@ class DISTRIBUTE_WRENCH_EXPORT DistributeWrench : public ::dynamicgraph::Entity 
   double m_eps;
 
  protected:
-  bool m_initSucceeded;      /// true if the entity has been successfully initialized
+  bool
+      m_initSucceeded;  /// true if the entity has been successfully initialized
   pinocchio::Model m_model;  /// Pinocchio robot model
   pinocchio::Data m_data;    /// Pinocchio robot data
   RobotUtilShrPtr m_robot_util;
 
-  //        pinocchio::SE3 m_ankle_M_ftSens; /// ankle to F/T sensor transformation
+  //        pinocchio::SE3 m_ankle_M_ftSens; /// ankle to F/T sensor
+  //        transformation
   pinocchio::SE3 m_ankle_M_sole;  /// ankle to sole transformation
 
   pinocchio::FrameIndex m_left_foot_id;
@@ -124,8 +127,10 @@ class DISTRIBUTE_WRENCH_EXPORT DistributeWrench : public ::dynamicgraph::Entity 
   Eigen::Matrix<double, 6, 1> m_wrenchLeft;
   Eigen::Matrix<double, 6, 1> m_wrenchRight;
 
-  Eigen::Vector4d m_left_foot_sizes;   /// sizes of the left foot (pos x, neg x, pos y, neg y)
-  Eigen::Vector4d m_right_foot_sizes;  /// sizes of the left foot (pos x, neg x, pos y, neg y)
+  Eigen::Vector4d m_left_foot_sizes;   /// sizes of the left foot (pos x, neg x,
+                                       /// pos y, neg y)
+  Eigen::Vector4d m_right_foot_sizes;  /// sizes of the left foot (pos x, neg x,
+                                       /// pos y, neg y)
 
   void computeWrenchFaceMatrix(const double mu);
   Eigen::Matrix<double, 16, 6> m_wrenchFaceMatrix;  // for modelling contact
@@ -162,8 +167,10 @@ class DISTRIBUTE_WRENCH_EXPORT DistributeWrench : public ::dynamicgraph::Entity 
   double m_wRatio;
   Eigen::VectorXd m_wAnkle;
 
-  void distributeWrench(const Eigen::VectorXd& wrenchDes, const double rho, const double mu);
-  void saturateWrench(const Eigen::VectorXd& wrenchDes, const int phase, const double mu);
+  void distributeWrench(const Eigen::VectorXd& wrenchDes, const double rho,
+                        const double mu);
+  void saturateWrench(const Eigen::VectorXd& wrenchDes, const int phase,
+                      const double mu);
 
   bool m_emergency_stop_triggered;
 };  // class DistributeWrench

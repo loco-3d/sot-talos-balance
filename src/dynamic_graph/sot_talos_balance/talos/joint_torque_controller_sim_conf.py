@@ -8,31 +8,78 @@ import numpy as np
 NJ = 32
 
 COULOMB_FRICTION_COMPENSATION_PERCENTAGE = 0.0
-k_p_torque = np.array(NJ * [
-    0.5,
-])
+k_p_torque = np.array(
+    NJ
+    * [
+        0.5,
+    ]
+)
 # torque control proportional gains
-k_d_torque = np.array(NJ * [
-    0.0,
-])
+k_d_torque = np.array(
+    NJ
+    * [
+        0.0,
+    ]
+)
 # torque control derivative gains
-k_i_torque = np.array(NJ * [
-    3.0,
-])
+k_i_torque = np.array(
+    NJ
+    * [
+        3.0,
+    ]
+)
 # torque control integral gains
-torque_integral_saturation = np.array(NJ * [
-    0.0,
-])
+torque_integral_saturation = np.array(
+    NJ
+    * [
+        0.0,
+    ]
+)
 poly_sign_dq = 3
 # order of polynomial to approximate Coulomb friction around zero velocity
-k_d_velocity = np.array(NJ * [
-    0.0,
-])
+k_d_velocity = np.array(
+    NJ
+    * [
+        0.0,
+    ]
+)
 # torque control derivative gains
-alpha_leaking = np.array([
-    75., 75., 75., 75., 75., 75., 75., 75., 75., 75., 75., 75., 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
-])
+alpha_leaking = np.array(
+    [
+        75.0,
+        75.0,
+        75.0,
+        75.0,
+        75.0,
+        75.0,
+        75.0,
+        75.0,
+        75.0,
+        75.0,
+        75.0,
+        75.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+    ]
+)
 
 # # PARAMETERS OF R_hip_y JOINT 0
 # k_p_torque[0] = 12.0;

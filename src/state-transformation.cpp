@@ -16,11 +16,11 @@
 
 #include "sot/talos_balance/state-transformation.hh"
 
-#include <sot/core/debug.hh>
-#include <dynamic-graph/factory.h>
-#include <dynamic-graph/command-bind.h>
-
 #include <dynamic-graph/all-commands.h>
+#include <dynamic-graph/command-bind.h>
+#include <dynamic-graph/factory.h>
+
+#include <sot/core/debug.hh>
 #include <sot/core/stop-watch.hh>
 
 namespace dynamicgraph {
@@ -30,9 +30,11 @@ namespace dg = ::dynamicgraph;
 using namespace dg;
 using namespace dg::command;
 
-// Size to be aligned                               "-------------------------------------------------------"
-#define PROFILE_STATETRANSFORMATION_Q_COMPUTATION "State transformation q computation                     "
-#define PROFILE_STATETRANSFORMATION_V_COMPUTATION "State transformation v computation                     "
+// Size to be aligned "-------------------------------------------------------"
+#define PROFILE_STATETRANSFORMATION_Q_COMPUTATION \
+  "State transformation q computation                     "
+#define PROFILE_STATETRANSFORMATION_V_COMPUTATION \
+  "State transformation v computation                     "
 
 #define INPUT_SIGNALS m_referenceFrameSIN << m_q_inSIN << m_v_inSIN
 
@@ -53,13 +55,17 @@ StateTransformation::StateTransformation(const std::string& name)
       CONSTRUCT_SIGNAL_IN(referenceFrame, MatrixHomogeneous),
       CONSTRUCT_SIGNAL_IN(q_in, dynamicgraph::Vector),
       CONSTRUCT_SIGNAL_IN(v_in, dynamicgraph::Vector),
-      CONSTRUCT_SIGNAL_OUT(q, dynamicgraph::Vector, m_referenceFrameSIN << m_q_inSIN),
-      CONSTRUCT_SIGNAL_OUT(v, dynamicgraph::Vector, m_referenceFrameSIN << m_v_inSIN),
+      CONSTRUCT_SIGNAL_OUT(q, dynamicgraph::Vector,
+                           m_referenceFrameSIN << m_q_inSIN),
+      CONSTRUCT_SIGNAL_OUT(v, dynamicgraph::Vector,
+                           m_referenceFrameSIN << m_v_inSIN),
       m_initSucceeded(false) {
   Entity::signalRegistration(INPUT_SIGNALS << OUTPUT_SIGNALS);
 
   /* Commands. */
-  addCommand("init", makeCommandVoid0(*this, &StateTransformation::init, docCommandVoid0("Initialize the entity.")));
+  addCommand("init",
+             makeCommandVoid0(*this, &StateTransformation::init,
+                              docCommandVoid0("Initialize the entity.")));
 }
 
 void StateTransformation::init() { m_initSucceeded = true; }
@@ -85,7 +91,8 @@ DEFINE_SIGNAL_OUT_FUNCTION(q, dynamicgraph::Vector) {
   const double yaw = euler[2];
 
   Eigen::Quaterniond quat;
-  quat = Eigen::AngleAxisd(yaw, Eigen::Vector3d::UnitZ()) * Eigen::AngleAxisd(pitch, Eigen::Vector3d::UnitY()) *
+  quat = Eigen::AngleAxisd(yaw, Eigen::Vector3d::UnitZ()) *
+         Eigen::AngleAxisd(pitch, Eigen::Vector3d::UnitY()) *
          Eigen::AngleAxisd(roll, Eigen::Vector3d::UnitX());
 
   MatrixHomogeneous M;

@@ -4,8 +4,10 @@ import os
 from time import sleep
 
 from dynamic_graph import plug
-from dynamic_graph.sot_talos_balance.create_entities_utils import (create_joint_controller,
-                                                                   create_joint_trajectory_generator)
+from dynamic_graph.sot_talos_balance.create_entities_utils import (
+    create_joint_controller,
+    create_joint_trajectory_generator,
+)
 
 
 def main(robot, gain):
@@ -29,7 +31,7 @@ def main(robot, gain):
     robot.controller.init(N_JOINTS)
 
     sleep(1.0)
-    os.system('rosservice call /start_dynamic_graph')
+    os.system("rosservice call /start_dynamic_graph")
     sleep(1.0)
     robot.traj_gen.move(31, -1.0, 1.0)
     sleep(1.1)

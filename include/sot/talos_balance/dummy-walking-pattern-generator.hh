@@ -34,13 +34,14 @@
 /* --------------------------------------------------------------------- */
 /* --- INCLUDE --------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
-#include <sot/core/robot-utils.hh>
-#include <dynamic-graph/signal-helper.h>
-#include <map>
-#include "boost/assign.hpp"
-
-#include <sot/core/matrix-geometry.hh>
 #include <dynamic-graph/linear-algebra.h>
+#include <dynamic-graph/signal-helper.h>
+
+#include <map>
+#include <sot/core/matrix-geometry.hh>
+#include <sot/core/robot-utils.hh>
+
+#include "boost/assign.hpp"
 
 namespace dynamicgraph {
 namespace sot {
@@ -50,7 +51,8 @@ namespace talos_balance {
 /* --- CLASS ----------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-class DUMMYWALKINGPATTERNGENERATOR_EXPORT DummyWalkingPatternGenerator : public ::dynamicgraph::Entity {
+class DUMMYWALKINGPATTERNGENERATOR_EXPORT DummyWalkingPatternGenerator
+    : public ::dynamicgraph::Entity {
   DYNAMIC_GRAPH_ENTITY_DECL();
 
  public:
@@ -99,7 +101,8 @@ class DUMMYWALKINGPATTERNGENERATOR_EXPORT DummyWalkingPatternGenerator : public 
   virtual void display(std::ostream& os) const;
 
  protected:
-  bool m_initSucceeded;  /// true if the entity has been successfully initialized
+  bool
+      m_initSucceeded;  /// true if the entity has been successfully initialized
 
   dynamicgraph::Vector actInv(MatrixHomogeneous m, dynamicgraph::Vector v);
   MatrixHomogeneous actInv(MatrixHomogeneous m1, MatrixHomogeneous m2);

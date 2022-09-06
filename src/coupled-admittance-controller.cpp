@@ -16,11 +16,11 @@
 
 #include "sot/talos_balance/coupled-admittance-controller.hh"
 
-#include <sot/core/debug.hh>
-#include <dynamic-graph/factory.h>
-#include <dynamic-graph/command-bind.h>
-
 #include <dynamic-graph/all-commands.h>
+#include <dynamic-graph/command-bind.h>
+#include <dynamic-graph/factory.h>
+
+#include <sot/core/debug.hh>
 #include <sot/core/stop-watch.hh>
 
 namespace dynamicgraph {
@@ -30,7 +30,7 @@ namespace dg = ::dynamicgraph;
 using namespace dg;
 using namespace dg::command;
 
-// Size to be aligned                                   "-------------------------------------------------------"
+// Size to be aligned "-------------------------------------------------------"
 
 #define PROFILE_COUPLED_ADMITTANCECONTROLLER_TAUSUM_COMPUTATION \
   "CoupledAdmittanceController: tauSum computation                "
@@ -49,10 +49,13 @@ using namespace dg::command;
 #define PROFILE_COUPLED_ADMITTANCECONTROLLER_DQREFR_COMPUTATION \
   "CoupledAdmittanceController: dqRefR computation                "
 
-#define INPUT_SIGNALS m_kSumSIN << m_kDiffSIN << m_tauLSIN << m_tauRSIN << m_tauDesLSIN << m_tauDesRSIN
+#define INPUT_SIGNALS                                               \
+  m_kSumSIN << m_kDiffSIN << m_tauLSIN << m_tauRSIN << m_tauDesLSIN \
+            << m_tauDesRSIN
 
-#define INNER_SIGNALS \
-  m_tauSumSINNER << m_tauDiffSINNER << m_tauDesSumSINNER << m_tauDesDiffSINNER << m_dqRefSumSINNER << m_dqRefDiffSINNER
+#define INNER_SIGNALS                                                          \
+  m_tauSumSINNER << m_tauDiffSINNER << m_tauDesSumSINNER << m_tauDesDiffSINNER \
+                 << m_dqRefSumSINNER << m_dqRefDiffSINNER
 
 #define OUTPUT_SIGNALS m_dqRefLSOUT << m_dqRefRSOUT
 
@@ -61,12 +64,14 @@ using namespace dg::command;
 typedef CoupledAdmittanceController EntityClassName;
 
 /* --- DG FACTORY ---------------------------------------------------- */
-DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(CoupledAdmittanceController, "CoupledAdmittanceController");
+DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(CoupledAdmittanceController,
+                                   "CoupledAdmittanceController");
 
 /* ------------------------------------------------------------------- */
 /* --- CONSTRUCTION -------------------------------------------------- */
 /* ------------------------------------------------------------------- */
-CoupledAdmittanceController::CoupledAdmittanceController(const std::string& name)
+CoupledAdmittanceController::CoupledAdmittanceController(
+    const std::string& name)
     : Entity(name),
       CONSTRUCT_SIGNAL_IN(kSum, dynamicgraph::Vector),
       CONSTRUCT_SIGNAL_IN(kDiff, dynamicgraph::Vector),
@@ -78,8 +83,12 @@ CoupledAdmittanceController::CoupledAdmittanceController(const std::string& name
       CONSTRUCT_SIGNAL_INNER(tauDiff, dynamicgraph::Vector, INPUT_SIGNALS),
       CONSTRUCT_SIGNAL_INNER(tauDesSum, dynamicgraph::Vector, INPUT_SIGNALS),
       CONSTRUCT_SIGNAL_INNER(tauDesDiff, dynamicgraph::Vector, INPUT_SIGNALS),
-      CONSTRUCT_SIGNAL_INNER(dqRefSum, dynamicgraph::Vector, INPUT_SIGNALS << m_tauSumSINNER << m_tauDesSumSINNER),
-      CONSTRUCT_SIGNAL_INNER(dqRefDiff, dynamicgraph::Vector, INPUT_SIGNALS << m_tauDiffSINNER << m_tauDesDiffSINNER),
+      CONSTRUCT_SIGNAL_INNER(
+          dqRefSum, dynamicgraph::Vector,
+          INPUT_SIGNALS << m_tauSumSINNER << m_tauDesSumSINNER),
+      CONSTRUCT_SIGNAL_INNER(
+          dqRefDiff, dynamicgraph::Vector,
+          INPUT_SIGNALS << m_tauDiffSINNER << m_tauDesDiffSINNER),
       CONSTRUCT_SIGNAL_OUT(dqRefL, dynamicgraph::Vector, INNER_SIGNALS),
       CONSTRUCT_SIGNAL_OUT(dqRefR, dynamicgraph::Vector, INNER_SIGNALS) {
   Entity::signalRegistration(INPUT_SIGNALS << INNER_SIGNALS << OUTPUT_SIGNALS);
@@ -115,20 +124,23 @@ DEFINE_SIGNAL_INNER_FUNCTION(tauDiff, dynamicgraph::Vector) {
 }
 
 DEFINE_SIGNAL_INNER_FUNCTION(tauDesSum, dynamicgraph::Vector) {
-  getProfiler().start(PROFILE_COUPLED_ADMITTANCECONTROLLER_TAUDESSUM_COMPUTATION);
+  getProfiler().start(
+      PROFILE_COUPLED_ADMITTANCECONTROLLER_TAUDESSUM_COMPUTATION);
 
   const Vector& tauDesL = m_tauDesLSIN(iter);
   const Vector& tauDesR = m_tauDesRSIN(iter);
 
   s = tauDesL + tauDesR;
 
-  getProfiler().stop(PROFILE_COUPLED_ADMITTANCECONTROLLER_TAUDESSUM_COMPUTATION);
+  getProfiler().stop(
+      PROFILE_COUPLED_ADMITTANCECONTROLLER_TAUDESSUM_COMPUTATION);
 
   return s;
 }
 
 DEFINE_SIGNAL_INNER_FUNCTION(tauDesDiff, dynamicgraph::Vector) {
-  getProfiler().start(PROFILE_COUPLED_ADMITTANCECONTROLLER_TAUDESDIFF_COMPUTATION);
+  getProfiler().start(
+      PROFILE_COUPLED_ADMITTANCECONTROLLER_TAUDESDIFF_COMPUTATION);
 
   const Vector& tauDesL = m_tauDesLSIN(iter);
   const Vector& tauDesR = m_tauDesRSIN(iter);
@@ -141,7 +153,8 @@ DEFINE_SIGNAL_INNER_FUNCTION(tauDesDiff, dynamicgraph::Vector) {
 }
 
 DEFINE_SIGNAL_INNER_FUNCTION(dqRefSum, dynamicgraph::Vector) {
-  getProfiler().start(PROFILE_COUPLED_ADMITTANCECONTROLLER_DQREFSUM_COMPUTATION);
+  getProfiler().start(
+      PROFILE_COUPLED_ADMITTANCECONTROLLER_DQREFSUM_COMPUTATION);
 
   const Vector& tau = m_tauSumSINNER(iter);
   const Vector& tauDes = m_tauDesSumSINNER(iter);
@@ -155,7 +168,8 @@ DEFINE_SIGNAL_INNER_FUNCTION(dqRefSum, dynamicgraph::Vector) {
 }
 
 DEFINE_SIGNAL_INNER_FUNCTION(dqRefDiff, dynamicgraph::Vector) {
-  getProfiler().start(PROFILE_COUPLED_ADMITTANCECONTROLLER_DQREFDIFF_COMPUTATION);
+  getProfiler().start(
+      PROFILE_COUPLED_ADMITTANCECONTROLLER_DQREFDIFF_COMPUTATION);
 
   const Vector& tau = m_tauDiffSINNER(iter);
   const Vector& tauDes = m_tauDesDiffSINNER(iter);
@@ -163,7 +177,8 @@ DEFINE_SIGNAL_INNER_FUNCTION(dqRefDiff, dynamicgraph::Vector) {
 
   s = k.cwiseProduct(tauDes - tau);
 
-  getProfiler().stop(PROFILE_COUPLED_ADMITTANCECONTROLLER_DQREFDIFF_COMPUTATION);
+  getProfiler().stop(
+      PROFILE_COUPLED_ADMITTANCECONTROLLER_DQREFDIFF_COMPUTATION);
 
   return s;
 }

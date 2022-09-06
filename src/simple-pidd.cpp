@@ -16,11 +16,12 @@
 
 #include "sot/talos_balance/simple-pidd.hh"
 
-#include <sot/core/debug.hh>
-#include <dynamic-graph/factory.h>
-#include <dynamic-graph/command-bind.h>
-
 #include <dynamic-graph/all-commands.h>
+#include <dynamic-graph/command-bind.h>
+#include <dynamic-graph/factory.h>
+
+#include <sot/core/debug.hh>
+
 #include "sot/core/stop-watch.hh"
 
 namespace dynamicgraph {
@@ -30,11 +31,13 @@ namespace dg = ::dynamicgraph;
 using namespace dg;
 using namespace dg::command;
 
-// Size to be aligned                              "-------------------------------------------------------"
-#define PROFILE_SIMPLE_PIDD_DDX_REF_COMPUTATION "SimplePIDD: ddx_ref computation                        "
+// Size to be aligned "-------------------------------------------------------"
+#define PROFILE_SIMPLE_PIDD_DDX_REF_COMPUTATION \
+  "SimplePIDD: ddx_ref computation                        "
 
-#define INPUT_SIGNALS \
-  m_KpSIN << m_KiSIN << m_KdSIN << m_decayFactorSIN << m_xSIN << m_x_desSIN << m_dxSIN << m_dx_desSIN << m_ddx_desSIN
+#define INPUT_SIGNALS                                                       \
+  m_KpSIN << m_KiSIN << m_KdSIN << m_decayFactorSIN << m_xSIN << m_x_desSIN \
+          << m_dxSIN << m_dx_desSIN << m_ddx_desSIN
 
 #define OUTPUT_SIGNALS m_ddx_refSOUT << m_dx_refSOUT
 
@@ -65,12 +68,17 @@ SimplePIDD::SimplePIDD(const std::string& name)
   Entity::signalRegistration(INPUT_SIGNALS << OUTPUT_SIGNALS);
 
   /* Commands. */
-  addCommand("init", makeCommandVoid2(*this, &SimplePIDD::init,
-                                      docCommandVoid2("Initialize the entity.", "time step", "number of elements")));
+  addCommand("init", makeCommandVoid2(
+                         *this, &SimplePIDD::init,
+                         docCommandVoid2("Initialize the entity.", "time step",
+                                         "number of elements")));
   addCommand("resetIntegralError",
-             makeCommandVoid0(*this, &SimplePIDD::resetIntegralError, docCommandVoid0("Set integral error to zero.")));
-  addCommand("resetVelocity", makeCommandVoid0(*this, &SimplePIDD::resetIntegralError,
-                                               docCommandVoid0("Set reference velocity to zero.")));
+             makeCommandVoid0(*this, &SimplePIDD::resetIntegralError,
+                              docCommandVoid0("Set integral error to zero.")));
+  addCommand(
+      "resetVelocity",
+      makeCommandVoid0(*this, &SimplePIDD::resetIntegralError,
+                       docCommandVoid0("Set reference velocity to zero.")));
 }
 
 void SimplePIDD::init(const double& dt, const int& N) {
@@ -90,7 +98,8 @@ void SimplePIDD::resetIntegralError() { m_integralError.setZero(); }
 
 DEFINE_SIGNAL_OUT_FUNCTION(ddx_ref, dynamicgraph::Vector) {
   if (!m_initSucceeded) {
-    SEND_WARNING_STREAM_MSG("Cannot compute signal ddx_ref before initialization!");
+    SEND_WARNING_STREAM_MSG(
+        "Cannot compute signal ddx_ref before initialization!");
     return s;
   }
 
@@ -112,7 +121,8 @@ DEFINE_SIGNAL_OUT_FUNCTION(ddx_ref, dynamicgraph::Vector) {
   Vector x_err = x_des - x;
   Vector dx_err = dx_des - dx;
 
-  Vector ddx_ref = ddx_des + Kd.cwiseProduct(dx_err) + Kp.cwiseProduct(x_err) + Ki.cwiseProduct(m_integralError);
+  Vector ddx_ref = ddx_des + Kd.cwiseProduct(dx_err) + Kp.cwiseProduct(x_err) +
+                   Ki.cwiseProduct(m_integralError);
 
   // update the integrator (AFTER using its value)
   m_integralError += (x_err - decayFactor * m_integralError) * m_dt;
@@ -126,7 +136,8 @@ DEFINE_SIGNAL_OUT_FUNCTION(ddx_ref, dynamicgraph::Vector) {
 
 DEFINE_SIGNAL_OUT_FUNCTION(dx_ref, dynamicgraph::Vector) {
   if (!m_initSucceeded) {
-    SEND_WARNING_STREAM_MSG("Cannot compute signal dx_ref before initialization!");
+    SEND_WARNING_STREAM_MSG(
+        "Cannot compute signal dx_ref before initialization!");
     return s;
   }
 

@@ -1,15 +1,17 @@
 #define _CRT_SECURE_NO_WARNINGS
 #define NOMINMAX
 
-#include <float.h>
-#include <cctype>
-#include <thread>
-#include <string.h>
-#include <cmath>
-#include <algorithm>
-#include <locale>
-
 #include "sot/talos_balance/sdk_qualisys/RTProtocol.h"
+
+#include <float.h>
+#include <string.h>
+
+#include <algorithm>
+#include <cctype>
+#include <cmath>
+#include <locale>
+#include <thread>
+
 #include "sot/talos_balance/sdk_qualisys/Markup.h"
 #include "sot/talos_balance/sdk_qualisys/Network.h"
 
@@ -24,14 +26,15 @@
 
 namespace {
 inline void ToLower(std::string& str) {
-  std::transform(str.begin(), str.end(), str.begin(), [](int c) { return std::tolower(c); });
+  std::transform(str.begin(), str.end(), str.begin(),
+                 [](int c) { return std::tolower(c); });
 }
 
 inline void RemoveInvalidChars(std::string& str) {
   auto isInvalidChar = [](int c) -> int {
-    // iscntrl: control codes(NUL, etc.), '\t', '\n', '\v', '\f', '\r', backspace (DEL)
-    // isspace: some common checks but also 0x20 (SPACE)
-    // return != 0 --> invalid char
+    // iscntrl: control codes(NUL, etc.), '\t', '\n', '\v', '\f', '\r',
+    // backspace (DEL) isspace: some common checks but also 0x20 (SPACE) return
+    // != 0 --> invalid char
     return std::iscntrl(c) + std::isspace(c);
   };
   str.erase(std::remove_if(str.begin(), str.end(), isInvalidChar), str.end());
@@ -66,8 +69,9 @@ CRTProtocol::~CRTProtocol() {
   }
 }  // ~CRTProtocol
 
-bool CRTProtocol::Connect(const char* pServerAddr, unsigned short nPort, unsigned short* pnUDPServerPort,
-                          int nMajorVersion, int nMinorVersion, bool bBigEndian) {
+bool CRTProtocol::Connect(const char* pServerAddr, unsigned short nPort,
+                          unsigned short* pnUDPServerPort, int nMajorVersion,
+                          int nMinorVersion, bool bBigEndian) {
   CRTPacket::EPacketType eType;
   char tTemp[100];
   char pResponseStr[256];
@@ -100,7 +104,8 @@ bool CRTProtocol::Connect(const char* pServerAddr, unsigned short nPort, unsigne
   if (mpoNetwork->Connect(pServerAddr, nPort)) {
     if (pnUDPServerPort != nullptr) {
       if (mpoNetwork->CreateUDPSocket(*pnUDPServerPort) == false) {
-        sprintf(maErrorStr, "CreateUDPSocket failed. %s", mpoNetwork->GetErrorString());
+        sprintf(maErrorStr, "CreateUDPSocket failed. %s",
+                mpoNetwork->GetErrorString());
         Disconnect();
         return false;
       }
@@ -115,11 +120,13 @@ bool CRTProtocol::Connect(const char* pServerAddr, unsigned short nPort, unsigne
         return false;
       } else if (eType == CRTPacket::PacketCommand) {
         const std::string welcomeMessage("QTM RT Interface connected");
-        if (strncmp(welcomeMessage.c_str(), mpoRTPacket->GetCommandString(), welcomeMessage.size()) == 0) {
+        if (strncmp(welcomeMessage.c_str(), mpoRTPacket->GetCommandString(),
+                    welcomeMessage.size()) == 0) {
           // Set protocol version
           if (SetVersion(nMajorVersion, nMinorVersion)) {
             // Set byte order.
-            // Unless we use protocol version 1.0, we have set the byte order by selecting the correct port.
+            // Unless we use protocol version 1.0, we have set the byte order by
+            // selecting the correct port.
 
             if ((mnMajorVersion == 1) && (mnMinorVersion == 0)) {
               if (mbBigEndian) {
@@ -201,7 +208,8 @@ bool CRTProtocol::SetVersion(int nMajorVersion, int nMinorVersion) {
   return false;
 }
 
-bool CRTProtocol::GetVersion(unsigned int& nMajorVersion, unsigned int& nMinorVersion) {
+bool CRTProtocol::GetVersion(unsigned int& nMajorVersion,
+                             unsigned int& nMinorVersion) {
   if (!Connected()) {
     return false;
   }
@@ -252,7 +260,9 @@ bool CRTProtocol::CheckLicense(const char* pLicenseCode) {
   return false;
 }
 
-bool CRTProtocol::DiscoverRTServer(unsigned short nServerPort, bool bNoLocalResponses, unsigned short nDiscoverPort) {
+bool CRTProtocol::DiscoverRTServer(unsigned short nServerPort,
+                                   bool bNoLocalResponses,
+                                   unsigned short nDiscoverPort) {
   char pData[10];
   SDiscoverResponse sResponse;
 
@@ -276,30 +286,37 @@ bool CRTProtocol::DiscoverRTServer(unsigned short nServerPort, bool bNoLocalResp
     int nReceived;
     do {
       unsigned int nAddr = 0;
-      nReceived = mpoNetwork->Receive(maDataBuff, mDataBuffSize, false, 100000, &nAddr);
+      nReceived =
+          mpoNetwork->Receive(maDataBuff, mDataBuffSize, false, 100000, &nAddr);
 
       if (nReceived != -1 && nReceived > 8) {
         if (CRTPacket::GetType(maDataBuff) == CRTPacket::PacketCommand) {
           char* response = CRTPacket::GetCommandString(maDataBuff);
           sResponse.nAddr = nAddr;
-          sResponse.nBasePort = CRTPacket::GetDiscoverResponseBasePort(maDataBuff);
+          sResponse.nBasePort =
+              CRTPacket::GetDiscoverResponseBasePort(maDataBuff);
 
-          if (response && (!bNoLocalResponses || !mpoNetwork->IsLocalAddress(nAddr))) {
+          if (response &&
+              (!bNoLocalResponses || !mpoNetwork->IsLocalAddress(nAddr))) {
             strcpy(sResponse.message, response);
             mvsDiscoverResponseList.push_back(sResponse);
           }
         }
       }
-    } while (nReceived != -1 && nReceived > 8);  // Keep reading until no more responses.
+    } while (nReceived != -1 &&
+             nReceived > 8);  // Keep reading until no more responses.
 
     return true;
   }
   return false;
 }
 
-int CRTProtocol::GetNumberOfDiscoverResponses() { return (int)mvsDiscoverResponseList.size(); }
+int CRTProtocol::GetNumberOfDiscoverResponses() {
+  return (int)mvsDiscoverResponseList.size();
+}
 
-bool CRTProtocol::GetDiscoverResponse(unsigned int nIndex, unsigned int& nAddr, unsigned short& nBasePort,
+bool CRTProtocol::GetDiscoverResponse(unsigned int nIndex, unsigned int& nAddr,
+                                      unsigned short& nBasePort,
                                       std::string& message) {
   if (nIndex < mvsDiscoverResponseList.size()) {
     nAddr = mvsDiscoverResponseList[nIndex].nAddr;
@@ -310,12 +327,14 @@ bool CRTProtocol::GetDiscoverResponse(unsigned int nIndex, unsigned int& nAddr, 
   return false;
 }
 
-bool CRTProtocol::GetCurrentFrame(unsigned int nComponentType, const SComponentOptions& componentOptions) {
+bool CRTProtocol::GetCurrentFrame(unsigned int nComponentType,
+                                  const SComponentOptions& componentOptions) {
   char pCommandStr[256];
   strcpy(pCommandStr, "GetCurrentFrame ");
 
   std::string::size_type nCommandStrSize = strlen(pCommandStr);
-  if (GetComponentString(pCommandStr + (int)nCommandStrSize, nComponentType, componentOptions)) {
+  if (GetComponentString(pCommandStr + (int)nCommandStrSize, nComponentType,
+                         componentOptions)) {
     if (SendCommand(pCommandStr)) {
       return true;
     }
@@ -326,8 +345,10 @@ bool CRTProtocol::GetCurrentFrame(unsigned int nComponentType, const SComponentO
   return false;
 }
 
-bool CRTProtocol::StreamFrames(EStreamRate eRate, unsigned int nRateArg, unsigned short nUDPPort, const char* pUDPAddr,
-                               unsigned int nComponentType, const SComponentOptions& componentOptions) {
+bool CRTProtocol::StreamFrames(EStreamRate eRate, unsigned int nRateArg,
+                               unsigned short nUDPPort, const char* pUDPAddr,
+                               unsigned int nComponentType,
+                               const SComponentOptions& componentOptions) {
   char pCommandStr[256];
 
   if (eRate == RateFrequencyDivisor) {
@@ -346,12 +367,14 @@ bool CRTProtocol::StreamFrames(EStreamRate eRate, unsigned int nRateArg, unsigne
       strcpy(maErrorStr, "UDP address string too long.");
       return false;
     }
-    sprintf(pCommandStr, "%s UDP%s%s:%d ", pCommandStr, pUDPAddr != nullptr ? ":" : "",
-            pUDPAddr != nullptr ? pUDPAddr : "", nUDPPort);
+    sprintf(pCommandStr, "%s UDP%s%s:%d ", pCommandStr,
+            pUDPAddr != nullptr ? ":" : "", pUDPAddr != nullptr ? pUDPAddr : "",
+            nUDPPort);
   }
 
   std::string::size_type nCommandStrSize = strlen(pCommandStr);
-  if (GetComponentString(pCommandStr + (int)nCommandStrSize, nComponentType, componentOptions)) {
+  if (GetComponentString(pCommandStr + (int)nCommandStrSize, nComponentType,
+                         componentOptions)) {
     if (SendCommand(pCommandStr)) {
       return true;
     }
@@ -371,7 +394,8 @@ bool CRTProtocol::StreamFramesStop() {
   return false;
 }
 
-bool CRTProtocol::GetState(CRTPacket::EEvent& eEvent, bool bUpdate, int nTimeout) {
+bool CRTProtocol::GetState(CRTPacket::EEvent& eEvent, bool bUpdate,
+                           int nTimeout) {
   CRTPacket::EPacketType eType;
 
   if (bUpdate) {
@@ -408,9 +432,13 @@ bool CRTProtocol::GetCapture(const char* pFileName, bool bC3D) {
   if (mpFileBuffer != nullptr) {
     if (bC3D) {
       // C3D file
-      if (SendCommand((mnMajorVersion > 1 || mnMinorVersion > 7) ? "GetCaptureC3D" : "GetCapture", pResponseStr)) {
+      if (SendCommand((mnMajorVersion > 1 || mnMinorVersion > 7)
+                          ? "GetCaptureC3D"
+                          : "GetCapture",
+                      pResponseStr)) {
         if (strcmp(pResponseStr, "Sending capture") == 0) {
-          if (ReceiveRTPacket(eType, true, 5000000) > 0)  // Wait for C3D file in 5 seconds.
+          if (ReceiveRTPacket(eType, true, 5000000) >
+              0)  // Wait for C3D file in 5 seconds.
           {
             if (eType == CRTPacket::PacketC3DFile) {
               if (mpFileBuffer != nullptr) {
@@ -426,16 +454,20 @@ bool CRTProtocol::GetCapture(const char* pFileName, bool bC3D) {
           }
         } else {
           sprintf(maErrorStr, "%s failed.",
-                  (mnMajorVersion > 1 || mnMinorVersion > 7) ? "GetCaptureC3D" : "GetCapture");
+                  (mnMajorVersion > 1 || mnMinorVersion > 7) ? "GetCaptureC3D"
+                                                             : "GetCapture");
         }
       } else {
-        sprintf(maErrorStr, "%s failed.", (mnMajorVersion > 1 || mnMinorVersion > 7) ? "GetCaptureC3D" : "GetCapture");
+        sprintf(maErrorStr, "%s failed.",
+                (mnMajorVersion > 1 || mnMinorVersion > 7) ? "GetCaptureC3D"
+                                                           : "GetCapture");
       }
     } else {
       // QTM file
       if (SendCommand("GetCaptureQTM", pResponseStr)) {
         if (strcmp(pResponseStr, "Sending capture") == 0) {
-          if (ReceiveRTPacket(eType, true, 5000000) > 0)  // Wait for QTM file in 5 seconds.
+          if (ReceiveRTPacket(eType, true, 5000000) >
+              0)  // Wait for QTM file in 5 seconds.
           {
             if (eType == CRTPacket::PacketQTMFile) {
               if (mpFileBuffer != nullptr) {
@@ -485,7 +517,10 @@ bool CRTProtocol::SetQTMEvent(const char* pLabel) {
   char pResponseStr[256];
 
   if (strlen(pLabel) <= 92) {
-    sprintf(tTemp, "%s %s", (mnMajorVersion > 1 || mnMinorVersion > 7) ? "SetQTMEvent" : "Event", pLabel);
+    sprintf(
+        tTemp, "%s %s",
+        (mnMajorVersion > 1 || mnMinorVersion > 7) ? "SetQTMEvent" : "Event",
+        pLabel);
 
     if (SendCommand(tTemp, pResponseStr)) {
       if (strcmp(pResponseStr, "Event set") == 0) {
@@ -495,7 +530,9 @@ bool CRTProtocol::SetQTMEvent(const char* pLabel) {
     if (pResponseStr) {
       sprintf(maErrorStr, "%s.", pResponseStr);
     } else {
-      sprintf(maErrorStr, "%s failed.", (mnMajorVersion > 1 || mnMinorVersion > 7) ? "SetQTMEvent" : "Event");
+      sprintf(
+          maErrorStr, "%s failed.",
+          (mnMajorVersion > 1 || mnMinorVersion > 7) ? "SetQTMEvent" : "Event");
     }
   } else {
     strcpy(maErrorStr, "Event label too long.");
@@ -516,7 +553,8 @@ bool CRTProtocol::TakeControl(const char* pPassword) {
     }
   }
   if (SendCommand(pCmd, pResponseStr)) {
-    if (strcmp("You are now master", pResponseStr) == 0 || strcmp("You are already master", pResponseStr) == 0) {
+    if (strcmp("You are now master", pResponseStr) == 0 ||
+        strcmp("You are already master", pResponseStr) == 0) {
       mbIsMaster = true;
       return true;
     }
@@ -554,7 +592,8 @@ bool CRTProtocol::NewMeasurement() {
   char pResponseStr[256];
 
   if (SendCommand("New", pResponseStr)) {
-    if (strcmp(pResponseStr, "Creating new connection") == 0 || strcmp(pResponseStr, "Already connected") == 0) {
+    if (strcmp(pResponseStr, "Creating new connection") == 0 ||
+        strcmp(pResponseStr, "Already connected") == 0) {
       return true;
     }
   }
@@ -570,8 +609,10 @@ bool CRTProtocol::CloseMeasurement() {
   char pResponseStr[256];
 
   if (SendCommand("Close", pResponseStr)) {
-    if (strcmp(pResponseStr, "Closing connection") == 0 || strcmp(pResponseStr, "File closed") == 0 ||
-        strcmp(pResponseStr, "Closing file") == 0 || strcmp(pResponseStr, "No connection to close") == 0) {
+    if (strcmp(pResponseStr, "Closing connection") == 0 ||
+        strcmp(pResponseStr, "File closed") == 0 ||
+        strcmp(pResponseStr, "Closing file") == 0 ||
+        strcmp(pResponseStr, "No connection to close") == 0) {
       return true;
     }
   }
@@ -641,7 +682,8 @@ bool CRTProtocol::LoadCapture(const char* pFileName) {
   if (strlen(pFileName) <= 94) {
     sprintf(tTemp, "Load %s", pFileName);
 
-    if (SendCommand(tTemp, pResponseStr, 20000000))  // Set timeout to 20 s for Load command.
+    if (SendCommand(tTemp, pResponseStr,
+                    20000000))  // Set timeout to 20 s for Load command.
     {
       if (strcmp(pResponseStr, "Measurement loaded") == 0) {
         return true;
@@ -658,7 +700,8 @@ bool CRTProtocol::LoadCapture(const char* pFileName) {
   return false;
 }
 
-bool CRTProtocol::SaveCapture(const char* pFileName, bool bOverwrite, char* pNewFileName, int nSizeOfNewFileName) {
+bool CRTProtocol::SaveCapture(const char* pFileName, bool bOverwrite,
+                              char* pNewFileName, int nSizeOfNewFileName) {
   char tTemp[100];
   char pResponseStr[256];
   char tNewFileNameTmp[300];
@@ -675,7 +718,8 @@ bool CRTProtocol::SaveCapture(const char* pFileName, bool bOverwrite, char* pNew
         }
         return true;
       }
-      if (sscanf(pResponseStr, "Measurement saved as '%[^']'", tNewFileNameTmp) == 1) {
+      if (sscanf(pResponseStr, "Measurement saved as '%[^']'",
+                 tNewFileNameTmp) == 1) {
         if (pNewFileName) {
           strcpy(pNewFileName, tNewFileNameTmp);
         }
@@ -788,11 +832,13 @@ bool CRTProtocol::GetEventString(CRTPacket::EEvent eEvent, char* pStr) {
   return true;
 }
 
-bool CRTProtocol::ConvertRateString(const char* pRate, EStreamRate& eRate, unsigned int& nRateArg) {
+bool CRTProtocol::ConvertRateString(const char* pRate, EStreamRate& eRate,
+                                    unsigned int& nRateArg) {
   std::string rateString;
 
   rateString.assign(pRate);
-  std::transform(rateString.begin(), rateString.end(), rateString.begin(), ::tolower);
+  std::transform(rateString.begin(), rateString.end(), rateString.begin(),
+                 ::tolower);
 
   eRate = RateNone;
 
@@ -819,7 +865,8 @@ unsigned int CRTProtocol::ConvertComponentString(const char* pComponentType) {
 
   componentString.assign(pComponentType);
   // Make string lower case.
-  std::transform(componentString.begin(), componentString.end(), componentString.begin(), ::tolower);
+  std::transform(componentString.begin(), componentString.end(),
+                 componentString.begin(), ::tolower);
 
   if (componentString.find("2d") != std::string::npos) {
     componentTypes += CRTProtocol::cComponent2d;
@@ -878,7 +925,8 @@ unsigned int CRTProtocol::ConvertComponentString(const char* pComponentType) {
   return componentTypes;
 }
 
-bool CRTProtocol::GetComponentString(char* pComponentStr, unsigned int nComponentType,
+bool CRTProtocol::GetComponentString(char* pComponentStr,
+                                     unsigned int nComponentType,
                                      const SComponentOptions& options) {
   pComponentStr[0] = 0;
 
@@ -960,7 +1008,8 @@ bool CRTProtocol::GetComponentString(char* pComponentStr, unsigned int nComponen
   return (pComponentStr[0] != 0);
 }
 
-int CRTProtocol::ReceiveRTPacket(CRTPacket::EPacketType& eType, bool bSkipEvents, int nTimeout) {
+int CRTProtocol::ReceiveRTPacket(CRTPacket::EPacketType& eType,
+                                 bool bSkipEvents, int nTimeout) {
   int nRecved = 0;
   unsigned int nRecvedTotal = 0;
   unsigned int nFrameSize;
@@ -988,17 +1037,20 @@ int CRTProtocol::ReceiveRTPacket(CRTPacket::EPacketType& eType, bool bSkipEvents
     }
     nRecvedTotal += nRecved;
 
-    bool bBigEndian = (mbBigEndian || (mnMajorVersion == 1 && mnMinorVersion == 0));
+    bool bBigEndian =
+        (mbBigEndian || (mnMajorVersion == 1 && mnMinorVersion == 0));
     nFrameSize = mpoRTPacket->GetSize(maDataBuff, bBigEndian);
     eType = mpoRTPacket->GetType(maDataBuff, bBigEndian);
 
     unsigned int nReadSize;
 
-    if (eType == CRTPacket::PacketC3DFile || eType == CRTPacket::PacketQTMFile) {
+    if (eType == CRTPacket::PacketC3DFile ||
+        eType == CRTPacket::PacketQTMFile) {
       if (mpFileBuffer != nullptr) {
         rewind(mpFileBuffer);  // Start from the beginning
-        if (fwrite(maDataBuff + sizeof(int) * 2, 1, nRecvedTotal - sizeof(int) * 2, mpFileBuffer) !=
-            nRecvedTotal - sizeof(int) * 2) {
+        if (fwrite(maDataBuff + sizeof(int) * 2, 1,
+                   nRecvedTotal - sizeof(int) * 2,
+                   mpFileBuffer) != nRecvedTotal - sizeof(int) * 2) {
           strcpy(maErrorStr, "Failed to write file to disk.");
           fclose(mpFileBuffer);
           mpFileBuffer = nullptr;
@@ -1011,14 +1063,16 @@ int CRTProtocol::ReceiveRTPacket(CRTPacket::EPacketType& eType, bool bSkipEvents
             nReadSize = mDataBuffSize;
           }
           // As long as we haven't received enough data, wait for more
-          nRecved = mpoNetwork->Receive(&(maDataBuff[sizeof(int) * 2]), nReadSize, false, nTimeout);
+          nRecved = mpoNetwork->Receive(&(maDataBuff[sizeof(int) * 2]),
+                                        nReadSize, false, nTimeout);
           if (nRecved <= 0) {
             strcpy(maErrorStr, "Socket Error.");
             fclose(mpFileBuffer);
             mpFileBuffer = nullptr;
             return -1;
           }
-          if (fwrite(maDataBuff + sizeof(int) * 2, 1, nRecved, mpFileBuffer) != (size_t)nRecved) {
+          if (fwrite(maDataBuff + sizeof(int) * 2, 1, nRecved, mpFileBuffer) !=
+              (size_t)nRecved) {
             strcpy(maErrorStr, "Failed to write file to disk.");
             fclose(mpFileBuffer);
             mpFileBuffer = nullptr;
@@ -1046,7 +1100,9 @@ int CRTProtocol::ReceiveRTPacket(CRTPacket::EPacketType& eType, bool bSkipEvents
       // Receive more data until we have read the whole packet
       while (nRecvedTotal < nFrameSize) {
         // As long as we haven't received enough data, wait for more
-        nRecved = mpoNetwork->Receive(&(maDataBuff[nRecvedTotal]), nFrameSize - nRecvedTotal, false, nTimeout);
+        nRecved =
+            mpoNetwork->Receive(&(maDataBuff[nRecvedTotal]),
+                                nFrameSize - nRecvedTotal, false, nTimeout);
         if (nRecved <= 0) {
           strcpy(maErrorStr, "Socket Error.");
           return -1;
@@ -1056,7 +1112,8 @@ int CRTProtocol::ReceiveRTPacket(CRTPacket::EPacketType& eType, bool bSkipEvents
     }
 
     mpoRTPacket->SetData(maDataBuff);
-    if (mpoRTPacket->GetEvent(meLastEvent))  // Update last event if there is an event
+    if (mpoRTPacket->GetEvent(
+            meLastEvent))  // Update last event if there is an event
     {
       if (meLastEvent != CRTPacket::EventCameraSettingsChanged) {
         meState = meLastEvent;
@@ -1074,7 +1131,8 @@ int CRTProtocol::ReceiveRTPacket(CRTPacket::EPacketType& eType, bool bSkipEvents
 
 CRTPacket* CRTProtocol::GetRTPacket() { return mpoRTPacket; }
 
-bool CRTProtocol::ReadXmlBool(CMarkup* xml, const std::string& element, bool& value) const {
+bool CRTProtocol::ReadXmlBool(CMarkup* xml, const std::string& element,
+                              bool& value) const {
   if (!xml->FindChildElem(element.c_str())) {
     return false;
   }
@@ -1120,7 +1178,10 @@ bool CRTProtocol::ReadCameraSystemSettings() {
     if (eType == CRTPacket::PacketError) {
       sprintf(maErrorStr, "%s.", mpoRTPacket->GetErrorString());
     } else {
-      sprintf(maErrorStr, "GetParameters General returned wrong packet type. Got type %d expected type 2.", eType);
+      sprintf(maErrorStr,
+              "GetParameters General returned wrong packet type. Got type %d "
+              "expected type 2.",
+              eType);
     }
     return false;
   }
@@ -1143,18 +1204,23 @@ bool CRTProtocol::ReadCameraSystemSettings() {
   }
   msGeneralSettings.fCaptureTime = (float)atof(oXML.GetChildData().c_str());
 
-  // Refactored variant of all this copy/paste code. TODO: Refactor everything else.
-  if (!ReadXmlBool(&oXML, "Start_On_External_Trigger", msGeneralSettings.bStartOnExternalTrigger)) {
+  // Refactored variant of all this copy/paste code. TODO: Refactor everything
+  // else.
+  if (!ReadXmlBool(&oXML, "Start_On_External_Trigger",
+                   msGeneralSettings.bStartOnExternalTrigger)) {
     return false;
   }
   if (mnMajorVersion > 1 || mnMinorVersion > 14) {
-    if (!ReadXmlBool(&oXML, "Start_On_Trigger_NO", msGeneralSettings.bStartOnTrigNO)) {
+    if (!ReadXmlBool(&oXML, "Start_On_Trigger_NO",
+                     msGeneralSettings.bStartOnTrigNO)) {
       return false;
     }
-    if (!ReadXmlBool(&oXML, "Start_On_Trigger_NC", msGeneralSettings.bStartOnTrigNC)) {
+    if (!ReadXmlBool(&oXML, "Start_On_Trigger_NC",
+                     msGeneralSettings.bStartOnTrigNC)) {
       return false;
     }
-    if (!ReadXmlBool(&oXML, "Start_On_Trigger_Software", msGeneralSettings.bStartOnTrigSoftware)) {
+    if (!ReadXmlBool(&oXML, "Start_On_Trigger_Software",
+                     msGeneralSettings.bStartOnTrigSoftware)) {
       return false;
     }
   }
@@ -1244,7 +1310,8 @@ bool CRTProtocol::ReadCameraSystemSettings() {
   std::transform(tStr.begin(), tStr.end(), tStr.begin(), ::tolower);
 
   if (tStr == "none") {
-    msGeneralSettings.sExternalTimebase.fNominalFrequency = -1;  // -1 = disabled
+    msGeneralSettings.sExternalTimebase.fNominalFrequency =
+        -1;  // -1 = disabled
   } else {
     float fFrequency;
     if (sscanf(tStr.c_str(), "%f", &fFrequency) == 1) {
@@ -1291,10 +1358,13 @@ bool CRTProtocol::ReadCameraSystemSettings() {
 
   oXML.OutOfElem();  // External_Time_Base
 
-  const char* processings[3] = {"Processing_Actions", "RealTime_Processing_Actions", "Reprocessing_Actions"};
-  EProcessingActions* processingActions[3] = {&msGeneralSettings.eProcessingActions,
-                                              &msGeneralSettings.eRtProcessingActions,
-                                              &msGeneralSettings.eReprocessingActions};
+  const char* processings[3] = {"Processing_Actions",
+                                "RealTime_Processing_Actions",
+                                "Reprocessing_Actions"};
+  EProcessingActions* processingActions[3] = {
+      &msGeneralSettings.eProcessingActions,
+      &msGeneralSettings.eRtProcessingActions,
+      &msGeneralSettings.eReprocessingActions};
   auto actionsCount = (mnMajorVersion > 1 || mnMinorVersion > 13) ? 3 : 1;
   for (auto i = 0; i < actionsCount; i++) {
     // ==================== Processing actions ====================
@@ -1310,7 +1380,8 @@ bool CRTProtocol::ReadCameraSystemSettings() {
         return false;
       }
       if (CompareNoCase(oXML.GetChildData(), "true")) {
-        *processingActions[i] = (EProcessingActions)(*processingActions[i] + ProcessingPreProcess2D);
+        *processingActions[i] = (EProcessingActions)(*processingActions[i] +
+                                                     ProcessingPreProcess2D);
       }
     }
 
@@ -1320,10 +1391,12 @@ bool CRTProtocol::ReadCameraSystemSettings() {
     tStr = oXML.GetChildData();
     std::transform(tStr.begin(), tStr.end(), tStr.begin(), ::tolower);
     if (tStr == "3d") {
-      *processingActions[i] = (EProcessingActions)(*processingActions[i] + ProcessingTracking3D);
+      *processingActions[i] =
+          (EProcessingActions)(*processingActions[i] + ProcessingTracking3D);
     } else if (tStr == "2d" && i != 1)  // i != 1 => Not RtProcessingSettings
     {
-      *processingActions[i] = (EProcessingActions)(*processingActions[i] + ProcessingTracking2D);
+      *processingActions[i] =
+          (EProcessingActions)(*processingActions[i] + ProcessingTracking2D);
     }
 
     if (i != 1)  // Not RtProcessingSettings
@@ -1332,14 +1405,16 @@ bool CRTProtocol::ReadCameraSystemSettings() {
         return false;
       }
       if (CompareNoCase(oXML.GetChildData(), "true")) {
-        *processingActions[i] = (EProcessingActions)(*processingActions[i] + ProcessingTwinSystemMerge);
+        *processingActions[i] = (EProcessingActions)(*processingActions[i] +
+                                                     ProcessingTwinSystemMerge);
       }
 
       if (!oXML.FindChildElem("SplineFill")) {
         return false;
       }
       if (CompareNoCase(oXML.GetChildData(), "true")) {
-        *processingActions[i] = (EProcessingActions)(*processingActions[i] + ProcessingSplineFill);
+        *processingActions[i] =
+            (EProcessingActions)(*processingActions[i] + ProcessingSplineFill);
       }
     }
 
@@ -1347,21 +1422,24 @@ bool CRTProtocol::ReadCameraSystemSettings() {
       return false;
     }
     if (CompareNoCase(oXML.GetChildData(), "true")) {
-      *processingActions[i] = (EProcessingActions)(*processingActions[i] + ProcessingAIM);
+      *processingActions[i] =
+          (EProcessingActions)(*processingActions[i] + ProcessingAIM);
     }
 
     if (!oXML.FindChildElem("Track6DOF")) {
       return false;
     }
     if (CompareNoCase(oXML.GetChildData(), "true")) {
-      *processingActions[i] = (EProcessingActions)(*processingActions[i] + Processing6DOFTracking);
+      *processingActions[i] =
+          (EProcessingActions)(*processingActions[i] + Processing6DOFTracking);
     }
 
     if (!oXML.FindChildElem("ForceData")) {
       return false;
     }
     if (CompareNoCase(oXML.GetChildData(), "true")) {
-      *processingActions[i] = (EProcessingActions)(*processingActions[i] + ProcessingForceData);
+      *processingActions[i] =
+          (EProcessingActions)(*processingActions[i] + ProcessingForceData);
     }
 
     if (mnMajorVersion > 1 || mnMinorVersion > 11) {
@@ -1369,7 +1447,8 @@ bool CRTProtocol::ReadCameraSystemSettings() {
         return false;
       }
       if (CompareNoCase(oXML.GetChildData(), "true")) {
-        *processingActions[i] = (EProcessingActions)(*processingActions[i] + ProcessingGazeVector);
+        *processingActions[i] =
+            (EProcessingActions)(*processingActions[i] + ProcessingGazeVector);
       }
     }
 
@@ -1379,21 +1458,25 @@ bool CRTProtocol::ReadCameraSystemSettings() {
         return false;
       }
       if (CompareNoCase(oXML.GetChildData(), "true")) {
-        *processingActions[i] = (EProcessingActions)(*processingActions[i] + ProcessingExportTSV);
+        *processingActions[i] =
+            (EProcessingActions)(*processingActions[i] + ProcessingExportTSV);
       }
 
       if (!oXML.FindChildElem("ExportC3D")) {
         return false;
       }
       if (CompareNoCase(oXML.GetChildData(), "true")) {
-        *processingActions[i] = (EProcessingActions)(*processingActions[i] + ProcessingExportC3D);
+        *processingActions[i] =
+            (EProcessingActions)(*processingActions[i] + ProcessingExportC3D);
       }
 
       if (!oXML.FindChildElem("ExportMatlabFile")) {
         return false;
       }
       if (CompareNoCase(oXML.GetChildData(), "true")) {
-        *processingActions[i] = (EProcessingActions)(*processingActions[i] + ProcessingExportMatlabFile);
+        *processingActions[i] =
+            (EProcessingActions)(*processingActions[i] +
+                                 ProcessingExportMatlabFile);
       }
 
       if (mnMajorVersion > 1 || mnMinorVersion > 11) {
@@ -1401,7 +1484,8 @@ bool CRTProtocol::ReadCameraSystemSettings() {
           return false;
         }
         if (CompareNoCase(oXML.GetChildData(), "true")) {
-          *processingActions[i] = (EProcessingActions)(*processingActions[i] + ProcessingExportAviFile);
+          *processingActions[i] = (EProcessingActions)(*processingActions[i] +
+                                                       ProcessingExportAviFile);
         }
       }
     }
@@ -1672,47 +1756,56 @@ bool CRTProtocol::ReadCameraSystemSettings() {
     if (!oXML.FindChildElem("Rot_1_1")) {
       return false;
     }
-    sCameraSettings.fPositionRotMatrix[0][0] = (float)atof(oXML.GetChildData().c_str());
+    sCameraSettings.fPositionRotMatrix[0][0] =
+        (float)atof(oXML.GetChildData().c_str());
 
     if (!oXML.FindChildElem("Rot_2_1")) {
       return false;
     }
-    sCameraSettings.fPositionRotMatrix[1][0] = (float)atof(oXML.GetChildData().c_str());
+    sCameraSettings.fPositionRotMatrix[1][0] =
+        (float)atof(oXML.GetChildData().c_str());
 
     if (!oXML.FindChildElem("Rot_3_1")) {
       return false;
     }
-    sCameraSettings.fPositionRotMatrix[2][0] = (float)atof(oXML.GetChildData().c_str());
+    sCameraSettings.fPositionRotMatrix[2][0] =
+        (float)atof(oXML.GetChildData().c_str());
 
     if (!oXML.FindChildElem("Rot_1_2")) {
       return false;
     }
-    sCameraSettings.fPositionRotMatrix[0][1] = (float)atof(oXML.GetChildData().c_str());
+    sCameraSettings.fPositionRotMatrix[0][1] =
+        (float)atof(oXML.GetChildData().c_str());
 
     if (!oXML.FindChildElem("Rot_2_2")) {
       return false;
     }
-    sCameraSettings.fPositionRotMatrix[1][1] = (float)atof(oXML.GetChildData().c_str());
+    sCameraSettings.fPositionRotMatrix[1][1] =
+        (float)atof(oXML.GetChildData().c_str());
 
     if (!oXML.FindChildElem("Rot_3_2")) {
       return false;
     }
-    sCameraSettings.fPositionRotMatrix[2][1] = (float)atof(oXML.GetChildData().c_str());
+    sCameraSettings.fPositionRotMatrix[2][1] =
+        (float)atof(oXML.GetChildData().c_str());
 
     if (!oXML.FindChildElem("Rot_1_3")) {
       return false;
     }
-    sCameraSettings.fPositionRotMatrix[0][2] = (float)atof(oXML.GetChildData().c_str());
+    sCameraSettings.fPositionRotMatrix[0][2] =
+        (float)atof(oXML.GetChildData().c_str());
 
     if (!oXML.FindChildElem("Rot_2_3")) {
       return false;
     }
-    sCameraSettings.fPositionRotMatrix[1][2] = (float)atof(oXML.GetChildData().c_str());
+    sCameraSettings.fPositionRotMatrix[1][2] =
+        (float)atof(oXML.GetChildData().c_str());
 
     if (!oXML.FindChildElem("Rot_3_3")) {
       return false;
     }
-    sCameraSettings.fPositionRotMatrix[2][2] = (float)atof(oXML.GetChildData().c_str());
+    sCameraSettings.fPositionRotMatrix[2][2] =
+        (float)atof(oXML.GetChildData().c_str());
 
     oXML.OutOfElem();  // Position
 
@@ -1817,7 +1910,8 @@ bool CRTProtocol::ReadCameraSystemSettings() {
     // Only available from protocol version 1.10 and later.
     for (int port = 0; port < 3; port++) {
       char syncOutStr[16];
-      sprintf(syncOutStr, "Sync_Out%s", port == 0 ? "" : (port == 1 ? "2" : "_MT"));
+      sprintf(syncOutStr, "Sync_Out%s",
+              port == 0 ? "" : (port == 1 ? "2" : "_MT"));
       if (oXML.FindChildElem(syncOutStr)) {
         oXML.IntoElem();
 
@@ -1849,15 +1943,18 @@ bool CRTProtocol::ReadCameraSystemSettings() {
             if (!oXML.FindChildElem("Value")) {
               return false;
             }
-            sCameraSettings.nSyncOutValue[port] = atoi(oXML.GetChildData().c_str());
+            sCameraSettings.nSyncOutValue[port] =
+                atoi(oXML.GetChildData().c_str());
 
             if (!oXML.FindChildElem("Duty_Cycle")) {
               return false;
             }
-            sCameraSettings.fSyncOutDutyCycle[port] = (float)atof(oXML.GetChildData().c_str());
+            sCameraSettings.fSyncOutDutyCycle[port] =
+                (float)atof(oXML.GetChildData().c_str());
           }
         }
-        if (port == 2 || (sCameraSettings.eSyncOutMode[port] != ModeFixed100Hz)) {
+        if (port == 2 ||
+            (sCameraSettings.eSyncOutMode[port] != ModeFixed100Hz)) {
           if (!oXML.FindChildElem("Signal_Polarity")) {
             return false;
           }
@@ -1906,17 +2003,20 @@ bool CRTProtocol::ReadCameraSystemSettings() {
         sCameraSettings.autoExposureEnabled = true;
       }
       float autoExposureCompensation;
-      if (sscanf(oXML.GetAttrib("Compensation").c_str(), "%f", &autoExposureCompensation) == 1) {
+      if (sscanf(oXML.GetAttrib("Compensation").c_str(), "%f",
+                 &autoExposureCompensation) == 1) {
         sCameraSettings.autoExposureCompensation = autoExposureCompensation;
       }
       oXML.OutOfElem();
     } else {
       sCameraSettings.autoExposureEnabled = false;
-      sCameraSettings.autoExposureCompensation = std::numeric_limits<float>::quiet_NaN();
+      sCameraSettings.autoExposureCompensation =
+          std::numeric_limits<float>::quiet_NaN();
     }
 
     if (oXML.FindChildElem("AutoWhiteBalance")) {
-      sCameraSettings.autoWhiteBalance = CompareNoCase(oXML.GetChildData().c_str(), "true") ? 1 : 0;
+      sCameraSettings.autoWhiteBalance =
+          CompareNoCase(oXML.GetChildData().c_str(), "true") ? 1 : 0;
     } else {
       sCameraSettings.autoWhiteBalance = -1;
     }
@@ -1957,7 +2057,10 @@ bool CRTProtocol::Read3DSettings(bool& bDataAvailable) {
     if (eType == CRTPacket::PacketError) {
       sprintf(maErrorStr, "%s.", mpoRTPacket->GetErrorString());
     } else {
-      sprintf(maErrorStr, "GetParameters 3D returned wrong packet type. Got type %d expected type 2.", eType);
+      sprintf(maErrorStr,
+              "GetParameters 3D returned wrong packet type. Got type %d "
+              "expected type 2.",
+              eType);
     }
     return false;
   }
@@ -2071,7 +2174,10 @@ bool CRTProtocol::Read6DOFSettings(bool& bDataAvailable) {
     if (eType == CRTPacket::PacketError) {
       sprintf(maErrorStr, "%s.", mpoRTPacket->GetErrorString());
     } else {
-      sprintf(maErrorStr, "GetParameters 6D returned wrong packet type. Got type %d expected type 2.", eType);
+      sprintf(maErrorStr,
+              "GetParameters 6D returned wrong packet type. Got type %d "
+              "expected type 2.",
+              eType);
     }
     return false;
   }
@@ -2183,7 +2289,10 @@ bool CRTProtocol::ReadGazeVectorSettings(bool& bDataAvailable) {
     if (eType == CRTPacket::PacketError) {
       sprintf(maErrorStr, "%s.", mpoRTPacket->GetErrorString());
     } else {
-      sprintf(maErrorStr, "GetParameters GazeVector returned wrong packet type. Got type %d expected type 2.", eType);
+      sprintf(maErrorStr,
+              "GetParameters GazeVector returned wrong packet type. Got type "
+              "%d expected type 2.",
+              eType);
     }
     return false;
   }
@@ -2249,7 +2358,10 @@ bool CRTProtocol::ReadAnalogSettings(bool& bDataAvailable) {
     if (eType == CRTPacket::PacketError) {
       sprintf(maErrorStr, "%s.", mpoRTPacket->GetErrorString());
     } else {
-      sprintf(maErrorStr, "GetParameters Analog returned wrong packet type. Got type %d expected type 2.", eType);
+      sprintf(maErrorStr,
+              "GetParameters Analog returned wrong packet type. Got type %d "
+              "expected type 2.",
+              eType);
     }
     return false;
   }
@@ -2414,7 +2526,10 @@ bool CRTProtocol::ReadForceSettings(bool& bDataAvailable) {
     if (eType == CRTPacket::PacketError) {
       sprintf(maErrorStr, "%s.", mpoRTPacket->GetErrorString());
     } else {
-      sprintf(maErrorStr, "GetParameters Force returned wrong packet type. Got type %d expected type 2.", eType);
+      sprintf(maErrorStr,
+              "GetParameters Force returned wrong packet type. Got type %d "
+              "expected type 2.",
+              eType);
     }
     return false;
   }
@@ -2571,7 +2686,8 @@ bool CRTProtocol::ReadForceSettings(bool& bDataAvailable) {
           sForceChannel.nChannelNumber = atoi(oXML.GetChildData().c_str());
         }
         if (oXML.FindChildElem("ConversionFactor")) {
-          sForceChannel.fConversionFactor = (float)atof(oXML.GetChildData().c_str());
+          sForceChannel.fConversionFactor =
+              (float)atof(oXML.GetChildData().c_str());
         }
         sForcePlate.vChannels.push_back(sForceChannel);
         oXML.OutOfElem();
@@ -2592,7 +2708,8 @@ bool CRTProtocol::ReadForceSettings(bool& bDataAvailable) {
           int nCol = 0;
           sprintf(strCol, "Col%d", nCol + 1);
           while (oXML.FindChildElem(strCol)) {
-            sForcePlate.afCalibrationMatrix[nRow][nCol] = (float)atof(oXML.GetChildData().c_str());
+            sForcePlate.afCalibrationMatrix[nRow][nCol] =
+                (float)atof(oXML.GetChildData().c_str());
             nCol++;
             sprintf(strCol, "Col%d", nCol + 1);
           }
@@ -2616,7 +2733,8 @@ bool CRTProtocol::ReadForceSettings(bool& bDataAvailable) {
 
               int nCol = 0;
               while (oXML.FindChildElem("Column")) {
-                sForcePlate.afCalibrationMatrix[nRow][nCol] = (float)atof(oXML.GetChildData().c_str());
+                sForcePlate.afCalibrationMatrix[nRow][nCol] =
+                    (float)atof(oXML.GetChildData().c_str());
                 nCol++;
               }
               sForcePlate.nCalibrationMatrixColumns = nCol;
@@ -2669,7 +2787,10 @@ bool CRTProtocol::ReadImageSettings(bool& bDataAvailable) {
     if (eType == CRTPacket::PacketError) {
       sprintf(maErrorStr, "%s.", mpoRTPacket->GetErrorString());
     } else {
-      sprintf(maErrorStr, "GetParameters Image returned wrong packet type. Got type %d expected type 2.", eType);
+      sprintf(maErrorStr,
+              "GetParameters Image returned wrong packet type. Got type %d "
+              "expected type 2.",
+              eType);
     }
     return false;
   }
@@ -2763,7 +2884,8 @@ bool CRTProtocol::ReadImageSettings(bool& bDataAvailable) {
   return true;
 }  // ReadImageSettings
 
-bool CRTProtocol::ReadSkeletonSettings(bool& bDataAvailable, bool skeletonGlobalData) {
+bool CRTProtocol::ReadSkeletonSettings(bool& bDataAvailable,
+                                       bool skeletonGlobalData) {
   CRTPacket::EPacketType eType;
   CMarkup oXML;
 
@@ -2793,7 +2915,10 @@ bool CRTProtocol::ReadSkeletonSettings(bool& bDataAvailable, bool skeletonGlobal
     if (eType == CRTPacket::PacketError) {
       sprintf(maErrorStr, "%s.", mpoRTPacket->GetErrorString());
     } else {
-      sprintf(maErrorStr, "GetParameters Skeleton returned wrong packet type. Got type %d expected type 2.", eType);
+      sprintf(maErrorStr,
+              "GetParameters Skeleton returned wrong packet type. Got type %d "
+              "expected type 2.",
+              eType);
     }
     return false;
   }
@@ -2822,7 +2947,8 @@ bool CRTProtocol::ReadSkeletonSettings(bool& bDataAvailable, bool skeletonGlobal
       SSettingsSkeletonSegment segment;
 
       segment.name = oXML.GetAttrib("Name");
-      if (segment.name.size() == 0 || sscanf(oXML.GetAttrib("ID").c_str(), "%u", &segment.id) != 1) {
+      if (segment.name.size() == 0 ||
+          sscanf(oXML.GetAttrib("ID").c_str(), "%u", &segment.id) != 1) {
         return false;
       }
 
@@ -2886,10 +3012,12 @@ bool CRTProtocol::ReadSkeletonSettings(bool& bDataAvailable, bool skeletonGlobal
   return true;
 }  // ReadSkeletonSettings
 
-void CRTProtocol::GetSystemSettings(unsigned int& nCaptureFrequency, float& fCaptureTime, bool& bStartOnExtTrig,
-                                    bool& startOnTrigNO, bool& startOnTrigNC, bool& startOnTrigSoftware,
-                                    EProcessingActions& eProcessingActions, EProcessingActions& eRtProcessingActions,
-                                    EProcessingActions& eReprocessingActions) const {
+void CRTProtocol::GetSystemSettings(
+    unsigned int& nCaptureFrequency, float& fCaptureTime, bool& bStartOnExtTrig,
+    bool& startOnTrigNO, bool& startOnTrigNC, bool& startOnTrigSoftware,
+    EProcessingActions& eProcessingActions,
+    EProcessingActions& eRtProcessingActions,
+    EProcessingActions& eReprocessingActions) const {
   nCaptureFrequency = msGeneralSettings.nCaptureFrequency;
   fCaptureTime = msGeneralSettings.fCaptureTime;
   bStartOnExtTrig = msGeneralSettings.bStartOnExternalTrigger;
@@ -2901,11 +3029,13 @@ void CRTProtocol::GetSystemSettings(unsigned int& nCaptureFrequency, float& fCap
   eReprocessingActions = msGeneralSettings.eReprocessingActions;
 }
 
-// External time base settings only available in version 1.10 of the rt protocol and later
-void CRTProtocol::GetExtTimeBaseSettings(bool& bEnabled, ESignalSource& eSignalSource, bool& bSignalModePeriodic,
-                                         unsigned int& nFreqMultiplier, unsigned int& nFreqDivisor,
-                                         unsigned int& nFreqTolerance, float& fNominalFrequency, bool& bNegativeEdge,
-                                         unsigned int& nSignalShutterDelay, float& fNonPeriodicTimeout) const {
+// External time base settings only available in version 1.10 of the rt protocol
+// and later
+void CRTProtocol::GetExtTimeBaseSettings(
+    bool& bEnabled, ESignalSource& eSignalSource, bool& bSignalModePeriodic,
+    unsigned int& nFreqMultiplier, unsigned int& nFreqDivisor,
+    unsigned int& nFreqTolerance, float& fNominalFrequency, bool& bNegativeEdge,
+    unsigned int& nSignalShutterDelay, float& fNonPeriodicTimeout) const {
   bEnabled = msGeneralSettings.sExternalTimebase.bEnabled;
   eSignalSource = msGeneralSettings.sExternalTimebase.eSignalSource;
   bSignalModePeriodic = msGeneralSettings.sExternalTimebase.bSignalModePeriodic;
@@ -2918,10 +3048,14 @@ void CRTProtocol::GetExtTimeBaseSettings(bool& bEnabled, ESignalSource& eSignalS
   fNonPeriodicTimeout = msGeneralSettings.sExternalTimebase.fNonPeriodicTimeout;
 }
 
-unsigned int CRTProtocol::GetCameraCount() const { return (unsigned int)msGeneralSettings.vsCameras.size(); }
+unsigned int CRTProtocol::GetCameraCount() const {
+  return (unsigned int)msGeneralSettings.vsCameras.size();
+}
 
-bool CRTProtocol::GetCameraSettings(unsigned int nCameraIndex, unsigned int& nID, ECameraModel& eModel,
-                                    bool& bUnderwater, bool& bSupportsHwSync, unsigned int& nSerial,
+bool CRTProtocol::GetCameraSettings(unsigned int nCameraIndex,
+                                    unsigned int& nID, ECameraModel& eModel,
+                                    bool& bUnderwater, bool& bSupportsHwSync,
+                                    unsigned int& nSerial,
                                     ECameraMode& eMode) const {
   if (nCameraIndex < msGeneralSettings.vsCameras.size()) {
     nID = msGeneralSettings.vsCameras[nCameraIndex].nID;
@@ -2935,53 +3069,71 @@ bool CRTProtocol::GetCameraSettings(unsigned int nCameraIndex, unsigned int& nID
   return false;
 }
 
-bool CRTProtocol::GetCameraMarkerSettings(unsigned int nCameraIndex, unsigned int& nCurrentExposure,
-                                          unsigned int& nMinExposure, unsigned int& nMaxExposure,
-                                          unsigned int& nCurrentThreshold, unsigned int& nMinThreshold,
+bool CRTProtocol::GetCameraMarkerSettings(unsigned int nCameraIndex,
+                                          unsigned int& nCurrentExposure,
+                                          unsigned int& nMinExposure,
+                                          unsigned int& nMaxExposure,
+                                          unsigned int& nCurrentThreshold,
+                                          unsigned int& nMinThreshold,
                                           unsigned int& nMaxThreshold) const {
   if (nCameraIndex < msGeneralSettings.vsCameras.size()) {
-    nCurrentExposure = msGeneralSettings.vsCameras[nCameraIndex].nMarkerExposure;
+    nCurrentExposure =
+        msGeneralSettings.vsCameras[nCameraIndex].nMarkerExposure;
     nMinExposure = msGeneralSettings.vsCameras[nCameraIndex].nMarkerExposureMin;
     nMaxExposure = msGeneralSettings.vsCameras[nCameraIndex].nMarkerExposureMax;
-    nCurrentThreshold = msGeneralSettings.vsCameras[nCameraIndex].nMarkerThreshold;
-    nMinThreshold = msGeneralSettings.vsCameras[nCameraIndex].nMarkerThresholdMin;
-    nMaxThreshold = msGeneralSettings.vsCameras[nCameraIndex].nMarkerThresholdMax;
+    nCurrentThreshold =
+        msGeneralSettings.vsCameras[nCameraIndex].nMarkerThreshold;
+    nMinThreshold =
+        msGeneralSettings.vsCameras[nCameraIndex].nMarkerThresholdMin;
+    nMaxThreshold =
+        msGeneralSettings.vsCameras[nCameraIndex].nMarkerThresholdMax;
     return true;
   }
   return false;
 }
 
-bool CRTProtocol::GetCameraVideoSettings(unsigned int nCameraIndex, EVideoResolution& eVideoResolution,
-                                         EVideoAspectRatio& eVideoAspectRatio, unsigned int& nVideoFrequency,
-                                         unsigned int& nCurrentExposure, unsigned int& nMinExposure,
-                                         unsigned int& nMaxExposure, unsigned int& nCurrentFlashTime,
-                                         unsigned int& nMinFlashTime, unsigned int& nMaxFlashTime) const {
+bool CRTProtocol::GetCameraVideoSettings(
+    unsigned int nCameraIndex, EVideoResolution& eVideoResolution,
+    EVideoAspectRatio& eVideoAspectRatio, unsigned int& nVideoFrequency,
+    unsigned int& nCurrentExposure, unsigned int& nMinExposure,
+    unsigned int& nMaxExposure, unsigned int& nCurrentFlashTime,
+    unsigned int& nMinFlashTime, unsigned int& nMaxFlashTime) const {
   if (nCameraIndex < msGeneralSettings.vsCameras.size()) {
-    eVideoResolution = msGeneralSettings.vsCameras[nCameraIndex].eVideoResolution;
-    eVideoAspectRatio = msGeneralSettings.vsCameras[nCameraIndex].eVideoAspectRatio;
+    eVideoResolution =
+        msGeneralSettings.vsCameras[nCameraIndex].eVideoResolution;
+    eVideoAspectRatio =
+        msGeneralSettings.vsCameras[nCameraIndex].eVideoAspectRatio;
     nVideoFrequency = msGeneralSettings.vsCameras[nCameraIndex].nVideoFrequency;
     nCurrentExposure = msGeneralSettings.vsCameras[nCameraIndex].nVideoExposure;
     nMinExposure = msGeneralSettings.vsCameras[nCameraIndex].nVideoExposureMin;
     nMaxExposure = msGeneralSettings.vsCameras[nCameraIndex].nVideoExposureMax;
-    nCurrentFlashTime = msGeneralSettings.vsCameras[nCameraIndex].nVideoFlashTime;
-    nMinFlashTime = msGeneralSettings.vsCameras[nCameraIndex].nVideoFlashTimeMin;
-    nMaxFlashTime = msGeneralSettings.vsCameras[nCameraIndex].nVideoFlashTimeMax;
+    nCurrentFlashTime =
+        msGeneralSettings.vsCameras[nCameraIndex].nVideoFlashTime;
+    nMinFlashTime =
+        msGeneralSettings.vsCameras[nCameraIndex].nVideoFlashTimeMin;
+    nMaxFlashTime =
+        msGeneralSettings.vsCameras[nCameraIndex].nVideoFlashTimeMax;
     return true;
   }
   return false;
 }
 
-bool CRTProtocol::GetCameraSyncOutSettings(unsigned int nCameraIndex, unsigned int portNumber,
-                                           ESyncOutFreqMode& eSyncOutMode, unsigned int& nSyncOutValue,
-                                           float& fSyncOutDutyCycle, bool& bSyncOutNegativePolarity) const {
+bool CRTProtocol::GetCameraSyncOutSettings(
+    unsigned int nCameraIndex, unsigned int portNumber,
+    ESyncOutFreqMode& eSyncOutMode, unsigned int& nSyncOutValue,
+    float& fSyncOutDutyCycle, bool& bSyncOutNegativePolarity) const {
   if (nCameraIndex < msGeneralSettings.vsCameras.size()) {
     if (portNumber == 1 || portNumber == 2) {
-      eSyncOutMode = msGeneralSettings.vsCameras[nCameraIndex].eSyncOutMode[portNumber - 1];
-      nSyncOutValue = msGeneralSettings.vsCameras[nCameraIndex].nSyncOutValue[portNumber - 1];
-      fSyncOutDutyCycle = msGeneralSettings.vsCameras[nCameraIndex].fSyncOutDutyCycle[portNumber - 1];
+      eSyncOutMode = msGeneralSettings.vsCameras[nCameraIndex]
+                         .eSyncOutMode[portNumber - 1];
+      nSyncOutValue = msGeneralSettings.vsCameras[nCameraIndex]
+                          .nSyncOutValue[portNumber - 1];
+      fSyncOutDutyCycle = msGeneralSettings.vsCameras[nCameraIndex]
+                              .fSyncOutDutyCycle[portNumber - 1];
     }
     if (portNumber > 0 && portNumber < 4) {
-      bSyncOutNegativePolarity = msGeneralSettings.vsCameras[nCameraIndex].bSyncOutNegativePolarity[portNumber - 1];
+      bSyncOutNegativePolarity = msGeneralSettings.vsCameras[nCameraIndex]
+                                     .bSyncOutNegativePolarity[portNumber - 1];
     } else {
       return false;
     }
@@ -2990,18 +3142,22 @@ bool CRTProtocol::GetCameraSyncOutSettings(unsigned int nCameraIndex, unsigned i
   return false;
 }
 
-bool CRTProtocol::GetCameraPosition(unsigned int nCameraIndex, SPoint& sPoint, float fvRotationMatrix[3][3]) const {
+bool CRTProtocol::GetCameraPosition(unsigned int nCameraIndex, SPoint& sPoint,
+                                    float fvRotationMatrix[3][3]) const {
   if (nCameraIndex < msGeneralSettings.vsCameras.size()) {
     sPoint.fX = msGeneralSettings.vsCameras[nCameraIndex].fPositionX;
     sPoint.fY = msGeneralSettings.vsCameras[nCameraIndex].fPositionY;
     sPoint.fZ = msGeneralSettings.vsCameras[nCameraIndex].fPositionZ;
-    memcpy(fvRotationMatrix, msGeneralSettings.vsCameras[nCameraIndex].fPositionRotMatrix, 9 * sizeof(float));
+    memcpy(fvRotationMatrix,
+           msGeneralSettings.vsCameras[nCameraIndex].fPositionRotMatrix,
+           9 * sizeof(float));
     return true;
   }
   return false;
 }
 
-bool CRTProtocol::GetCameraOrientation(unsigned int nCameraIndex, int& nOrientation) const {
+bool CRTProtocol::GetCameraOrientation(unsigned int nCameraIndex,
+                                       int& nOrientation) const {
   if (nCameraIndex < msGeneralSettings.vsCameras.size()) {
     nOrientation = msGeneralSettings.vsCameras[nCameraIndex].nOrientation;
     return true;
@@ -3009,22 +3165,31 @@ bool CRTProtocol::GetCameraOrientation(unsigned int nCameraIndex, int& nOrientat
   return false;
 }
 
-bool CRTProtocol::GetCameraResolution(unsigned int nCameraIndex, unsigned int& nMarkerWidth,
-                                      unsigned int& nMarkerHeight, unsigned int& nVideoWidth,
+bool CRTProtocol::GetCameraResolution(unsigned int nCameraIndex,
+                                      unsigned int& nMarkerWidth,
+                                      unsigned int& nMarkerHeight,
+                                      unsigned int& nVideoWidth,
                                       unsigned int& nVideoHeight) const {
   if (nCameraIndex < msGeneralSettings.vsCameras.size()) {
-    nMarkerWidth = msGeneralSettings.vsCameras[nCameraIndex].nMarkerResolutionWidth;
-    nMarkerHeight = msGeneralSettings.vsCameras[nCameraIndex].nMarkerResolutionHeight;
-    nVideoWidth = msGeneralSettings.vsCameras[nCameraIndex].nVideoResolutionWidth;
-    nVideoHeight = msGeneralSettings.vsCameras[nCameraIndex].nVideoResolutionHeight;
+    nMarkerWidth =
+        msGeneralSettings.vsCameras[nCameraIndex].nMarkerResolutionWidth;
+    nMarkerHeight =
+        msGeneralSettings.vsCameras[nCameraIndex].nMarkerResolutionHeight;
+    nVideoWidth =
+        msGeneralSettings.vsCameras[nCameraIndex].nVideoResolutionWidth;
+    nVideoHeight =
+        msGeneralSettings.vsCameras[nCameraIndex].nVideoResolutionHeight;
     return true;
   }
   return false;
 }
 
-bool CRTProtocol::GetCameraFOV(unsigned int nCameraIndex, unsigned int& nMarkerLeft, unsigned int& nMarkerTop,
-                               unsigned int& nMarkerRight, unsigned int& nMarkerBottom, unsigned int& nVideoLeft,
-                               unsigned int& nVideoTop, unsigned int& nVideoRight, unsigned int& nVideoBottom) const {
+bool CRTProtocol::GetCameraFOV(
+    unsigned int nCameraIndex, unsigned int& nMarkerLeft,
+    unsigned int& nMarkerTop, unsigned int& nMarkerRight,
+    unsigned int& nMarkerBottom, unsigned int& nVideoLeft,
+    unsigned int& nVideoTop, unsigned int& nVideoRight,
+    unsigned int& nVideoBottom) const {
   if (nCameraIndex < msGeneralSettings.vsCameras.size()) {
     nMarkerLeft = msGeneralSettings.vsCameras[nCameraIndex].nMarkerFOVLeft;
     nMarkerTop = msGeneralSettings.vsCameras[nCameraIndex].nMarkerFOVTop;
@@ -3039,7 +3204,9 @@ bool CRTProtocol::GetCameraFOV(unsigned int nCameraIndex, unsigned int& nMarkerL
   return false;
 }
 
-bool CRTProtocol::GetCameraLensControlSettings(const unsigned int nCameraIndex, float* focus, float* aperture) const {
+bool CRTProtocol::GetCameraLensControlSettings(const unsigned int nCameraIndex,
+                                               float* focus,
+                                               float* aperture) const {
   if (nCameraIndex < msGeneralSettings.vsCameras.size()) {
     *focus = msGeneralSettings.vsCameras[nCameraIndex].fFocus;
     if (std::isnan(*focus)) return false;
@@ -3049,31 +3216,42 @@ bool CRTProtocol::GetCameraLensControlSettings(const unsigned int nCameraIndex, 
   return false;
 }
 
-bool CRTProtocol::GetCameraAutoExposureSettings(const unsigned int nCameraIndex, bool* autoExposureEnabled,
-                                                float* autoExposureCompensation) const {
+bool CRTProtocol::GetCameraAutoExposureSettings(
+    const unsigned int nCameraIndex, bool* autoExposureEnabled,
+    float* autoExposureCompensation) const {
   if (nCameraIndex < msGeneralSettings.vsCameras.size()) {
-    *autoExposureCompensation = msGeneralSettings.vsCameras[nCameraIndex].autoExposureCompensation;
+    *autoExposureCompensation =
+        msGeneralSettings.vsCameras[nCameraIndex].autoExposureCompensation;
     if (std::isnan(*autoExposureCompensation)) return false;
-    *autoExposureEnabled = msGeneralSettings.vsCameras[nCameraIndex].autoExposureEnabled;
+    *autoExposureEnabled =
+        msGeneralSettings.vsCameras[nCameraIndex].autoExposureEnabled;
     return true;
   }
   return false;
 }
 
-bool CRTProtocol::GetCameraAutoWhiteBalance(const unsigned int nCameraIndex, bool* autoWhiteBalanceEnabled) const {
+bool CRTProtocol::GetCameraAutoWhiteBalance(
+    const unsigned int nCameraIndex, bool* autoWhiteBalanceEnabled) const {
   if (nCameraIndex < msGeneralSettings.vsCameras.size() &&
       msGeneralSettings.vsCameras[nCameraIndex].autoWhiteBalance >= 0) {
-    *autoWhiteBalanceEnabled = msGeneralSettings.vsCameras[nCameraIndex].autoWhiteBalance == 1;
+    *autoWhiteBalanceEnabled =
+        msGeneralSettings.vsCameras[nCameraIndex].autoWhiteBalance == 1;
     return true;
   }
   return false;
 }
 
-CRTProtocol::EAxis CRTProtocol::Get3DUpwardAxis() const { return ms3DSettings.eAxisUpwards; }
+CRTProtocol::EAxis CRTProtocol::Get3DUpwardAxis() const {
+  return ms3DSettings.eAxisUpwards;
+}
 
-const char* CRTProtocol::Get3DCalibrated() const { return ms3DSettings.pCalibrationTime; }
+const char* CRTProtocol::Get3DCalibrated() const {
+  return ms3DSettings.pCalibrationTime;
+}
 
-unsigned int CRTProtocol::Get3DLabeledMarkerCount() const { return (unsigned int)ms3DSettings.s3DLabels.size(); }
+unsigned int CRTProtocol::Get3DLabeledMarkerCount() const {
+  return (unsigned int)ms3DSettings.s3DLabels.size();
+}
 
 const char* CRTProtocol::Get3DLabelName(unsigned int nMarkerIndex) const {
   if (nMarkerIndex < ms3DSettings.s3DLabels.size()) {
@@ -3089,7 +3267,9 @@ unsigned int CRTProtocol::Get3DLabelColor(unsigned int nMarkerIndex) const {
   return 0;
 }
 
-unsigned int CRTProtocol::Get3DBoneCount() const { return (unsigned int)ms3DSettings.sBones.size(); }
+unsigned int CRTProtocol::Get3DBoneCount() const {
+  return (unsigned int)ms3DSettings.sBones.size();
+}
 
 const char* CRTProtocol::Get3DBoneFromName(unsigned int boneIndex) const {
   if (boneIndex < ms3DSettings.sBones.size()) {
@@ -3105,13 +3285,16 @@ const char* CRTProtocol::Get3DBoneToName(unsigned int boneIndex) const {
   return nullptr;
 }
 
-void CRTProtocol::Get6DOFEulerNames(std::string& first, std::string& second, std::string& third) const {
+void CRTProtocol::Get6DOFEulerNames(std::string& first, std::string& second,
+                                    std::string& third) const {
   first = mvs6DOFSettings.eulerFirst;
   second = mvs6DOFSettings.eulerSecond;
   third = mvs6DOFSettings.eulerThird;
 }
 
-unsigned int CRTProtocol::Get6DOFBodyCount() const { return (unsigned int)mvs6DOFSettings.bodySettings.size(); }
+unsigned int CRTProtocol::Get6DOFBodyCount() const {
+  return (unsigned int)mvs6DOFSettings.bodySettings.size();
+}
 
 const char* CRTProtocol::Get6DOFBodyName(unsigned int nBodyIndex) const {
   if (nBodyIndex < mvs6DOFSettings.bodySettings.size()) {
@@ -3129,26 +3312,36 @@ unsigned int CRTProtocol::Get6DOFBodyColor(unsigned int nBodyIndex) const {
 
 unsigned int CRTProtocol::Get6DOFBodyPointCount(unsigned int nBodyIndex) const {
   if (nBodyIndex < mvs6DOFSettings.bodySettings.size()) {
-    return (unsigned int)mvs6DOFSettings.bodySettings.at(nBodyIndex).vsPoints.size();
+    return (unsigned int)mvs6DOFSettings.bodySettings.at(nBodyIndex)
+        .vsPoints.size();
   }
   return false;
 }
 
-bool CRTProtocol::Get6DOFBodyPoint(unsigned int nBodyIndex, unsigned int nMarkerIndex, SPoint& sPoint) const {
+bool CRTProtocol::Get6DOFBodyPoint(unsigned int nBodyIndex,
+                                   unsigned int nMarkerIndex,
+                                   SPoint& sPoint) const {
   if (nBodyIndex < mvs6DOFSettings.bodySettings.size()) {
-    if (nMarkerIndex < mvs6DOFSettings.bodySettings.at(nBodyIndex).vsPoints.size()) {
-      sPoint.fX = mvs6DOFSettings.bodySettings.at(nBodyIndex).vsPoints[nMarkerIndex].fX;
-      sPoint.fY = mvs6DOFSettings.bodySettings.at(nBodyIndex).vsPoints[nMarkerIndex].fY;
-      sPoint.fZ = mvs6DOFSettings.bodySettings.at(nBodyIndex).vsPoints[nMarkerIndex].fZ;
+    if (nMarkerIndex <
+        mvs6DOFSettings.bodySettings.at(nBodyIndex).vsPoints.size()) {
+      sPoint.fX =
+          mvs6DOFSettings.bodySettings.at(nBodyIndex).vsPoints[nMarkerIndex].fX;
+      sPoint.fY =
+          mvs6DOFSettings.bodySettings.at(nBodyIndex).vsPoints[nMarkerIndex].fY;
+      sPoint.fZ =
+          mvs6DOFSettings.bodySettings.at(nBodyIndex).vsPoints[nMarkerIndex].fZ;
       return true;
     }
   }
   return false;
 }
 
-unsigned int CRTProtocol::GetGazeVectorCount() const { return (unsigned int)mvsGazeVectorSettings.size(); }
+unsigned int CRTProtocol::GetGazeVectorCount() const {
+  return (unsigned int)mvsGazeVectorSettings.size();
+}
 
-const char* CRTProtocol::GetGazeVectorName(unsigned int nGazeVectorIndex) const {
+const char* CRTProtocol::GetGazeVectorName(
+    unsigned int nGazeVectorIndex) const {
   if (nGazeVectorIndex < mvsGazeVectorSettings.size()) {
     return mvsGazeVectorSettings[nGazeVectorIndex].name.c_str();
   }
@@ -3162,11 +3355,15 @@ float CRTProtocol::GetGazeVectorFrequency(unsigned int nGazeVectorIndex) const {
   return 0;
 }
 
-unsigned int CRTProtocol::GetAnalogDeviceCount() const { return (unsigned int)mvsAnalogDeviceSettings.size(); }
+unsigned int CRTProtocol::GetAnalogDeviceCount() const {
+  return (unsigned int)mvsAnalogDeviceSettings.size();
+}
 
-bool CRTProtocol::GetAnalogDevice(unsigned int nDeviceIndex, unsigned int& nDeviceID, unsigned int& nChannels,
-                                  char*& pName, unsigned int& nFrequency, char*& pUnit, float& fMinRange,
-                                  float& fMaxRange) const {
+bool CRTProtocol::GetAnalogDevice(unsigned int nDeviceIndex,
+                                  unsigned int& nDeviceID,
+                                  unsigned int& nChannels, char*& pName,
+                                  unsigned int& nFrequency, char*& pUnit,
+                                  float& fMinRange, float& fMaxRange) const {
   if (nDeviceIndex < mvsAnalogDeviceSettings.size()) {
     nDeviceID = mvsAnalogDeviceSettings.at(nDeviceIndex).nDeviceID;
     pName = (char*)mvsAnalogDeviceSettings.at(nDeviceIndex).oName.c_str();
@@ -3181,19 +3378,27 @@ bool CRTProtocol::GetAnalogDevice(unsigned int nDeviceIndex, unsigned int& nDevi
   return false;
 }
 
-const char* CRTProtocol::GetAnalogLabel(unsigned int nDeviceIndex, unsigned int nChannelIndex) const {
+const char* CRTProtocol::GetAnalogLabel(unsigned int nDeviceIndex,
+                                        unsigned int nChannelIndex) const {
   if (nDeviceIndex < mvsAnalogDeviceSettings.size()) {
-    if (nChannelIndex < mvsAnalogDeviceSettings.at(nDeviceIndex).voLabels.size()) {
-      return mvsAnalogDeviceSettings.at(nDeviceIndex).voLabels.at(nChannelIndex).c_str();
+    if (nChannelIndex <
+        mvsAnalogDeviceSettings.at(nDeviceIndex).voLabels.size()) {
+      return mvsAnalogDeviceSettings.at(nDeviceIndex)
+          .voLabels.at(nChannelIndex)
+          .c_str();
     }
   }
   return nullptr;
 }
 
-const char* CRTProtocol::GetAnalogUnit(unsigned int nDeviceIndex, unsigned int nChannelIndex) const {
+const char* CRTProtocol::GetAnalogUnit(unsigned int nDeviceIndex,
+                                       unsigned int nChannelIndex) const {
   if (nDeviceIndex < mvsAnalogDeviceSettings.size()) {
-    if (nChannelIndex < mvsAnalogDeviceSettings.at(nDeviceIndex).voUnits.size()) {
-      return mvsAnalogDeviceSettings.at(nDeviceIndex).voUnits.at(nChannelIndex).c_str();
+    if (nChannelIndex <
+        mvsAnalogDeviceSettings.at(nDeviceIndex).voUnits.size()) {
+      return mvsAnalogDeviceSettings.at(nDeviceIndex)
+          .voUnits.at(nChannelIndex)
+          .c_str();
     }
   }
   return nullptr;
@@ -3204,14 +3409,19 @@ void CRTProtocol::GetForceUnits(char*& pLength, char*& pForce) const {
   pForce = (char*)msForceSettings.oUnitForce.c_str();
 }
 
-unsigned int CRTProtocol::GetForcePlateCount() const { return (unsigned int)msForceSettings.vsForcePlates.size(); }
+unsigned int CRTProtocol::GetForcePlateCount() const {
+  return (unsigned int)msForceSettings.vsForcePlates.size();
+}
 
-bool CRTProtocol::GetForcePlate(unsigned int nPlateIndex, unsigned int& nID, unsigned int& nAnalogDeviceID,
-                                unsigned int& nFrequency, char*& pType, char*& pName, float& fLength,
+bool CRTProtocol::GetForcePlate(unsigned int nPlateIndex, unsigned int& nID,
+                                unsigned int& nAnalogDeviceID,
+                                unsigned int& nFrequency, char*& pType,
+                                char*& pName, float& fLength,
                                 float& fWidth) const {
   if (nPlateIndex < msForceSettings.vsForcePlates.size()) {
     nID = msForceSettings.vsForcePlates[nPlateIndex].nID;
-    nAnalogDeviceID = msForceSettings.vsForcePlates[nPlateIndex].nAnalogDeviceID;
+    nAnalogDeviceID =
+        msForceSettings.vsForcePlates[nPlateIndex].nAnalogDeviceID;
     nFrequency = msForceSettings.vsForcePlates[nPlateIndex].nFrequency;
     pType = (char*)msForceSettings.vsForcePlates[nPlateIndex].oType.c_str();
     pName = (char*)msForceSettings.vsForcePlates[nPlateIndex].oName.c_str();
@@ -3222,15 +3432,18 @@ bool CRTProtocol::GetForcePlate(unsigned int nPlateIndex, unsigned int& nID, uns
   return false;
 }
 
-bool CRTProtocol::GetForcePlateLocation(unsigned int nPlateIndex, SPoint sCorner[4]) const {
+bool CRTProtocol::GetForcePlateLocation(unsigned int nPlateIndex,
+                                        SPoint sCorner[4]) const {
   if (nPlateIndex < msForceSettings.vsForcePlates.size()) {
-    memcpy(sCorner, msForceSettings.vsForcePlates[nPlateIndex].asCorner, 3 * 4 * sizeof(float));
+    memcpy(sCorner, msForceSettings.vsForcePlates[nPlateIndex].asCorner,
+           3 * 4 * sizeof(float));
     return true;
   }
   return false;
 }
 
-bool CRTProtocol::GetForcePlateOrigin(unsigned int nPlateIndex, SPoint& sOrigin) const {
+bool CRTProtocol::GetForcePlateOrigin(unsigned int nPlateIndex,
+                                      SPoint& sOrigin) const {
   if (nPlateIndex < msForceSettings.vsForcePlates.size()) {
     sOrigin = msForceSettings.vsForcePlates[nPlateIndex].sOrigin;
     return true;
@@ -3238,45 +3451,65 @@ bool CRTProtocol::GetForcePlateOrigin(unsigned int nPlateIndex, SPoint& sOrigin)
   return false;
 }
 
-unsigned int CRTProtocol::GetForcePlateChannelCount(unsigned int nPlateIndex) const {
+unsigned int CRTProtocol::GetForcePlateChannelCount(
+    unsigned int nPlateIndex) const {
   if (nPlateIndex < msForceSettings.vsForcePlates.size()) {
-    return (unsigned int)msForceSettings.vsForcePlates[nPlateIndex].vChannels.size();
+    return (unsigned int)msForceSettings.vsForcePlates[nPlateIndex]
+        .vChannels.size();
   }
   return 0;
 }
 
-bool CRTProtocol::GetForcePlateChannel(unsigned int nPlateIndex, unsigned int nChannelIndex,
-                                       unsigned int& nChannelNumber, float& fConversionFactor) const {
+bool CRTProtocol::GetForcePlateChannel(unsigned int nPlateIndex,
+                                       unsigned int nChannelIndex,
+                                       unsigned int& nChannelNumber,
+                                       float& fConversionFactor) const {
   if (nPlateIndex < msForceSettings.vsForcePlates.size()) {
-    if (nChannelIndex < msForceSettings.vsForcePlates[nPlateIndex].vChannels.size()) {
-      nChannelNumber = msForceSettings.vsForcePlates[nPlateIndex].vChannels[nChannelIndex].nChannelNumber;
-      fConversionFactor = msForceSettings.vsForcePlates[nPlateIndex].vChannels[nChannelIndex].fConversionFactor;
+    if (nChannelIndex <
+        msForceSettings.vsForcePlates[nPlateIndex].vChannels.size()) {
+      nChannelNumber = msForceSettings.vsForcePlates[nPlateIndex]
+                           .vChannels[nChannelIndex]
+                           .nChannelNumber;
+      fConversionFactor = msForceSettings.vsForcePlates[nPlateIndex]
+                              .vChannels[nChannelIndex]
+                              .fConversionFactor;
       return true;
     }
   }
   return false;
 }
 
-bool CRTProtocol::GetForcePlateCalibrationMatrix(unsigned int nPlateIndex, float fvCalMatrix[12][12],
-                                                 unsigned int* rows, unsigned int* columns) const {
+bool CRTProtocol::GetForcePlateCalibrationMatrix(unsigned int nPlateIndex,
+                                                 float fvCalMatrix[12][12],
+                                                 unsigned int* rows,
+                                                 unsigned int* columns) const {
   if (nPlateIndex < msForceSettings.vsForcePlates.size()) {
     if (msForceSettings.vsForcePlates[nPlateIndex].bValidCalibrationMatrix) {
       *rows = msForceSettings.vsForcePlates[nPlateIndex].nCalibrationMatrixRows;
-      *columns = msForceSettings.vsForcePlates[nPlateIndex].nCalibrationMatrixColumns;
-      memcpy(fvCalMatrix, msForceSettings.vsForcePlates[nPlateIndex].afCalibrationMatrix,
+      *columns =
+          msForceSettings.vsForcePlates[nPlateIndex].nCalibrationMatrixColumns;
+      memcpy(fvCalMatrix,
+             msForceSettings.vsForcePlates[nPlateIndex].afCalibrationMatrix,
              msForceSettings.vsForcePlates[nPlateIndex].nCalibrationMatrixRows *
-                 msForceSettings.vsForcePlates[nPlateIndex].nCalibrationMatrixColumns * sizeof(float));
+                 msForceSettings.vsForcePlates[nPlateIndex]
+                     .nCalibrationMatrixColumns *
+                 sizeof(float));
       return true;
     }
   }
   return false;
 }
 
-unsigned int CRTProtocol::GetImageCameraCount() const { return (unsigned int)mvsImageSettings.size(); }
+unsigned int CRTProtocol::GetImageCameraCount() const {
+  return (unsigned int)mvsImageSettings.size();
+}
 
-bool CRTProtocol::GetImageCamera(unsigned int nCameraIndex, unsigned int& nCameraID, bool& bEnabled,
-                                 CRTPacket::EImageFormat& eFormat, unsigned int& nWidth, unsigned int& nHeight,
-                                 float& fCropLeft, float& fCropTop, float& fCropRight, float& fCropBottom) const {
+bool CRTProtocol::GetImageCamera(unsigned int nCameraIndex,
+                                 unsigned int& nCameraID, bool& bEnabled,
+                                 CRTPacket::EImageFormat& eFormat,
+                                 unsigned int& nWidth, unsigned int& nHeight,
+                                 float& fCropLeft, float& fCropTop,
+                                 float& fCropRight, float& fCropBottom) const {
   if (nCameraIndex < mvsImageSettings.size()) {
     nCameraID = mvsImageSettings[nCameraIndex].nID;
     bEnabled = mvsImageSettings[nCameraIndex].bEnabled;
@@ -3292,7 +3525,9 @@ bool CRTProtocol::GetImageCamera(unsigned int nCameraIndex, unsigned int& nCamer
   return false;
 }
 
-unsigned int CRTProtocol::GetSkeletonCount() const { return (unsigned int)mSkeletonSettings.size(); }
+unsigned int CRTProtocol::GetSkeletonCount() const {
+  return (unsigned int)mSkeletonSettings.size();
+}
 
 const char* CRTProtocol::GetSkeletonName(unsigned int skeletonIndex) {
   if (skeletonIndex < mSkeletonSettings.size()) {
@@ -3303,12 +3538,14 @@ const char* CRTProtocol::GetSkeletonName(unsigned int skeletonIndex) {
 
 unsigned int CRTProtocol::GetSkeletonSegmentCount(unsigned int skeletonIndex) {
   if (skeletonIndex < mSkeletonSettings.size()) {
-    return static_cast<long unsigned>(mSkeletonSettings[skeletonIndex].segments.size());
+    return static_cast<long unsigned>(
+        mSkeletonSettings[skeletonIndex].segments.size());
   }
   return 0;
 }
 
-bool CRTProtocol::GetSkeleton(unsigned int skeletonIndex, SSettingsSkeleton* skeleton) {
+bool CRTProtocol::GetSkeleton(unsigned int skeletonIndex,
+                              SSettingsSkeleton* skeleton) {
   if (skeleton == nullptr) return false;
 
   if (skeletonIndex < mSkeletonSettings.size()) {
@@ -3318,7 +3555,8 @@ bool CRTProtocol::GetSkeleton(unsigned int skeletonIndex, SSettingsSkeleton* ske
   return false;
 }
 
-bool CRTProtocol::GetSkeletonSegment(unsigned int skeletonIndex, unsigned int segmentIndex,
+bool CRTProtocol::GetSkeletonSegment(unsigned int skeletonIndex,
+                                     unsigned int segmentIndex,
                                      SSettingsSkeletonSegment* segment) {
   if (segment == nullptr) return false;
 
@@ -3335,11 +3573,13 @@ CRTProtocol::ECameraSystemType CRTProtocol::GetCameraSystemType() const {
   return msGeneralSettings.sCameraSystem.eType;
 }
 
-bool CRTProtocol::SetSystemSettings(const unsigned int* pnCaptureFrequency, const float* pfCaptureTime,
-                                    const bool* pbStartOnExtTrig, const bool* startOnTrigNO, const bool* startOnTrigNC,
-                                    const bool* startOnTrigSoftware, const EProcessingActions* peProcessingActions,
-                                    const EProcessingActions* peRtProcessingActions,
-                                    const EProcessingActions* peReprocessingActions) {
+bool CRTProtocol::SetSystemSettings(
+    const unsigned int* pnCaptureFrequency, const float* pfCaptureTime,
+    const bool* pbStartOnExtTrig, const bool* startOnTrigNO,
+    const bool* startOnTrigNC, const bool* startOnTrigSoftware,
+    const EProcessingActions* peProcessingActions,
+    const EProcessingActions* peRtProcessingActions,
+    const EProcessingActions* peReprocessingActions) {
   CMarkup oXML;
 
   oXML.AddElem("QTM_Settings");
@@ -3358,12 +3598,16 @@ bool CRTProtocol::SetSystemSettings(const unsigned int* pnCaptureFrequency, cons
     if (mnMajorVersion > 1 || mnMinorVersion > 14) {
       AddXMLElementBool(&oXML, "Start_On_Trigger_NO", startOnTrigNO);
       AddXMLElementBool(&oXML, "Start_On_Trigger_NC", startOnTrigNC);
-      AddXMLElementBool(&oXML, "Start_On_Trigger_Software", startOnTrigSoftware);
+      AddXMLElementBool(&oXML, "Start_On_Trigger_Software",
+                        startOnTrigSoftware);
     }
   }
 
-  const char* processings[3] = {"Processing_Actions", "RealTime_Processing_Actions", "Reprocessing_Actions"};
-  const EProcessingActions* processingActions[3] = {peProcessingActions, peRtProcessingActions, peReprocessingActions};
+  const char* processings[3] = {"Processing_Actions",
+                                "RealTime_Processing_Actions",
+                                "Reprocessing_Actions"};
+  const EProcessingActions* processingActions[3] = {
+      peProcessingActions, peRtProcessingActions, peReprocessingActions};
 
   auto actionsCount = (mnMajorVersion > 1 || mnMinorVersion > 13) ? 3 : 1;
 
@@ -3373,9 +3617,12 @@ bool CRTProtocol::SetSystemSettings(const unsigned int* pnCaptureFrequency, cons
       oXML.IntoElem();
 
       if (mnMajorVersion > 1 || mnMinorVersion > 13) {
-        AddXMLElementBool(&oXML, "PreProcessing2D", (*processingActions[i] & ProcessingPreProcess2D) != 0);
+        AddXMLElementBool(
+            &oXML, "PreProcessing2D",
+            (*processingActions[i] & ProcessingPreProcess2D) != 0);
       }
-      if (*processingActions[i] & ProcessingTracking2D && i != 1)  // i != 1 => Not RtProcessingSettings
+      if (*processingActions[i] & ProcessingTracking2D &&
+          i != 1)  // i != 1 => Not RtProcessingSettings
       {
         oXML.AddElem("Tracking", "2D");
       } else if (*processingActions[i] & ProcessingTracking3D) {
@@ -3385,19 +3632,32 @@ bool CRTProtocol::SetSystemSettings(const unsigned int* pnCaptureFrequency, cons
       }
       if (i != 1)  // Not RtProcessingSettings
       {
-        AddXMLElementBool(&oXML, "TwinSystemMerge", (*processingActions[i] & ProcessingTwinSystemMerge) != 0);
-        AddXMLElementBool(&oXML, "SplineFill", (*processingActions[i] & ProcessingSplineFill) != 0);
+        AddXMLElementBool(
+            &oXML, "TwinSystemMerge",
+            (*processingActions[i] & ProcessingTwinSystemMerge) != 0);
+        AddXMLElementBool(&oXML, "SplineFill",
+                          (*processingActions[i] & ProcessingSplineFill) != 0);
       }
-      AddXMLElementBool(&oXML, "AIM", (*processingActions[i] & ProcessingAIM) != 0);
-      AddXMLElementBool(&oXML, "Track6DOF", (*processingActions[i] & Processing6DOFTracking) != 0);
-      AddXMLElementBool(&oXML, "ForceData", (*processingActions[i] & ProcessingForceData) != 0);
-      AddXMLElementBool(&oXML, "GazeVector", (*processingActions[i] & ProcessingGazeVector) != 0);
+      AddXMLElementBool(&oXML, "AIM",
+                        (*processingActions[i] & ProcessingAIM) != 0);
+      AddXMLElementBool(&oXML, "Track6DOF",
+                        (*processingActions[i] & Processing6DOFTracking) != 0);
+      AddXMLElementBool(&oXML, "ForceData",
+                        (*processingActions[i] & ProcessingForceData) != 0);
+      AddXMLElementBool(&oXML, "GazeVector",
+                        (*processingActions[i] & ProcessingGazeVector) != 0);
       if (i != 1)  // Not RtProcessingSettings
       {
-        AddXMLElementBool(&oXML, "ExportTSV", (*processingActions[i] & ProcessingExportTSV) != 0);
-        AddXMLElementBool(&oXML, "ExportC3D", (*processingActions[i] & ProcessingExportC3D) != 0);
-        AddXMLElementBool(&oXML, "ExportMatlabFile", (*processingActions[i] & ProcessingExportMatlabFile) != 0);
-        AddXMLElementBool(&oXML, "ExportAviFile", (*processingActions[i] & ProcessingExportAviFile) != 0);
+        AddXMLElementBool(&oXML, "ExportTSV",
+                          (*processingActions[i] & ProcessingExportTSV) != 0);
+        AddXMLElementBool(&oXML, "ExportC3D",
+                          (*processingActions[i] & ProcessingExportC3D) != 0);
+        AddXMLElementBool(
+            &oXML, "ExportMatlabFile",
+            (*processingActions[i] & ProcessingExportMatlabFile) != 0);
+        AddXMLElementBool(
+            &oXML, "ExportAviFile",
+            (*processingActions[i] & ProcessingExportAviFile) != 0);
       }
       oXML.OutOfElem();  // Processing_Actions
     }
@@ -3412,11 +3672,13 @@ bool CRTProtocol::SetSystemSettings(const unsigned int* pnCaptureFrequency, cons
   return false;
 }  // SetGeneral
 
-bool CRTProtocol::SetExtTimeBaseSettings(const bool* pbEnabled, const ESignalSource* peSignalSource,
-                                         const bool* pbSignalModePeriodic, const unsigned int* pnFreqMultiplier,
-                                         const unsigned int* pnFreqDivisor, const unsigned int* pnFreqTolerance,
-                                         const float* pfNominalFrequency, const bool* pbNegativeEdge,
-                                         const unsigned int* pnSignalShutterDelay, const float* pfNonPeriodicTimeout) {
+bool CRTProtocol::SetExtTimeBaseSettings(
+    const bool* pbEnabled, const ESignalSource* peSignalSource,
+    const bool* pbSignalModePeriodic, const unsigned int* pnFreqMultiplier,
+    const unsigned int* pnFreqDivisor, const unsigned int* pnFreqTolerance,
+    const float* pfNominalFrequency, const bool* pbNegativeEdge,
+    const unsigned int* pnSignalShutterDelay,
+    const float* pfNonPeriodicTimeout) {
   CMarkup oXML;
 
   oXML.AddElem("QTM_Settings");
@@ -3448,7 +3710,8 @@ bool CRTProtocol::SetExtTimeBaseSettings(const bool* pbEnabled, const ESignalSou
     }
   }
 
-  AddXMLElementBool(&oXML, "Signal_Mode", pbSignalModePeriodic, "Periodic", "Non-periodic");
+  AddXMLElementBool(&oXML, "Signal_Mode", pbSignalModePeriodic, "Periodic",
+                    "Non-periodic");
   AddXMLElementUnsignedInt(&oXML, "Frequency_Multiplier", pnFreqMultiplier);
   AddXMLElementUnsignedInt(&oXML, "Frequency_Divisor", pnFreqDivisor);
   AddXMLElementUnsignedInt(&oXML, "Frequency_Tolerance", pnFreqTolerance);
@@ -3461,7 +3724,8 @@ bool CRTProtocol::SetExtTimeBaseSettings(const bool* pbEnabled, const ESignalSou
     }
   }
 
-  AddXMLElementBool(&oXML, "Signal_Edge", pbNegativeEdge, "Negative", "Positive");
+  AddXMLElementBool(&oXML, "Signal_Edge", pbNegativeEdge, "Negative",
+                    "Positive");
   AddXMLElementUnsignedInt(&oXML, "Signal_Shutter_Delay", pnSignalShutterDelay);
   AddXMLElementFloat(&oXML, "Non_Periodic_Timeout", pfNonPeriodicTimeout, 3);
 
@@ -3476,9 +3740,12 @@ bool CRTProtocol::SetExtTimeBaseSettings(const bool* pbEnabled, const ESignalSou
   return false;
 }  // SetGeneralExtTimeBase
 
-// nCameraID starts on 1. If nCameraID < 0 then settings are applied to all cameras.
-bool CRTProtocol::SetCameraSettings(const unsigned int nCameraID, const ECameraMode* peMode,
-                                    const float* pfMarkerExposure, const float* pfMarkerThreshold,
+// nCameraID starts on 1. If nCameraID < 0 then settings are applied to all
+// cameras.
+bool CRTProtocol::SetCameraSettings(const unsigned int nCameraID,
+                                    const ECameraMode* peMode,
+                                    const float* pfMarkerExposure,
+                                    const float* pfMarkerThreshold,
                                     const int* pnOrientation) {
   CMarkup oXML;
 
@@ -3520,11 +3787,13 @@ bool CRTProtocol::SetCameraSettings(const unsigned int nCameraID, const ECameraM
   return false;
 }  // SetGeneralCamera
 
-// nCameraID starts on 1. If nCameraID < 0 then settings are applied to all cameras.
-bool CRTProtocol::SetCameraVideoSettings(const unsigned int nCameraID, const EVideoResolution* eVideoResolution,
-                                         const EVideoAspectRatio* eVideoAspectRatio,
-                                         const unsigned int* pnVideoFrequency, const float* pfVideoExposure,
-                                         const float* pfVideoFlashTime) {
+// nCameraID starts on 1. If nCameraID < 0 then settings are applied to all
+// cameras.
+bool CRTProtocol::SetCameraVideoSettings(
+    const unsigned int nCameraID, const EVideoResolution* eVideoResolution,
+    const EVideoAspectRatio* eVideoAspectRatio,
+    const unsigned int* pnVideoFrequency, const float* pfVideoExposure,
+    const float* pfVideoFlashTime) {
   CMarkup oXML;
 
   oXML.AddElem("QTM_Settings");
@@ -3584,10 +3853,12 @@ bool CRTProtocol::SetCameraVideoSettings(const unsigned int nCameraID, const EVi
   return false;
 }  // SetGeneralCameraVideo
 
-// nCameraID starts on 1. If nCameraID < 0 then settings are applied to all cameras.
-bool CRTProtocol::SetCameraSyncOutSettings(const unsigned int nCameraID, const unsigned int portNumber,
-                                           const ESyncOutFreqMode* peSyncOutMode, const unsigned int* pnSyncOutValue,
-                                           const float* pfSyncOutDutyCycle, const bool* pbSyncOutNegativePolarity) {
+// nCameraID starts on 1. If nCameraID < 0 then settings are applied to all
+// cameras.
+bool CRTProtocol::SetCameraSyncOutSettings(
+    const unsigned int nCameraID, const unsigned int portNumber,
+    const ESyncOutFreqMode* peSyncOutMode, const unsigned int* pnSyncOutValue,
+    const float* pfSyncOutDutyCycle, const bool* pbSyncOutNegativePolarity) {
   CMarkup oXML;
 
   oXML.AddElem("QTM_Settings");
@@ -3602,7 +3873,8 @@ bool CRTProtocol::SetCameraSyncOutSettings(const unsigned int nCameraID, const u
 
   int port = portNumber - 1;
   if (((port == 0 || port == 1) && peSyncOutMode) || (port == 2)) {
-    oXML.AddElem(port == 0 ? "Sync_Out" : (port == 1 ? "Sync_Out2" : "Sync_Out_MT"));
+    oXML.AddElem(port == 0 ? "Sync_Out"
+                           : (port == 1 ? "Sync_Out2" : "Sync_Out_MT"));
     oXML.IntoElem();
 
     if (port == 0 || port == 1) {
@@ -3629,7 +3901,8 @@ bool CRTProtocol::SetCameraSyncOutSettings(const unsigned int nCameraID, const u
           return false;  // Should never happen
       }
 
-      if (*peSyncOutMode == ModeMultiplier || *peSyncOutMode == ModeDivisor || *peSyncOutMode == ModeActualFreq) {
+      if (*peSyncOutMode == ModeMultiplier || *peSyncOutMode == ModeDivisor ||
+          *peSyncOutMode == ModeActualFreq) {
         if (pnSyncOutValue) {
           AddXMLElementUnsignedInt(&oXML, "Value", pnSyncOutValue);
         }
@@ -3638,8 +3911,10 @@ bool CRTProtocol::SetCameraSyncOutSettings(const unsigned int nCameraID, const u
         }
       }
     }
-    if (pbSyncOutNegativePolarity && (port == 2 || (peSyncOutMode && *peSyncOutMode != ModeFixed100Hz))) {
-      AddXMLElementBool(&oXML, "Signal_Polarity", pbSyncOutNegativePolarity, "Negative", "Positive");
+    if (pbSyncOutNegativePolarity &&
+        (port == 2 || (peSyncOutMode && *peSyncOutMode != ModeFixed100Hz))) {
+      AddXMLElementBool(&oXML, "Signal_Polarity", pbSyncOutNegativePolarity,
+                        "Negative", "Positive");
     }
     oXML.OutOfElem();  // Sync_Out
   }
@@ -3654,8 +3929,11 @@ bool CRTProtocol::SetCameraSyncOutSettings(const unsigned int nCameraID, const u
   return false;
 }  // SetGeneralCameraSyncOut
 
-// nCameraID starts on 1. If nCameraID < 0 then settings are applied to all cameras.
-bool CRTProtocol::SetCameraLensControlSettings(const unsigned int nCameraID, const float focus, const float aperture) {
+// nCameraID starts on 1. If nCameraID < 0 then settings are applied to all
+// cameras.
+bool CRTProtocol::SetCameraLensControlSettings(const unsigned int nCameraID,
+                                               const float focus,
+                                               const float aperture) {
   CMarkup oXML;
 
   oXML.AddElem("QTM_Settings");
@@ -3688,8 +3966,10 @@ bool CRTProtocol::SetCameraLensControlSettings(const unsigned int nCameraID, con
   return false;
 }
 
-// nCameraID starts on 1. If nCameraID < 0 then settings are applied to all cameras.
-bool CRTProtocol::SetCameraAutoExposureSettings(const unsigned int nCameraID, const bool autoExposure,
+// nCameraID starts on 1. If nCameraID < 0 then settings are applied to all
+// cameras.
+bool CRTProtocol::SetCameraAutoExposureSettings(const unsigned int nCameraID,
+                                                const bool autoExposure,
                                                 const float compensation) {
   CMarkup oXML;
 
@@ -3722,8 +4002,10 @@ bool CRTProtocol::SetCameraAutoExposureSettings(const unsigned int nCameraID, co
   return false;
 }
 
-// nCameraID starts on 1. If nCameraID < 0 then settings are applied to all cameras.
-bool CRTProtocol::SetCameraAutoWhiteBalance(const unsigned int nCameraID, const bool enable) {
+// nCameraID starts on 1. If nCameraID < 0 then settings are applied to all
+// cameras.
+bool CRTProtocol::SetCameraAutoWhiteBalance(const unsigned int nCameraID,
+                                            const bool enable) {
   CMarkup oXML;
 
   oXML.AddElem("QTM_Settings");
@@ -3749,10 +4031,12 @@ bool CRTProtocol::SetCameraAutoWhiteBalance(const unsigned int nCameraID, const 
   return false;
 }
 
-bool CRTProtocol::SetImageSettings(const unsigned int nCameraID, const bool* pbEnable,
-                                   const CRTPacket::EImageFormat* peFormat, const unsigned int* pnWidth,
-                                   const unsigned int* pnHeight, const float* pfLeftCrop, const float* pfTopCrop,
-                                   const float* pfRightCrop, const float* pfBottomCrop) {
+bool CRTProtocol::SetImageSettings(
+    const unsigned int nCameraID, const bool* pbEnable,
+    const CRTPacket::EImageFormat* peFormat, const unsigned int* pnWidth,
+    const unsigned int* pnHeight, const float* pfLeftCrop,
+    const float* pfTopCrop, const float* pfRightCrop,
+    const float* pfBottomCrop) {
   CMarkup oXML;
 
   oXML.AddElem("QTM_Settings");
@@ -3801,8 +4085,11 @@ bool CRTProtocol::SetImageSettings(const unsigned int nCameraID, const bool* pbE
   return false;
 }  // SetImageSettings
 
-bool CRTProtocol::SetForceSettings(const unsigned int nPlateID, const SPoint* psCorner1, const SPoint* psCorner2,
-                                   const SPoint* psCorner3, const SPoint* psCorner4) {
+bool CRTProtocol::SetForceSettings(const unsigned int nPlateID,
+                                   const SPoint* psCorner1,
+                                   const SPoint* psCorner2,
+                                   const SPoint* psCorner3,
+                                   const SPoint* psCorner4) {
   CMarkup oXML;
 
   if (nPlateID > 0) {
@@ -3903,7 +4190,8 @@ bool CRTProtocol::SendCommand(const char* pCmdStr) {
   return SendString(pCmdStr, CRTPacket::PacketCommand);
 }  // SendCommand
 
-bool CRTProtocol::SendCommand(const char* pCmdStr, char* pCommandResponseStr, unsigned int timeout) {
+bool CRTProtocol::SendCommand(const char* pCmdStr, char* pCommandResponseStr,
+                              unsigned int timeout) {
   CRTPacket::EPacketType eType;
 
   if (SendString(pCmdStr, CRTPacket::PacketCommand)) {
@@ -3932,14 +4220,19 @@ bool CRTProtocol::SendXML(const char* pCmdStr) {
   if (SendString(pCmdStr, CRTPacket::PacketXML)) {
     if (ReceiveRTPacket(eType, true) > 0) {
       if (eType == CRTPacket::PacketCommand) {
-        if (strcmp(mpoRTPacket->GetCommandString(), "Setting parameters succeeded") == 0) {
+        if (strcmp(mpoRTPacket->GetCommandString(),
+                   "Setting parameters succeeded") == 0) {
           return true;
         } else {
-          sprintf(maErrorStr, "Expected command response \"Setting parameters succeeded\". Got \"%s\".",
+          sprintf(maErrorStr,
+                  "Expected command response \"Setting parameters succeeded\". "
+                  "Got \"%s\".",
                   mpoRTPacket->GetCommandString());
         }
       } else {
-        sprintf(maErrorStr, "Expected command response packet. Got packet type %d.", (int)eType);
+        sprintf(maErrorStr,
+                "Expected command response packet. Got packet type %d.",
+                (int)eType);
       }
     } else {
       strcpy(maErrorStr, "Missing command response packet.");
@@ -3952,19 +4245,22 @@ bool CRTProtocol::SendXML(const char* pCmdStr) {
   return false;
 }  // SendXML
 
-void CRTProtocol::AddXMLElementBool(CMarkup* oXML, const char* tTag, const bool* pbValue, const char* tTrue,
+void CRTProtocol::AddXMLElementBool(CMarkup* oXML, const char* tTag,
+                                    const bool* pbValue, const char* tTrue,
                                     const char* tFalse) {
   if (pbValue) {
     oXML->AddElem(tTag, *pbValue ? tTrue : tFalse);
   }
 }
 
-void CRTProtocol::AddXMLElementBool(CMarkup* oXML, const char* tTag, const bool pbValue, const char* tTrue,
+void CRTProtocol::AddXMLElementBool(CMarkup* oXML, const char* tTag,
+                                    const bool pbValue, const char* tTrue,
                                     const char* tFalse) {
   oXML->AddElem(tTag, pbValue ? tTrue : tFalse);
 }
 
-void CRTProtocol::AddXMLElementInt(CMarkup* oXML, const char* tTag, const int* pnValue) {
+void CRTProtocol::AddXMLElementInt(CMarkup* oXML, const char* tTag,
+                                   const int* pnValue) {
   if (pnValue) {
     std::string tVal;
 
@@ -3973,7 +4269,8 @@ void CRTProtocol::AddXMLElementInt(CMarkup* oXML, const char* tTag, const int* p
   }
 }
 
-void CRTProtocol::AddXMLElementUnsignedInt(CMarkup* oXML, const char* tTag, const unsigned int* pnValue) {
+void CRTProtocol::AddXMLElementUnsignedInt(CMarkup* oXML, const char* tTag,
+                                           const unsigned int* pnValue) {
   if (pnValue) {
     std::string tVal;
 
@@ -3982,7 +4279,9 @@ void CRTProtocol::AddXMLElementUnsignedInt(CMarkup* oXML, const char* tTag, cons
   }
 }
 
-void CRTProtocol::AddXMLElementFloat(CMarkup* oXML, const char* tTag, const float* pfValue, unsigned int pnDecimals) {
+void CRTProtocol::AddXMLElementFloat(CMarkup* oXML, const char* tTag,
+                                     const float* pfValue,
+                                     unsigned int pnDecimals) {
   if (pfValue) {
     std::string tVal;
     char fFormat[10];

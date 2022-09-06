@@ -15,27 +15,16 @@ CTRL_MAX = 10.0
 CTRL_SATURATION = 2047
 # saturation of the control signal
 IN_OUT_GAIN = 102.4
-# factor to convert from a [-20.0 ; 20.0] Ampers value to the [-2048 ; 2048] 12bit DAC register
-percentage_dead_zone_compensation = NJ * [
-    0.,
-]
+# factor to convert from a [-20.0 ; 20.0] Ampers value to the [-2048 ; 2048] 12bit DAC
+# register
+percentage_dead_zone_compensation = NJ * [0.0]
 # percentage of dead zone to compensate (used by ControlManager)
-i_max_dz_comp = NJ * [
-    0.05,
-]
+i_max_dz_comp = NJ * [0.05]
 # value of current tracking error at which deadzone is completely compensated
-percentage_bemf_compensation = NJ * [
-    0.,
-]
-current_sensor_offsets_low_level = NJ * [
-    0.,
-]
-kp_current = NJ * [
-    0.,
-]
-ki_current = np.array(NJ * [
-    0.,
-])
+percentage_bemf_compensation = NJ * [0.0]
+current_sensor_offsets_low_level = NJ * [0.0]
+kp_current = NJ * [0.0]
+ki_current = np.array(NJ * [0.0])
 
 percentage_bemf_compensation[0] = 0.9
 percentage_bemf_compensation[1] = 0.9  # a bit unstable
@@ -60,9 +49,10 @@ percentage_dead_zone_compensation[6] = 0.8
 percentage_dead_zone_compensation[7] = 0.8
 percentage_dead_zone_compensation[8] = 0.8
 percentage_dead_zone_compensation[9] = 0.8
-percentage_dead_zone_compensation[
-    10] = 0.8  # very asymettric error, a bit unstable on negative currents, may need investigation
-percentage_dead_zone_compensation[11] = 0.8  # getting some vibrations for negative errors, may need investigation
+percentage_dead_zone_compensation[10] = 0.8
+# very asymettric error, a bit unstable on negative currents, may need investigation
+percentage_dead_zone_compensation[11] = 0.8
+# getting some vibrations for negative errors, may need investigation
 
 i_max_dz_comp[0] = 0.03
 

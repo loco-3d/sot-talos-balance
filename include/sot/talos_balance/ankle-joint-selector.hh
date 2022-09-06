@@ -38,8 +38,9 @@
 #include <dynamic-graph/signal-helper.h>
 
 #include <map>
-#include "boost/assign.hpp"
 #include <sot/core/flags.hh>
+
+#include "boost/assign.hpp"
 
 namespace dynamicgraph {
 namespace sot {
@@ -49,7 +50,8 @@ namespace talos_balance {
 /* --- CLASS ----------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-class ANKLE_JOINT_SELECTOR_EXPORT AnkleJointSelector : public ::dynamicgraph::Entity {
+class ANKLE_JOINT_SELECTOR_EXPORT AnkleJointSelector
+    : public ::dynamicgraph::Entity {
   DYNAMIC_GRAPH_ENTITY_DECL();
 
  public:
@@ -90,7 +92,8 @@ class ANKLE_JOINT_SELECTOR_EXPORT AnkleJointSelector : public ::dynamicgraph::En
   Flags m_zeros;
   Flags m_ones;
   int m_n;
-  bool m_initSucceeded;  /// true if the entity has been successfully initialized
+  bool
+      m_initSucceeded;  /// true if the entity has been successfully initialized
 
 };  // class AnkleJointSelector
 

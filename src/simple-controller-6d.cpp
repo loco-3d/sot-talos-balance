@@ -16,11 +16,12 @@
 
 #include "sot/talos_balance/simple-controller-6d.hh"
 
-#include <sot/core/debug.hh>
-#include <dynamic-graph/factory.h>
-#include <dynamic-graph/command-bind.h>
-
 #include <dynamic-graph/all-commands.h>
+#include <dynamic-graph/command-bind.h>
+#include <dynamic-graph/factory.h>
+
+#include <sot/core/debug.hh>
+
 #include "sot/core/stop-watch.hh"
 
 namespace dynamicgraph {
@@ -30,8 +31,9 @@ namespace dg = ::dynamicgraph;
 using namespace dg;
 using namespace dg::command;
 
-// Size to be aligned                                     "-------------------------------------------------------"
-#define PROFILE_SIMPLE_CONTROLLER_6D_DX_REF_COMPUTATION "SimpleController6d: v_ref computation                 "
+// Size to be aligned "-------------------------------------------------------"
+#define PROFILE_SIMPLE_CONTROLLER_6D_DX_REF_COMPUTATION \
+  "SimpleController6d: v_ref computation                 "
 
 #define INPUT_SIGNALS m_KpSIN << m_xSIN << m_x_desSIN << m_v_desSIN
 
@@ -58,7 +60,9 @@ SimpleController6d::SimpleController6d(const std::string& name)
   Entity::signalRegistration(INPUT_SIGNALS << OUTPUT_SIGNALS);
 
   /* Commands. */
-  addCommand("init", makeCommandVoid0(*this, &SimpleController6d::init, docCommandVoid0("Initialize the entity.")));
+  addCommand("init",
+             makeCommandVoid0(*this, &SimpleController6d::init,
+                              docCommandVoid0("Initialize the entity.")));
 }
 
 void SimpleController6d::init() { m_initSucceeded = true; }
@@ -76,7 +80,8 @@ Eigen::Matrix3d SimpleController6d::skew(const Eigen::MatrixBase<Derived>& v) {
 
 DEFINE_SIGNAL_OUT_FUNCTION(v_ref, dynamicgraph::Vector) {
   if (!m_initSucceeded) {
-    SEND_WARNING_STREAM_MSG("Cannot compute signal v_ref before initialization!");
+    SEND_WARNING_STREAM_MSG(
+        "Cannot compute signal v_ref before initialization!");
     return s;
   }
   if (s.size() != 6) s.resize(6);
@@ -91,19 +96,24 @@ DEFINE_SIGNAL_OUT_FUNCTION(v_ref, dynamicgraph::Vector) {
   // const MatrixHomogeneous & x_err = x_des * x.inverse();
 
   const Eigen::Vector3d e_O =
-      0.5 * (x.linear().col(0).cross(x_des.linear().col(0)) + x.linear().col(1).cross(x_des.linear().col(1)) +
+      0.5 * (x.linear().col(0).cross(x_des.linear().col(0)) +
+             x.linear().col(1).cross(x_des.linear().col(1)) +
              x.linear().col(2).cross(x_des.linear().col(2)));
 
-  const Eigen::Matrix3d L = -0.5 * (skew(x_des.linear().col(0)) * skew(x.linear().col(0)) +
-                                    skew(x_des.linear().col(1)) * skew(x.linear().col(1)) +
-                                    skew(x_des.linear().col(2)) * skew(x.linear().col(2)));
+  const Eigen::Matrix3d L =
+      -0.5 * (skew(x_des.linear().col(0)) * skew(x.linear().col(0)) +
+              skew(x_des.linear().col(1)) * skew(x.linear().col(1)) +
+              skew(x_des.linear().col(2)) * skew(x.linear().col(2)));
 
   Eigen::Matrix<double, 6, 1> dv_ref;
 
   // dv_ref.head<3>() = Kp.head<3>().cwiseProduct(x_err.translation());
-  dv_ref.head<3>() = x.linear().transpose() * Kp.head<3>().cwiseProduct(x_des.translation() - x.translation());
+  dv_ref.head<3>() =
+      x.linear().transpose() *
+      Kp.head<3>().cwiseProduct(x_des.translation() - x.translation());
 
-  dv_ref.tail<3>() = x.linear().transpose() * L.inverse() * Kp.tail<3>().cwiseProduct(e_O);
+  dv_ref.tail<3>() =
+      x.linear().transpose() * L.inverse() * Kp.tail<3>().cwiseProduct(e_O);
 
   if (m_v_desSIN.isPlugged()) {
     const dynamicgraph::Vector& v_des = m_v_desSIN(iter);

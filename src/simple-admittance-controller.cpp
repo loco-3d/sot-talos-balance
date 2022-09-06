@@ -16,11 +16,11 @@
 
 #include "sot/talos_balance/simple-admittance-controller.hh"
 
-#include <sot/core/debug.hh>
-#include <dynamic-graph/factory.h>
-#include <dynamic-graph/command-bind.h>
-
 #include <dynamic-graph/all-commands.h>
+#include <dynamic-graph/command-bind.h>
+#include <dynamic-graph/factory.h>
+
+#include <sot/core/debug.hh>
 #include <sot/core/stop-watch.hh>
 
 namespace dynamicgraph {
@@ -30,7 +30,7 @@ namespace dg = ::dynamicgraph;
 using namespace dg;
 using namespace dg::command;
 
-// Size to be aligned                                   "-------------------------------------------------------"
+// Size to be aligned "-------------------------------------------------------"
 
 #define PROFILE_SIMPLE_ADMITTANCECONTROLLER_QREF_COMPUTATION \
   "SimpleAdmittanceController: qRef computation                 "
@@ -47,7 +47,8 @@ using namespace dg::command;
 typedef SimpleAdmittanceController EntityClassName;
 
 /* --- DG FACTORY ---------------------------------------------------- */
-DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(SimpleAdmittanceController, "SimpleAdmittanceController");
+DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(SimpleAdmittanceController,
+                                   "SimpleAdmittanceController");
 
 /* ------------------------------------------------------------------- */
 /* --- CONSTRUCTION -------------------------------------------------- */
@@ -65,20 +66,31 @@ SimpleAdmittanceController::SimpleAdmittanceController(const std::string& name)
   Entity::signalRegistration(INPUT_SIGNALS << OUTPUT_SIGNALS);
 
   /* Commands. */
-  addCommand("init", makeCommandVoid2(*this, &SimpleAdmittanceController::init,
-                                      docCommandVoid2("Initialize the entity.", "time step", "Number of elements")));
-  addCommand("setPosition", makeCommandVoid1(*this, &SimpleAdmittanceController::setPosition,
-                                             docCommandVoid1("Set initial reference position.", "Initial position")));
-  addCommand("useExternalState", makeDirectSetter(*this, &m_useState, docDirectSetter("use external state", "bool")));
+  addCommand("init", makeCommandVoid2(
+                         *this, &SimpleAdmittanceController::init,
+                         docCommandVoid2("Initialize the entity.", "time step",
+                                         "Number of elements")));
+  addCommand("setPosition",
+             makeCommandVoid1(*this, &SimpleAdmittanceController::setPosition,
+                              docCommandVoid1("Set initial reference position.",
+                                              "Initial position")));
+  addCommand("useExternalState",
+             makeDirectSetter(*this, &m_useState,
+                              docDirectSetter("use external state", "bool")));
   addCommand("isUsingExternalState",
-             makeDirectGetter(*this, &m_useState, docDirectGetter("use external state", "bool")));
+             makeDirectGetter(*this, &m_useState,
+                              docDirectGetter("use external state", "bool")));
 }
 
 void SimpleAdmittanceController::init(const double& dt, const unsigned& n) {
   if (n < 1) return SEND_MSG("n must be at least 1", MSG_TYPE_ERROR);
-  if (!m_KpSIN.isPlugged()) return SEND_MSG("Init failed: signal Kp is not plugged", MSG_TYPE_ERROR);
-  if (!m_tauSIN.isPlugged()) return SEND_MSG("Init failed: signal tau is not plugged", MSG_TYPE_ERROR);
-  if (!m_tauDesSIN.isPlugged()) return SEND_MSG("Init failed: signal tauDes is not plugged", MSG_TYPE_ERROR);
+  if (!m_KpSIN.isPlugged())
+    return SEND_MSG("Init failed: signal Kp is not plugged", MSG_TYPE_ERROR);
+  if (!m_tauSIN.isPlugged())
+    return SEND_MSG("Init failed: signal tau is not plugged", MSG_TYPE_ERROR);
+  if (!m_tauDesSIN.isPlugged())
+    return SEND_MSG("Init failed: signal tauDes is not plugged",
+                    MSG_TYPE_ERROR);
 
   m_n = n;
   m_dt = dt;
@@ -86,7 +98,8 @@ void SimpleAdmittanceController::init(const double& dt, const unsigned& n) {
   m_initSucceeded = true;
 }
 
-void SimpleAdmittanceController::setPosition(const dynamicgraph::Vector& position)
+void SimpleAdmittanceController::setPosition(
+    const dynamicgraph::Vector& position)
 
 {
   m_q = position;
@@ -98,7 +111,8 @@ void SimpleAdmittanceController::setPosition(const dynamicgraph::Vector& positio
 
 DEFINE_SIGNAL_OUT_FUNCTION(dqRef, dynamicgraph::Vector) {
   if (!m_initSucceeded) {
-    SEND_WARNING_STREAM_MSG("Cannot compute signal dqRef before initialization!");
+    SEND_WARNING_STREAM_MSG(
+        "Cannot compute signal dqRef before initialization!");
     return s;
   }
   if (s.size() != m_n) s.resize(m_n);
@@ -122,7 +136,8 @@ DEFINE_SIGNAL_OUT_FUNCTION(dqRef, dynamicgraph::Vector) {
 
 DEFINE_SIGNAL_OUT_FUNCTION(qRef, dynamicgraph::Vector) {
   if (!m_initSucceeded) {
-    SEND_WARNING_STREAM_MSG("Cannot compute signal qRef before initialization!");
+    SEND_WARNING_STREAM_MSG(
+        "Cannot compute signal qRef before initialization!");
     return s;
   }
   if (s.size() != m_n) s.resize(m_n);

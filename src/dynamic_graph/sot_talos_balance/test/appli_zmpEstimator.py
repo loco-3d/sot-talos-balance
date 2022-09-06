@@ -1,7 +1,11 @@
 # flake8: noqa
 from dynamic_graph import plug
 from dynamic_graph.sot.core import SOT, Derivator_of_Vector
-from dynamic_graph.sot.core.meta_tasks_kine import MetaTaskKine6d, MetaTaskKineCom, gotoNd
+from dynamic_graph.sot.core.meta_tasks_kine import (
+    MetaTaskKine6d,
+    MetaTaskKineCom,
+    gotoNd,
+)
 from dynamic_graph.tracer_real_time import TracerRealTime
 
 import dynamic_graph.sot_talos_balance.talos.control_manager_conf as cm_conf
@@ -34,8 +38,8 @@ robot.ftc = create_ft_calibrator(robot, ft_conf)
 
 # --- ZMP estimation (disconnected)
 zmp_estimator = SimpleZmpEstimator("zmpEst")
-robot.dynamic.createOpPoint('sole_LF', 'left_sole_link')
-robot.dynamic.createOpPoint('sole_RF', 'right_sole_link')
+robot.dynamic.createOpPoint("sole_LF", "left_sole_link")
+robot.dynamic.createOpPoint("sole_RF", "right_sole_link")
 plug(robot.dynamic.sole_LF, zmp_estimator.poseLeft)
 plug(robot.dynamic.sole_RF, zmp_estimator.poseRight)
 plug(robot.ftc.left_foot_force_out, zmp_estimator.wrenchLeft)
@@ -44,26 +48,30 @@ zmp_estimator.init()
 robot.zmp_estimator = zmp_estimator
 
 # --- Control Manager
-robot.cm = create_ctrl_manager(cm_conf, dt, robot_name='robot')
-robot.cm.addCtrlMode('sot_input')
-robot.cm.setCtrlMode('all', 'sot_input')
-robot.cm.addEmergencyStopSIN('zmp')
+robot.cm = create_ctrl_manager(cm_conf, dt, robot_name="robot")
+robot.cm.addCtrlMode("sot_input")
+robot.cm.setCtrlMode("all", "sot_input")
+robot.cm.addEmergencyStopSIN("zmp")
 
 # -------------------------- SOT CONTROL --------------------------
 
 # --- CONTACTS
-#define contactLF and contactRF
-robot.contactLF = MetaTaskKine6d('contactLF', robot.dynamic, 'LF', robot.OperationalPointsMap['left-ankle'])
-robot.contactLF.feature.frame('desired')
+# define contactLF and contactRF
+robot.contactLF = MetaTaskKine6d(
+    "contactLF", robot.dynamic, "LF", robot.OperationalPointsMap["left-ankle"]
+)
+robot.contactLF.feature.frame("desired")
 robot.contactLF.gain.setConstant(100)
 robot.contactLF.keep()
-locals()['contactLF'] = robot.contactLF
+locals()["contactLF"] = robot.contactLF
 
-robot.contactRF = MetaTaskKine6d('contactRF', robot.dynamic, 'RF', robot.OperationalPointsMap['right-ankle'])
-robot.contactRF.feature.frame('desired')
+robot.contactRF = MetaTaskKine6d(
+    "contactRF", robot.dynamic, "RF", robot.OperationalPointsMap["right-ankle"]
+)
+robot.contactRF.feature.frame("desired")
 robot.contactRF.gain.setConstant(100)
 robot.contactRF.keep()
-locals()['contactRF'] = robot.contactRF
+locals()["contactRF"] = robot.contactRF
 
 # --- COM
 robot.taskCom = MetaTaskKineCom(robot.dynamic)
@@ -72,7 +80,7 @@ robot.taskCom.featureDes.errorIN.value = robot.dynamic.com.value
 robot.taskCom.task.controlGain.value = 10
 
 # --- SOT solver
-robot.sot = SOT('sot')
+robot.sot = SOT("sot")
 robot.sot.setSize(robot.dynamic.getDimension())
 
 # --- Plug SOT control to device through control manager
@@ -96,37 +104,54 @@ plug(robot.dvdt.sout, robot.dynamic.acceleration)
 # -------------------------- PLOTS --------------------------
 
 # --- ROS PUBLISHER
-robot.publisher = create_rospublish(robot, 'robot_publisher')
+robot.publisher = create_rospublish(robot, "robot_publisher")
 
-create_topic(robot.publisher, robot.zmp_estimator, 'zmp', robot=robot, data_type='vector')  # estimated ZMP
-create_topic(robot.publisher, robot.zmp_estimator, 'emergencyStop', robot=robot,
-             data_type='boolean')  # ZMP emergency stop
-create_topic(robot.publisher, robot.dynamic, 'com', robot=robot, data_type='vector')  # SOT CoM
-create_topic(robot.publisher, robot.dynamic, 'zmp', robot=robot, data_type='vector')  # SOT ZMP
-create_topic(robot.publisher, robot.device, 'forceLLEG', robot=robot, data_type='vector')  # force on left foot
-create_topic(robot.publisher, robot.device, 'forceRLEG', robot=robot, data_type='vector')  # force on right foot
+create_topic(
+    robot.publisher, robot.zmp_estimator, "zmp", robot=robot, data_type="vector"
+)  # estimated ZMP
+create_topic(
+    robot.publisher,
+    robot.zmp_estimator,
+    "emergencyStop",
+    robot=robot,
+    data_type="boolean",
+)  # ZMP emergency stop
+create_topic(
+    robot.publisher, robot.dynamic, "com", robot=robot, data_type="vector"
+)  # SOT CoM
+create_topic(
+    robot.publisher, robot.dynamic, "zmp", robot=robot, data_type="vector"
+)  # SOT ZMP
+create_topic(
+    robot.publisher, robot.device, "forceLLEG", robot=robot, data_type="vector"
+)  # force on left foot
+create_topic(
+    robot.publisher, robot.device, "forceRLEG", robot=robot, data_type="vector"
+)  # force on right foot
 
-#create_topic(robot.publisher, robot.device, 'forceLLEG', robot = robot, data_type='vector')               # measured left wrench
-#create_topic(robot.publisher, robot.device, 'forceRLEG', robot = robot, data_type='vector')               # measured right wrench
+# create_topic(robot.publisher, robot.device, 'forceLLEG', robot = robot, data_type='vector')               # measured left wrench
+# create_topic(robot.publisher, robot.device, 'forceRLEG', robot = robot, data_type='vector')               # measured right wrench
 
-#create_topic(robot.publisher, robot.device_filters.ft_LF_filter, 'x_filtered', robot = robot, data_type='vector') # filtered left wrench
-#create_topic(robot.publisher, robot.device_filters.ft_RF_filter, 'x_filtered', robot = robot, data_type='vector') # filtered right wrench
+# create_topic(robot.publisher, robot.device_filters.ft_LF_filter, 'x_filtered', robot = robot, data_type='vector') # filtered left wrench
+# create_topic(robot.publisher, robot.device_filters.ft_RF_filter, 'x_filtered', robot = robot, data_type='vector') # filtered right wrench
 
-create_topic(robot.publisher, robot.ftc, 'left_foot_force_out', robot=robot,
-             data_type='vector')  # calibrated left wrench
-create_topic(robot.publisher, robot.ftc, 'right_foot_force_out', robot=robot,
-             data_type='vector')  # calibrated right wrench
+create_topic(
+    robot.publisher, robot.ftc, "left_foot_force_out", robot=robot, data_type="vector"
+)  # calibrated left wrench
+create_topic(
+    robot.publisher, robot.ftc, "right_foot_force_out", robot=robot, data_type="vector"
+)  # calibrated right wrench
 
 # --- TRACER
 robot.tracer = TracerRealTime("zmp_tracer")
 robot.tracer.setBufferSize(80 * (2**20))
-robot.tracer.open('/tmp', 'dg_', '.dat')
-robot.device.after.addSignal('{0}.triger'.format(robot.tracer.name))
+robot.tracer.open("/tmp", "dg_", ".dat")
+robot.device.after.addSignal("{0}.triger".format(robot.tracer.name))
 
-addTrace(robot.tracer, robot.zmp_estimator, 'zmp')
-addTrace(robot.tracer, robot.dynamic, 'com')
-addTrace(robot.tracer, robot.dynamic, 'zmp')
-addTrace(robot.tracer, robot.device, 'forceLLEG')
-addTrace(robot.tracer, robot.device, 'forceRLEG')
+addTrace(robot.tracer, robot.zmp_estimator, "zmp")
+addTrace(robot.tracer, robot.dynamic, "com")
+addTrace(robot.tracer, robot.dynamic, "zmp")
+addTrace(robot.tracer, robot.device, "forceLLEG")
+addTrace(robot.tracer, robot.device, "forceRLEG")
 
 robot.tracer.start()

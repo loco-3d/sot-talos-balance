@@ -1,6 +1,10 @@
 from time import sleep
 
-from dynamic_graph.sot_talos_balance.utils.run_test_utils import run_ft_wrist_calibration, run_test, runCommandClient
+from dynamic_graph.sot_talos_balance.utils.run_test_utils import (
+    run_ft_wrist_calibration,
+    run_test,
+    runCommandClient,
+)
 
 try:
     # Python 2
@@ -8,17 +12,21 @@ try:
 except NameError:
     pass
 
-run_test('appli_admittance_end_effector.py')
+run_test("appli_admittance_end_effector.py")
 
-run_ft_wrist_calibration('robot.forceCalibrator')
+run_ft_wrist_calibration("robot.forceCalibrator")
 
 input("Wait before running the test")
 
 sleep(10.0)
 
 # --- DISPLAY
-# force_data = np.loadtxt('/tmp/dg_' + evalCommandClient('robot.controller.name') + '-force.dat')
-# w_force_data = np.loadtxt('/tmp/dg_' + evalCommandClient('robot.controller.name') + '-w_force.dat')
+# force_data = np.loadtxt(
+# "/tmp/dg_" + evalCommandClient("robot.controller.name") + "-force.dat"
+# )
+# w_force_data = np.loadtxt(
+# "/tmp/dg_" + evalCommandClient("robot.controller.name") + "-w_force.dat"
+# )
 
 # plt.ion()
 
@@ -38,4 +46,4 @@ sleep(10.0)
 
 input("Wait before leaving the simulation")
 
-runCommandClient('dump_tracer(robot.tracer)')
+runCommandClient("dump_tracer(robot.tracer)")

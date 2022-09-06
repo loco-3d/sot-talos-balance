@@ -34,14 +34,14 @@
 /* --------------------------------------------------------------------- */
 /* --- INCLUDE --------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
+#include <dynamic-graph/linear-algebra.h>
+#include <dynamic-graph/signal-helper.h>
+
+#include <map>
+#include <sot/core/matrix-geometry.hh>
 #include <sot/core/robot-utils.hh>
 
-#include <dynamic-graph/signal-helper.h>
-#include <map>
 #include "boost/assign.hpp"
-
-#include <sot/core/matrix-geometry.hh>
-#include <dynamic-graph/linear-algebra.h>
 
 namespace dynamicgraph {
 namespace sot {
@@ -51,7 +51,8 @@ namespace talos_balance {
 /* --- CLASS ----------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-class SIMPLEREFERENCEFRAME_EXPORT SimpleReferenceFrame : public ::dynamicgraph::Entity {
+class SIMPLEREFERENCEFRAME_EXPORT SimpleReferenceFrame
+    : public ::dynamicgraph::Entity {
   DYNAMIC_GRAPH_ENTITY_DECL();
 
  public:
@@ -78,7 +79,8 @@ class SIMPLEREFERENCEFRAME_EXPORT SimpleReferenceFrame : public ::dynamicgraph::
   Vector m_rightFootSoleXYZ;
   MatrixHomogeneous m_referenceFrame;
   bool m_first;
-  bool m_initSucceeded;  /// true if the entity has been successfully initialized
+  bool
+      m_initSucceeded;  /// true if the entity has been successfully initialized
 
 };  // class SimpleReferenceFrame
 

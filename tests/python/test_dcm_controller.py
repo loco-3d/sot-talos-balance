@@ -30,15 +30,15 @@ controller.zmpDes.value = zmpDes
 controller.decayFactor.value = decayFactor
 
 print()
-print("Kp:       %s" % (controller.Kp.value, ))
-print("Ki:       %s" % (controller.Ki.value, ))
-print("omega:    %s" % (controller.omega.value, ))
-print("mass:     %s" % (controller.mass.value, ))
-print("com:      %s" % (controller.com.value, ))
-print("dcm:      %s" % (controller.dcm.value, ))
-print("dcmDes:   %s" % (controller.dcmDes.value, ))
-print("zmpDes:   %s" % (controller.dcmDes.value, ))
-print("decayFactor: %s" % (controller.decayFactor.value, ))
+print("Kp:       %s" % (controller.Kp.value,))
+print("Ki:       %s" % (controller.Ki.value,))
+print("omega:    %s" % (controller.omega.value,))
+print("mass:     %s" % (controller.mass.value,))
+print("com:      %s" % (controller.com.value,))
+print("dcm:      %s" % (controller.dcm.value,))
+print("dcmDes:   %s" % (controller.dcmDes.value,))
+print("zmpDes:   %s" % (controller.dcmDes.value,))
+print("decayFactor: %s" % (controller.decayFactor.value,))
 
 print("\n--------------------")
 
@@ -52,9 +52,9 @@ zmpRef = np.array(3 * [0.0])
 wrenchRef = np.array([0.0, 0.0, 9.81, 0.0, 0.0, 0.0])
 
 print()
-print("zmpRef:  %s" % (controller.zmpRef.value, ))
+print("zmpRef:  %s" % (controller.zmpRef.value,))
 assert_almost_equal(controller.zmpRef.value, zmpRef)
-print("wrenchRef: %s" % (controller.wrenchRef.value, ))
+print("wrenchRef: %s" % (controller.wrenchRef.value,))
 assert_almost_equal(controller.wrenchRef.value, wrenchRef)
 
 print("\n--------------------")
@@ -62,7 +62,7 @@ print("\n--------------------")
 dcmDes = np.array([1.0, 0.0, 0.0])
 controller.dcmDes.value = dcmDes
 
-print("dcmDes:   %s" % (controller.dcmDes.value, ))
+print("dcmDes:   %s" % (controller.dcmDes.value,))
 
 controller.wrenchRef.recompute(1)
 
@@ -70,9 +70,9 @@ zmpRef = np.array([-11.0, 0.0, 0.0])
 wrenchRef = np.array([11.0, 0.0, 9.81, 0.0, float(com[2] * 11), 0.0])
 
 print()
-print("zmpRef:  %s" % (controller.zmpRef.value, ))
+print("zmpRef:  %s" % (controller.zmpRef.value,))
 assert_almost_equal(controller.zmpRef.value, zmpRef)
-print("wrenchRef: %s" % (controller.wrenchRef.value, ))
+print("wrenchRef: %s" % (controller.wrenchRef.value,))
 assert_almost_equal(controller.wrenchRef.value, wrenchRef)
 
 print("\n--------------------")
@@ -86,7 +86,7 @@ zmpRef = np.array([-12.0, 0.0, 0.0])
 wrenchRef = np.array([12.0, 0.0, 9.81, 0.0, float(com[2] * 12), 0.0])
 
 print()
-print("zmpRef:  %s" % (controller.zmpRef.value, ))
+print("zmpRef:  %s" % (controller.zmpRef.value,))
 assert_almost_equal(controller.zmpRef.value, zmpRef)
-print("wrenchRef: %s" % (controller.wrenchRef.value, ))
+print("wrenchRef: %s" % (controller.wrenchRef.value,))
 assert_almost_equal(controller.wrenchRef.value, wrenchRef)

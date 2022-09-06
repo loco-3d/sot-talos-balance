@@ -35,15 +35,15 @@
 /* --- INCLUDE --------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-#include <pinocchio/fwd.hpp>
-#include <sot/core/robot-utils.hh>
 #include <dynamic-graph/signal-helper.h>
 
 #include <map>
-#include "boost/assign.hpp"
-
-#include <pinocchio/multibody/model.hpp>
+#include <pinocchio/fwd.hpp>
 #include <pinocchio/multibody/data.hpp>
+#include <pinocchio/multibody/model.hpp>
+#include <sot/core/robot-utils.hh>
+
+#include "boost/assign.hpp"
 
 namespace dynamicgraph {
 namespace sot {
@@ -53,7 +53,8 @@ namespace talos_balance {
 /* --- CLASS ----------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-class SIMPLE_DISTRIBUTE_WRENCH_EXPORT SimpleDistributeWrench : public ::dynamicgraph::Entity {
+class SIMPLE_DISTRIBUTE_WRENCH_EXPORT SimpleDistributeWrench
+    : public ::dynamicgraph::Entity {
   DYNAMIC_GRAPH_ENTITY_DECL();
 
  public:
@@ -91,15 +92,18 @@ class SIMPLE_DISTRIBUTE_WRENCH_EXPORT SimpleDistributeWrench : public ::dynamicg
   /* --- ENTITY INHERITANCE --- */
   virtual void display(std::ostream& os) const;
 
-  Eigen::Vector3d computeCoP(const dynamicgraph::Vector& wrench, const pinocchio::SE3& pose) const;
+  Eigen::Vector3d computeCoP(const dynamicgraph::Vector& wrench,
+                             const pinocchio::SE3& pose) const;
 
  protected:
-  bool m_initSucceeded;      /// true if the entity has been successfully initialized
+  bool
+      m_initSucceeded;  /// true if the entity has been successfully initialized
   pinocchio::Model m_model;  /// Pinocchio robot model
   pinocchio::Data m_data;    /// Pinocchio robot data
   RobotUtilShrPtr m_robot_util;
 
-  //        pinocchio::SE3 m_ankle_M_ftSens; /// ankle to F/T sensor transformation
+  //        pinocchio::SE3 m_ankle_M_ftSens; /// ankle to F/T sensor
+  //        transformation
   pinocchio::SE3 m_ankle_M_sole;  /// ankle to sole transformation
 
   pinocchio::FrameIndex m_left_foot_id;

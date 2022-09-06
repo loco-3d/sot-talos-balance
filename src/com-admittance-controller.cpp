@@ -16,11 +16,11 @@
 
 #include "sot/talos_balance/com-admittance-controller.hh"
 
-#include <sot/core/debug.hh>
-#include <dynamic-graph/factory.h>
-#include <dynamic-graph/command-bind.h>
-
 #include <dynamic-graph/all-commands.h>
+#include <dynamic-graph/command-bind.h>
+#include <dynamic-graph/factory.h>
+
+#include <sot/core/debug.hh>
 #include <sot/core/stop-watch.hh>
 
 namespace dynamicgraph {
@@ -30,11 +30,15 @@ namespace dg = ::dynamicgraph;
 using namespace dg;
 using namespace dg::command;
 
-// Size to be aligned                                         "-------------------------------------------------------"
-#define PROFILE_COMADMITTANCECONTROLLER_DDCOMREF_COMPUTATION "ComAdmittanceController: ddcomRef computation          "
-#define PROFILE_COMADMITTANCECONTROLLER_STATEREF_COMPUTATION "ComAdmittanceController: stateRef computation          "
-#define PROFILE_COMADMITTANCECONTROLLER_DCOMREF_COMPUTATION "ComAdmittanceController: dcomRef computation           "
-#define PROFILE_COMADMITTANCECONTROLLER_COMREF_COMPUTATION "ComAdmittanceController: comRef computation            "
+// Size to be aligned "-------------------------------------------------------"
+#define PROFILE_COMADMITTANCECONTROLLER_DDCOMREF_COMPUTATION \
+  "ComAdmittanceController: ddcomRef computation          "
+#define PROFILE_COMADMITTANCECONTROLLER_STATEREF_COMPUTATION \
+  "ComAdmittanceController: stateRef computation          "
+#define PROFILE_COMADMITTANCECONTROLLER_DCOMREF_COMPUTATION \
+  "ComAdmittanceController: dcomRef computation           "
+#define PROFILE_COMADMITTANCECONTROLLER_COMREF_COMPUTATION \
+  "ComAdmittanceController: comRef computation            "
 
 #define INPUT_SIGNALS m_KpSIN << m_zmpSIN << m_zmpDesSIN << m_ddcomDesSIN
 
@@ -47,7 +51,8 @@ using namespace dg::command;
 typedef ComAdmittanceController EntityClassName;
 
 /* --- DG FACTORY ---------------------------------------------------- */
-DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(ComAdmittanceController, "ComAdmittanceController");
+DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(ComAdmittanceController,
+                                   "ComAdmittanceController");
 
 /* ------------------------------------------------------------------- */
 /* --- CONSTRUCTION -------------------------------------------------- */
@@ -62,39 +67,58 @@ ComAdmittanceController::ComAdmittanceController(const std::string& name)
       CONSTRUCT_SIGNAL_INNER(stateRef, dynamicgraph::Vector, m_ddcomRefSOUT),
       CONSTRUCT_SIGNAL_OUT(comRef, dynamicgraph::Vector, m_stateRefSINNER),
       CONSTRUCT_SIGNAL_OUT(dcomRef, dynamicgraph::Vector, m_stateRefSINNER)
-      // dcomRef is set to depend from comRefSOUT to ensure position is updated before velocity
+      // dcomRef is set to depend from comRefSOUT to ensure position is updated
+      // before velocity
       ,
       m_initSucceeded(false) {
   Entity::signalRegistration(INPUT_SIGNALS << INNER_SIGNALS << OUTPUT_SIGNALS);
 
   /* Commands. */
   addCommand("init", makeCommandVoid1(*this, &ComAdmittanceController::init,
-                                      docCommandVoid1("Initialize the entity.", "time step")));
-  addCommand("setPosition", makeCommandVoid1(*this, &ComAdmittanceController::setPosition,
-                                             docCommandVoid1("Set initial reference position.", "Initial position")));
-  addCommand("setVelocity", makeCommandVoid1(*this, &ComAdmittanceController::setVelocity,
-                                             docCommandVoid1("Set initial reference velocity.", "Initial velocity")));
-  addCommand("setState", makeCommandVoid2(*this, &ComAdmittanceController::setState,
-                                          docCommandVoid2("Set initial reference position and velocity.",
-                                                          "Initial position", "Initial velocity")));
+                                      docCommandVoid1("Initialize the entity.",
+                                                      "time step")));
+  addCommand("setPosition",
+             makeCommandVoid1(*this, &ComAdmittanceController::setPosition,
+                              docCommandVoid1("Set initial reference position.",
+                                              "Initial position")));
+  addCommand("setVelocity",
+             makeCommandVoid1(*this, &ComAdmittanceController::setVelocity,
+                              docCommandVoid1("Set initial reference velocity.",
+                                              "Initial velocity")));
+  addCommand("setState",
+             makeCommandVoid2(
+                 *this, &ComAdmittanceController::setState,
+                 docCommandVoid2("Set initial reference position and velocity.",
+                                 "Initial position", "Initial velocity")));
 }
 
 void ComAdmittanceController::init(const double& dt) {
-  if (!m_KpSIN.isPlugged()) return SEND_MSG("Init failed: signal Kp is not plugged", MSG_TYPE_ERROR);
-  if (!m_ddcomDesSIN.isPlugged()) return SEND_MSG("Init failed: signal ddcomDes is not plugged", MSG_TYPE_ERROR);
-  if (!m_zmpSIN.isPlugged()) return SEND_MSG("Init failed: signal zmp is not plugged", MSG_TYPE_ERROR);
-  if (!m_zmpDesSIN.isPlugged()) return SEND_MSG("Init failed: signal zmpDes is not plugged", MSG_TYPE_ERROR);
+  if (!m_KpSIN.isPlugged())
+    return SEND_MSG("Init failed: signal Kp is not plugged", MSG_TYPE_ERROR);
+  if (!m_ddcomDesSIN.isPlugged())
+    return SEND_MSG("Init failed: signal ddcomDes is not plugged",
+                    MSG_TYPE_ERROR);
+  if (!m_zmpSIN.isPlugged())
+    return SEND_MSG("Init failed: signal zmp is not plugged", MSG_TYPE_ERROR);
+  if (!m_zmpDesSIN.isPlugged())
+    return SEND_MSG("Init failed: signal zmpDes is not plugged",
+                    MSG_TYPE_ERROR);
 
   m_dt = dt;
   m_state.setZero(6);
   m_initSucceeded = true;
 }
 
-void ComAdmittanceController::setPosition(const dynamicgraph::Vector& com) { m_state.head<3>() = com; }
+void ComAdmittanceController::setPosition(const dynamicgraph::Vector& com) {
+  m_state.head<3>() = com;
+}
 
-void ComAdmittanceController::setVelocity(const dynamicgraph::Vector& dcom) { m_state.tail<3>() = dcom; }
+void ComAdmittanceController::setVelocity(const dynamicgraph::Vector& dcom) {
+  m_state.tail<3>() = dcom;
+}
 
-void ComAdmittanceController::setState(const dynamicgraph::Vector& com, const dynamicgraph::Vector& dcom) {
+void ComAdmittanceController::setState(const dynamicgraph::Vector& com,
+                                       const dynamicgraph::Vector& dcom) {
   setPosition(com);
   setVelocity(dcom);
 }
@@ -105,7 +129,8 @@ void ComAdmittanceController::setState(const dynamicgraph::Vector& com, const dy
 
 DEFINE_SIGNAL_OUT_FUNCTION(ddcomRef, dynamicgraph::Vector) {
   if (!m_initSucceeded) {
-    SEND_WARNING_STREAM_MSG("Cannot compute signal ddcomRef before initialization!");
+    SEND_WARNING_STREAM_MSG(
+        "Cannot compute signal ddcomRef before initialization!");
     return s;
   }
   if (s.size() != 3) s.resize(3);
@@ -131,7 +156,8 @@ DEFINE_SIGNAL_OUT_FUNCTION(ddcomRef, dynamicgraph::Vector) {
 
 DEFINE_SIGNAL_INNER_FUNCTION(stateRef, dynamicgraph::Vector) {
   if (!m_initSucceeded) {
-    SEND_WARNING_STREAM_MSG("Cannot compute signal stateRef before initialization!");
+    SEND_WARNING_STREAM_MSG(
+        "Cannot compute signal stateRef before initialization!");
     return s;
   }
   if (s.size() != 6) s.resize(6);
@@ -156,7 +182,8 @@ DEFINE_SIGNAL_INNER_FUNCTION(stateRef, dynamicgraph::Vector) {
 
 DEFINE_SIGNAL_OUT_FUNCTION(comRef, dynamicgraph::Vector) {
   if (!m_initSucceeded) {
-    SEND_WARNING_STREAM_MSG("Cannot compute signal dcomRef before initialization!");
+    SEND_WARNING_STREAM_MSG(
+        "Cannot compute signal dcomRef before initialization!");
     return s;
   }
   if (s.size() != 3) s.resize(3);
@@ -176,7 +203,8 @@ DEFINE_SIGNAL_OUT_FUNCTION(comRef, dynamicgraph::Vector) {
 
 DEFINE_SIGNAL_OUT_FUNCTION(dcomRef, dynamicgraph::Vector) {
   if (!m_initSucceeded) {
-    SEND_WARNING_STREAM_MSG("Cannot compute signal dcomRef before initialization!");
+    SEND_WARNING_STREAM_MSG(
+        "Cannot compute signal dcomRef before initialization!");
     return s;
   }
   if (s.size() != 3) s.resize(3);

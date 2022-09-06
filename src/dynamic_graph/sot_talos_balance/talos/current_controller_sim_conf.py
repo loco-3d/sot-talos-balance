@@ -12,10 +12,11 @@ CTRL_MAX = 1e6
 # max desired current (security check of ControlManager)
 CTRL_SATURATION = 1e6
 # saturation of the control signal
-IN_OUT_GAIN = 1.
-# factor to convert from a [-20.0 ; 20.0] Ampers value to the [-2048 ; 2048] 12bit DAC register
-percentage_dead_zone_compensation = NJ * [0.]  # noqa
+IN_OUT_GAIN = 1.0
+# factor to convert from a [-20.0 ; 20.0] Ampers value to the [-2048 ; 2048] 12bit DAC
+# register
+percentage_dead_zone_compensation = NJ * [0.0]  # noqa
 # percentage of dead zone to compensate (used by ControlManager)
-percentage_bemf_compensation = NJ * [0.]  # noqa
-kp_current = NJ * [0.]  # noqa
-ki_current = NJ * [0.]  # noqa
+percentage_bemf_compensation = NJ * [0.0]  # noqa
+kp_current = NJ * [0.0]  # noqa
+ki_current = NJ * [0.0]  # noqa

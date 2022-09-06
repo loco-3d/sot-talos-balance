@@ -5,16 +5,16 @@ from dynamic_graph.sot_talos_balance.ankle_joint_selector import AnkleJointSelec
 
 # TODO: print value ? since cpp11 branch, the getter doesn't seem to work
 
-ajs = AnkleJointSelector('ajs')
+ajs = AnkleJointSelector("ajs")
 ajs.init(38)
-ajs.rightRollDecoupled.value = np.array([1.])
-ajs.rightRollCoupled.value = np.array([2.])
-ajs.rightPitchDecoupled.value = np.array([3.])
-ajs.rightPitchCoupled.value = np.array([4.])
-ajs.leftRollDecoupled.value = np.array([5.])
-ajs.leftRollCoupled.value = np.array([6.])
-ajs.leftPitchDecoupled.value = np.array([7.])
-ajs.leftPitchCoupled.value = np.array([8.])
+ajs.rightRollDecoupled.value = np.array([1.0])
+ajs.rightRollCoupled.value = np.array([2.0])
+ajs.rightPitchDecoupled.value = np.array([3.0])
+ajs.rightPitchCoupled.value = np.array([4.0])
+ajs.leftRollDecoupled.value = np.array([5.0])
+ajs.leftRollCoupled.value = np.array([6.0])
+ajs.leftPitchDecoupled.value = np.array([7.0])
+ajs.leftPitchCoupled.value = np.array([8.0])
 
 time = 0
 print("\nRight support")

@@ -1,11 +1,12 @@
 #ifndef RTPROTOCOL_H
 #define RTPROTOCOL_H
 
-#include "RTPacket.h"
-#include "Network.h"
-#include <vector>
-#include <string>
 #include <map>
+#include <string>
+#include <vector>
+
+#include "Network.h"
+#include "RTPacket.h"
 
 #ifdef _WIN32
 #pragma warning(disable : 4251)
@@ -44,12 +45,18 @@ class DLL_EXPORT CRTProtocol {
   static const unsigned int cComponentSkeleton = 0x020000;
 
   struct SComponentOptions {
-    SComponentOptions() : mAnalogChannels(nullptr), mSkeletonGlobalData(false) {}
+    SComponentOptions()
+        : mAnalogChannels(nullptr), mSkeletonGlobalData(false) {}
     char* mAnalogChannels;
     bool mSkeletonGlobalData;
   };
 
-  enum EStreamRate { RateNone = 0, RateAllFrames = 1, RateFrequency = 2, RateFrequencyDivisor = 3 };
+  enum EStreamRate {
+    RateNone = 0,
+    RateAllFrames = 1,
+    RateFrequency = 2,
+    RateFrequencyDivisor = 3
+  };
 
   enum ECameraModel {
     ModelMacReflex = 0,
@@ -355,8 +362,10 @@ class DLL_EXPORT CRTProtocol {
   CRTProtocol();
   ~CRTProtocol();
 
-  bool Connect(const char* pServerAddr, unsigned short nPort, unsigned short* pnUDPServerPort = nullptr,
-               int nMajorVersion = MAJOR_VERSION, int nMinorVersion = MINOR_VERSION, bool bBigEndian = false);
+  bool Connect(const char* pServerAddr, unsigned short nPort,
+               unsigned short* pnUDPServerPort = nullptr,
+               int nMajorVersion = MAJOR_VERSION,
+               int nMinorVersion = MINOR_VERSION, bool bBigEndian = false);
   unsigned short GetUdpServerPort();
   void Disconnect();
   bool Connected() const;
@@ -365,16 +374,22 @@ class DLL_EXPORT CRTProtocol {
   bool GetQTMVersion(char* pVersion, unsigned int nVersionLen);
   bool GetByteOrder(bool& bBigEndian);
   bool CheckLicense(const char* pLicenseCode);
-  bool DiscoverRTServer(unsigned short nServerPort, bool bNoLocalResponses,
-                        unsigned short nDiscoverPort = DEFAULT_AUTO_DESCOVER_PORT);
+  bool DiscoverRTServer(
+      unsigned short nServerPort, bool bNoLocalResponses,
+      unsigned short nDiscoverPort = DEFAULT_AUTO_DESCOVER_PORT);
   int GetNumberOfDiscoverResponses();
-  bool GetDiscoverResponse(unsigned int nIndex, unsigned int& nAddr, unsigned short& nBasePort, std::string& message);
+  bool GetDiscoverResponse(unsigned int nIndex, unsigned int& nAddr,
+                           unsigned short& nBasePort, std::string& message);
 
-  bool GetCurrentFrame(unsigned int nComponentType, const SComponentOptions& componentOptions = {});
-  bool StreamFrames(EStreamRate eRate, unsigned int nRateArg, unsigned short nUDPPort, const char* pUDPAddr,
-                    unsigned int nComponentType, const SComponentOptions& componentOptions = {});
+  bool GetCurrentFrame(unsigned int nComponentType,
+                       const SComponentOptions& componentOptions = {});
+  bool StreamFrames(EStreamRate eRate, unsigned int nRateArg,
+                    unsigned short nUDPPort, const char* pUDPAddr,
+                    unsigned int nComponentType,
+                    const SComponentOptions& componentOptions = {});
   bool StreamFramesStop();
-  bool GetState(CRTPacket::EEvent& eEvent, bool bUpdate = true, int nTimeout = WAIT_FOR_DATA_TIMEOUT);
+  bool GetState(CRTPacket::EEvent& eEvent, bool bUpdate = true,
+                int nTimeout = WAIT_FOR_DATA_TIMEOUT);
   bool GetCapture(const char* pFileName, bool bC3D);
   bool SendTrig();
   bool SetQTMEvent(const char* pLabel);
@@ -387,18 +402,22 @@ class DLL_EXPORT CRTProtocol {
   bool StartRTOnFile();
   bool StopCapture();
   bool LoadCapture(const char* pFileName);
-  bool SaveCapture(const char* pFileName, bool bOverwrite, char* pNewFileName = nullptr, int nSizeOfNewFileName = 0);
+  bool SaveCapture(const char* pFileName, bool bOverwrite,
+                   char* pNewFileName = nullptr, int nSizeOfNewFileName = 0);
   bool LoadProject(const char* pFileName);
   bool Reprocess();
 
   static bool GetEventString(CRTPacket::EEvent eEvent, char* pStr);
-  static bool ConvertRateString(const char* pRate, EStreamRate& eRate, unsigned int& nRateArg);
+  static bool ConvertRateString(const char* pRate, EStreamRate& eRate,
+                                unsigned int& nRateArg);
   static unsigned int ConvertComponentString(const char* pComponentType);
-  static bool GetComponentString(char* pComponentStr, unsigned int nComponentType,
-                                 const SComponentOptions& options = SComponentOptions());
+  static bool GetComponentString(
+      char* pComponentStr, unsigned int nComponentType,
+      const SComponentOptions& options = SComponentOptions());
 
-  int ReceiveRTPacket(CRTPacket::EPacketType& eType, bool bSkipEvents = true,
-                      int nTimeout = WAIT_FOR_DATA_TIMEOUT);  // nTimeout < 0 : Blocking receive
+  int ReceiveRTPacket(
+      CRTPacket::EPacketType& eType, bool bSkipEvents = true,
+      int nTimeout = WAIT_FOR_DATA_TIMEOUT);  // nTimeout < 0 : Blocking receive
   CRTPacket* GetRTPacket();
 
   bool ReadXmlBool(CMarkup* xml, const std::string& element, bool& value) const;
@@ -409,51 +428,78 @@ class DLL_EXPORT CRTProtocol {
   bool ReadAnalogSettings(bool& bDataAvailable);
   bool ReadForceSettings(bool& bDataAvailable);
   bool ReadImageSettings(bool& bDataAvailable);
-  bool ReadSkeletonSettings(bool& bDataAvailable, bool skeletonGlobalData = false);
+  bool ReadSkeletonSettings(bool& bDataAvailable,
+                            bool skeletonGlobalData = false);
 
-  void GetSystemSettings(unsigned int& nCaptureFrequency, float& fCaptureTime, bool& bStartOnExtTrig, bool& trigNO,
-                         bool& trigNC, bool& trigSoftware, EProcessingActions& eProcessingActions,
-                         EProcessingActions& eRtProcessingActions, EProcessingActions& eReprocessingActions) const;
+  void GetSystemSettings(unsigned int& nCaptureFrequency, float& fCaptureTime,
+                         bool& bStartOnExtTrig, bool& trigNO, bool& trigNC,
+                         bool& trigSoftware,
+                         EProcessingActions& eProcessingActions,
+                         EProcessingActions& eRtProcessingActions,
+                         EProcessingActions& eReprocessingActions) const;
 
-  void GetExtTimeBaseSettings(bool& bEnabled, ESignalSource& eSignalSource, bool& bSignalModePeriodic,
-                              unsigned int& nFreqMultiplier, unsigned int& nFreqDivisor, unsigned int& nFreqTolerance,
-                              float& fNominalFrequency, bool& bNegativeEdge, unsigned int& nSignalShutterDelay,
+  void GetExtTimeBaseSettings(bool& bEnabled, ESignalSource& eSignalSource,
+                              bool& bSignalModePeriodic,
+                              unsigned int& nFreqMultiplier,
+                              unsigned int& nFreqDivisor,
+                              unsigned int& nFreqTolerance,
+                              float& fNominalFrequency, bool& bNegativeEdge,
+                              unsigned int& nSignalShutterDelay,
                               float& fNonPeriodicTimeout) const;
 
   unsigned int GetCameraCount() const;
 
-  bool GetCameraSettings(unsigned int nCameraIndex, unsigned int& nID, ECameraModel& eModel, bool& bUnderwater,
-                         bool& bSupportsHwSync, unsigned int& nSerial, ECameraMode& eMode) const;
+  bool GetCameraSettings(unsigned int nCameraIndex, unsigned int& nID,
+                         ECameraModel& eModel, bool& bUnderwater,
+                         bool& bSupportsHwSync, unsigned int& nSerial,
+                         ECameraMode& eMode) const;
 
-  bool GetCameraMarkerSettings(unsigned int nCameraIndex, unsigned int& nCurrentExposure, unsigned int& nMinExposure,
-                               unsigned int& nMaxExposure, unsigned int& nCurrentThreshold,
-                               unsigned int& nMinThreshold, unsigned int& nMaxThreshold) const;
+  bool GetCameraMarkerSettings(unsigned int nCameraIndex,
+                               unsigned int& nCurrentExposure,
+                               unsigned int& nMinExposure,
+                               unsigned int& nMaxExposure,
+                               unsigned int& nCurrentThreshold,
+                               unsigned int& nMinThreshold,
+                               unsigned int& nMaxThreshold) const;
 
-  bool GetCameraVideoSettings(unsigned int nCameraIndex, EVideoResolution& eVideoResolution,
-                              EVideoAspectRatio& eVideoAspectRatio, unsigned int& nVideoFrequency,
-                              unsigned int& nCurrentExposure, unsigned int& nMinExposure, unsigned int& nMaxExposure,
-                              unsigned int& nCurrentFlashTime, unsigned int& nMinFlashTime,
-                              unsigned int& nMaxFlashTime) const;
+  bool GetCameraVideoSettings(
+      unsigned int nCameraIndex, EVideoResolution& eVideoResolution,
+      EVideoAspectRatio& eVideoAspectRatio, unsigned int& nVideoFrequency,
+      unsigned int& nCurrentExposure, unsigned int& nMinExposure,
+      unsigned int& nMaxExposure, unsigned int& nCurrentFlashTime,
+      unsigned int& nMinFlashTime, unsigned int& nMaxFlashTime) const;
 
-  bool GetCameraSyncOutSettings(unsigned int nCameraIndex, unsigned int portNumber, ESyncOutFreqMode& eSyncOutMode,
-                                unsigned int& nSyncOutValue, float& fSyncOutDutyCycle,
+  bool GetCameraSyncOutSettings(unsigned int nCameraIndex,
+                                unsigned int portNumber,
+                                ESyncOutFreqMode& eSyncOutMode,
+                                unsigned int& nSyncOutValue,
+                                float& fSyncOutDutyCycle,
                                 bool& bSyncOutNegativePolarity) const;
 
-  bool GetCameraPosition(unsigned int nCameraIndex, SPoint& sPoint, float fvRotationMatrix[3][3]) const;
+  bool GetCameraPosition(unsigned int nCameraIndex, SPoint& sPoint,
+                         float fvRotationMatrix[3][3]) const;
 
   bool GetCameraOrientation(unsigned int nCameraIndex, int& nOrientation) const;
 
-  bool GetCameraResolution(unsigned int nCameraIndex, unsigned int& nMarkerWidth, unsigned int& nMarkerHeight,
-                           unsigned int& nVideoWidth, unsigned int& nVideoHeight) const;
+  bool GetCameraResolution(unsigned int nCameraIndex,
+                           unsigned int& nMarkerWidth,
+                           unsigned int& nMarkerHeight,
+                           unsigned int& nVideoWidth,
+                           unsigned int& nVideoHeight) const;
 
-  bool GetCameraFOV(unsigned int nCameraIndex, unsigned int& nMarkerLeft, unsigned int& nMarkerTop,
-                    unsigned int& nMarkerRight, unsigned int& nMarkerBottom, unsigned int& nVideoLeft,
-                    unsigned int& nVideoTop, unsigned int& nVideoRight, unsigned int& nVideoBottom) const;
+  bool GetCameraFOV(unsigned int nCameraIndex, unsigned int& nMarkerLeft,
+                    unsigned int& nMarkerTop, unsigned int& nMarkerRight,
+                    unsigned int& nMarkerBottom, unsigned int& nVideoLeft,
+                    unsigned int& nVideoTop, unsigned int& nVideoRight,
+                    unsigned int& nVideoBottom) const;
 
-  bool GetCameraLensControlSettings(const unsigned int nCameraIndex, float* focus, float* aperture) const;
-  bool GetCameraAutoExposureSettings(const unsigned int nCameraIndex, bool* autoExposureEnabled,
+  bool GetCameraLensControlSettings(const unsigned int nCameraIndex,
+                                    float* focus, float* aperture) const;
+  bool GetCameraAutoExposureSettings(const unsigned int nCameraIndex,
+                                     bool* autoExposureEnabled,
                                      float* autoExposureCompensation) const;
-  bool GetCameraAutoWhiteBalance(const unsigned int nCameraIndex, bool* autoWhiteBalanceEnabled) const;
+  bool GetCameraAutoWhiteBalance(const unsigned int nCameraIndex,
+                                 bool* autoWhiteBalanceEnabled) const;
 
   EAxis Get3DUpwardAxis() const;
   const char* Get3DCalibrated() const;
@@ -465,97 +511,138 @@ class DLL_EXPORT CRTProtocol {
   const char* Get3DBoneFromName(unsigned int boneIndex) const;
   const char* Get3DBoneToName(unsigned int boneIndex) const;
 
-  void Get6DOFEulerNames(std::string& first, std::string& second, std::string& third) const;
+  void Get6DOFEulerNames(std::string& first, std::string& second,
+                         std::string& third) const;
   unsigned int Get6DOFBodyCount() const;
   const char* Get6DOFBodyName(unsigned int nBodyIndex) const;
   unsigned int Get6DOFBodyColor(unsigned int nBodyIndex) const;
   unsigned int Get6DOFBodyPointCount(unsigned int nBodyIndex) const;
-  bool Get6DOFBodyPoint(unsigned int nBodyIndex, unsigned int nMarkerIndex, SPoint& sPoint) const;
+  bool Get6DOFBodyPoint(unsigned int nBodyIndex, unsigned int nMarkerIndex,
+                        SPoint& sPoint) const;
 
   unsigned int GetGazeVectorCount() const;
   const char* GetGazeVectorName(unsigned int nGazeVectorIndex) const;
   float GetGazeVectorFrequency(unsigned int nGazeVectorIndex) const;
 
   unsigned int GetAnalogDeviceCount() const;
-  bool GetAnalogDevice(unsigned int nDeviceIndex, unsigned int& nDeviceID, unsigned int& nChannels, char*& pName,
-                       unsigned int& nFrequency, char*& pUnit, float& fMinRange, float& fMaxRange) const;
-  const char* GetAnalogLabel(unsigned int nDeviceIndex, unsigned int nChannelIndex) const;
-  const char* GetAnalogUnit(unsigned int nDeviceIndex, unsigned int nChannelIndex) const;
+  bool GetAnalogDevice(unsigned int nDeviceIndex, unsigned int& nDeviceID,
+                       unsigned int& nChannels, char*& pName,
+                       unsigned int& nFrequency, char*& pUnit, float& fMinRange,
+                       float& fMaxRange) const;
+  const char* GetAnalogLabel(unsigned int nDeviceIndex,
+                             unsigned int nChannelIndex) const;
+  const char* GetAnalogUnit(unsigned int nDeviceIndex,
+                            unsigned int nChannelIndex) const;
 
   void GetForceUnits(char*& pLength, char*& pForce) const;
   unsigned int GetForcePlateCount() const;
-  bool GetForcePlate(unsigned int nPlateIndex, unsigned int& nID, unsigned int& nAnalogDeviceID,
-                     unsigned int& nFrequency, char*& pType, char*& pName, float& fLength, float& fWidth) const;
+  bool GetForcePlate(unsigned int nPlateIndex, unsigned int& nID,
+                     unsigned int& nAnalogDeviceID, unsigned int& nFrequency,
+                     char*& pType, char*& pName, float& fLength,
+                     float& fWidth) const;
   bool GetForcePlateLocation(unsigned int nPlateIndex, SPoint sCorner[4]) const;
   bool GetForcePlateOrigin(unsigned int nPlateIndex, SPoint& sOrigin) const;
   unsigned int GetForcePlateChannelCount(unsigned int nPlateIndex) const;
-  bool GetForcePlateChannel(unsigned int nPlateIndex, unsigned int nChannelIndex, unsigned int& nChannelNumber,
+  bool GetForcePlateChannel(unsigned int nPlateIndex,
+                            unsigned int nChannelIndex,
+                            unsigned int& nChannelNumber,
                             float& fConversionFactor) const;
-  bool GetForcePlateCalibrationMatrix(unsigned int nPlateIndex, float fvCalMatrix[12][12], unsigned int* rows,
+  bool GetForcePlateCalibrationMatrix(unsigned int nPlateIndex,
+                                      float fvCalMatrix[12][12],
+                                      unsigned int* rows,
                                       unsigned int* columns) const;
 
   unsigned int GetImageCameraCount() const;
-  bool GetImageCamera(unsigned int nCameraIndex, unsigned int& nCameraID, bool& bEnabled,
-                      CRTPacket::EImageFormat& eFormat, unsigned int& nWidth, unsigned int& nHeight, float& fCropLeft,
-                      float& fCropTop, float& fCropRight, float& fCropBottom) const;
+  bool GetImageCamera(unsigned int nCameraIndex, unsigned int& nCameraID,
+                      bool& bEnabled, CRTPacket::EImageFormat& eFormat,
+                      unsigned int& nWidth, unsigned int& nHeight,
+                      float& fCropLeft, float& fCropTop, float& fCropRight,
+                      float& fCropBottom) const;
 
   unsigned int GetSkeletonCount() const;
   const char* GetSkeletonName(unsigned int skeletonIndex);
   unsigned int GetSkeletonSegmentCount(unsigned int skeletonIndex);
   bool GetSkeleton(unsigned int skeletonIndex, SSettingsSkeleton* skeleton);
-  bool GetSkeletonSegment(unsigned int skeletonIndex, unsigned int segmentIndex,
-                          SSettingsSkeletonSegment* segment);  // parentIndex = -1 => No parent.
+  bool GetSkeletonSegment(
+      unsigned int skeletonIndex, unsigned int segmentIndex,
+      SSettingsSkeletonSegment* segment);  // parentIndex = -1 => No parent.
 
   ECameraSystemType GetCameraSystemType() const;
 
-  bool SetSystemSettings(const unsigned int* pnCaptureFrequency, const float* pfCaptureTime,
-                         const bool* pbStartOnExtTrig, const bool* trigNO, const bool* trigNC,
-                         const bool* trigSoftware, const EProcessingActions* peProcessingActions,
+  bool SetSystemSettings(const unsigned int* pnCaptureFrequency,
+                         const float* pfCaptureTime,
+                         const bool* pbStartOnExtTrig, const bool* trigNO,
+                         const bool* trigNC, const bool* trigSoftware,
+                         const EProcessingActions* peProcessingActions,
                          const EProcessingActions* peRtProcessingActions,
                          const EProcessingActions* peReprocessingActions);
 
-  bool SetExtTimeBaseSettings(const bool* pbEnabled, const ESignalSource* peSignalSource,
-                              const bool* pbSignalModePeriodic, const unsigned int* pnFreqMultiplier,
-                              const unsigned int* pnFreqDivisor, const unsigned int* pnFreqTolerance,
-                              const float* pfNominalFrequency, const bool* pbNegativeEdge,
-                              const unsigned int* pnSignalShutterDelay, const float* pfNonPeriodicTimeout);
+  bool SetExtTimeBaseSettings(
+      const bool* pbEnabled, const ESignalSource* peSignalSource,
+      const bool* pbSignalModePeriodic, const unsigned int* pnFreqMultiplier,
+      const unsigned int* pnFreqDivisor, const unsigned int* pnFreqTolerance,
+      const float* pfNominalFrequency, const bool* pbNegativeEdge,
+      const unsigned int* pnSignalShutterDelay,
+      const float* pfNonPeriodicTimeout);
 
-  bool SetCameraSettings(const unsigned int nCameraID, const ECameraMode* peMode, const float* pfMarkerExposure,
-                         const float* pfMarkerThreshold, const int* pnOrientation);
+  bool SetCameraSettings(const unsigned int nCameraID,
+                         const ECameraMode* peMode,
+                         const float* pfMarkerExposure,
+                         const float* pfMarkerThreshold,
+                         const int* pnOrientation);
 
-  bool SetCameraVideoSettings(const unsigned int nCameraID, const EVideoResolution* eVideoResolution,
-                              const EVideoAspectRatio* eVideoAspectRatio, const unsigned int* pnVideoFrequency,
-                              const float* pfVideoExposure, const float* pfVideoFlashTime);
+  bool SetCameraVideoSettings(const unsigned int nCameraID,
+                              const EVideoResolution* eVideoResolution,
+                              const EVideoAspectRatio* eVideoAspectRatio,
+                              const unsigned int* pnVideoFrequency,
+                              const float* pfVideoExposure,
+                              const float* pfVideoFlashTime);
 
-  bool SetCameraSyncOutSettings(const unsigned int nCameraID, const unsigned int portNumber,
-                                const ESyncOutFreqMode* peSyncOutMode, const unsigned int* pnSyncOutValue,
-                                const float* pfSyncOutDutyCycle, const bool* pbSyncOutNegativePolarity);
+  bool SetCameraSyncOutSettings(const unsigned int nCameraID,
+                                const unsigned int portNumber,
+                                const ESyncOutFreqMode* peSyncOutMode,
+                                const unsigned int* pnSyncOutValue,
+                                const float* pfSyncOutDutyCycle,
+                                const bool* pbSyncOutNegativePolarity);
 
-  bool SetCameraLensControlSettings(const unsigned int nCameraID, const float focus, const float aperture);
-  bool SetCameraAutoExposureSettings(const unsigned int nCameraID, const bool autoExposure, const float compensation);
-  bool SetCameraAutoWhiteBalance(const unsigned int nCameraID, const bool enable);
+  bool SetCameraLensControlSettings(const unsigned int nCameraID,
+                                    const float focus, const float aperture);
+  bool SetCameraAutoExposureSettings(const unsigned int nCameraID,
+                                     const bool autoExposure,
+                                     const float compensation);
+  bool SetCameraAutoWhiteBalance(const unsigned int nCameraID,
+                                 const bool enable);
 
-  bool SetImageSettings(const unsigned int nCameraID, const bool* pbEnable, const CRTPacket::EImageFormat* peFormat,
-                        const unsigned int* pnWidth, const unsigned int* pnHeight, const float* pfLeftCrop,
-                        const float* pfTopCrop, const float* pfRightCrop, const float* pfBottomCrop);
+  bool SetImageSettings(const unsigned int nCameraID, const bool* pbEnable,
+                        const CRTPacket::EImageFormat* peFormat,
+                        const unsigned int* pnWidth,
+                        const unsigned int* pnHeight, const float* pfLeftCrop,
+                        const float* pfTopCrop, const float* pfRightCrop,
+                        const float* pfBottomCrop);
 
-  bool SetForceSettings(const unsigned int nPlateID, const SPoint* psCorner1, const SPoint* psCorner2,
-                        const SPoint* psCorner3, const SPoint* psCorner4);
+  bool SetForceSettings(const unsigned int nPlateID, const SPoint* psCorner1,
+                        const SPoint* psCorner2, const SPoint* psCorner3,
+                        const SPoint* psCorner4);
 
   char* GetErrorString();
 
  private:
   bool SendString(const char* pCmdStr, int nType);
   bool SendCommand(const char* pCmdStr);
-  bool SendCommand(const char* pCmdStr, char* pCommandResponseStr, unsigned int timeout = WAIT_FOR_DATA_TIMEOUT);
+  bool SendCommand(const char* pCmdStr, char* pCommandResponseStr,
+                   unsigned int timeout = WAIT_FOR_DATA_TIMEOUT);
   bool SendXML(const char* pCmdStr);
-  void AddXMLElementBool(CMarkup* oXML, const char* tTag, const bool* pbValue, const char* tTrue = "True",
+  void AddXMLElementBool(CMarkup* oXML, const char* tTag, const bool* pbValue,
+                         const char* tTrue = "True",
                          const char* tFalse = "False");
-  void AddXMLElementBool(CMarkup* oXML, const char* tTag, const bool bValue, const char* tTrue = "True",
+  void AddXMLElementBool(CMarkup* oXML, const char* tTag, const bool bValue,
+                         const char* tTrue = "True",
                          const char* tFalse = "False");
   void AddXMLElementInt(CMarkup* oXML, const char* tTag, const int* pnValue);
-  void AddXMLElementUnsignedInt(CMarkup* oXML, const char* tTag, const unsigned int* pnValue);
-  void AddXMLElementFloat(CMarkup* oXML, const char* tTag, const float* pfValue, unsigned int pnDecimals = 6);
+  void AddXMLElementUnsignedInt(CMarkup* oXML, const char* tTag,
+                                const unsigned int* pnValue);
+  void AddXMLElementFloat(CMarkup* oXML, const char* tTag, const float* pfValue,
+                          unsigned int pnDecimals = 6);
   bool CompareNoCase(std::string tStr1, const char* tStr2) const;
 
  private:
@@ -564,7 +651,8 @@ class DLL_EXPORT CRTProtocol {
   char* maDataBuff;
   unsigned int mDataBuffSize;
   CRTPacket::EEvent meLastEvent;
-  CRTPacket::EEvent meState;  // Same as meLastEvent but without EventCameraSettingsChanged
+  CRTPacket::EEvent
+      meState;  // Same as meLastEvent but without EventCameraSettingsChanged
   int mnMinorVersion;
   int mnMajorVersion;
   bool mbBigEndian;

@@ -3,19 +3,27 @@ from __future__ import print_function
 import dynamic_graph.sot_talos_balance.talos.parameter_server_conf as param_server_conf
 import numpy as np
 import pinocchio as pin
-from dynamic_graph.sot_talos_balance.create_entities_utils import Bunch, DcmEstimator, ParameterServer
+from dynamic_graph.sot_talos_balance.create_entities_utils import (
+    Bunch,
+    DcmEstimator,
+    ParameterServer,
+)
 from numpy.testing import assert_almost_equal
 
 dt = 0.001
 conf = Bunch()
-robot_name = 'robot'
+robot_name = "robot"
 
 urdfPath = param_server_conf.urdfFileName
 urdfDir = param_server_conf.model_path
 
 model = pin.buildModelFromUrdf(urdfPath, pin.JointModelFreeFlyer())
-model.lowerPositionLimit = np.concatenate((np.array([-1.] * 7), model.lowerPositionLimit[7:]))
-model.upperPositionLimit = np.concatenate((np.array([-1.] * 7), model.upperPositionLimit[7:]))
+model.lowerPositionLimit = np.concatenate(
+    (np.array([-1.0] * 7), model.lowerPositionLimit[7:])
+)
+model.upperPositionLimit = np.concatenate(
+    (np.array([-1.0] * 7), model.upperPositionLimit[7:])
+)
 data = model.createData()
 q = pin.randomConfiguration(model)
 v = pin.utils.rand(model.nv)
@@ -31,7 +39,7 @@ param_server.setJointsUrdfToSot(np.array(param_server_conf.urdftosot))
 param_server.setRightFootForceSensorXYZ(np.array(param_server_conf.rightFootSensorXYZ))
 param_server.setRightFootSoleXYZ(np.array(param_server_conf.rightFootSoleXYZ))
 
-dcm_estimator = DcmEstimator('dcm_estimator')
+dcm_estimator = DcmEstimator("dcm_estimator")
 dcm_estimator.q.value = q
 dcm_estimator.v.value = v
 dcm_estimator.init(dt, robot_name)

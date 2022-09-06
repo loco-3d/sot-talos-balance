@@ -16,12 +16,12 @@
 
 #include "sot/talos_balance/pose-quaternion-to-matrix-homo.hh"
 
-#include <sot/core/debug.hh>
-#include <dynamic-graph/factory.h>
 #include <dynamic-graph/all-commands.h>
-#include <sot/core/stop-watch.hh>
+#include <dynamic-graph/factory.h>
 
 #include <Eigen/Core>
+#include <sot/core/debug.hh>
+#include <sot/core/stop-watch.hh>
 
 namespace dynamicgraph {
 namespace sot {
@@ -30,8 +30,9 @@ namespace dg = ::dynamicgraph;
 using namespace dg;
 using namespace dg::command;
 
-// Size to be aligned                                      "-------------------------------------------------------"
-#define PROFILE_POSEQUATERNIONTOMATRIXHOMO_COMPUTATION "PoseQuaternionToMatrixHomo computation                 "
+// Size to be aligned "-------------------------------------------------------"
+#define PROFILE_POSEQUATERNIONTOMATRIXHOMO_COMPUTATION \
+  "PoseQuaternionToMatrixHomo computation                 "
 
 #define INPUT_SIGNALS m_sinSIN
 
@@ -42,7 +43,8 @@ using namespace dg::command;
 typedef PoseQuaternionToMatrixHomo EntityClassName;
 
 /* --- DG FACTORY ---------------------------------------------------- */
-DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(PoseQuaternionToMatrixHomo, "PoseQuaternionToMatrixHomo");
+DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(PoseQuaternionToMatrixHomo,
+                                   "PoseQuaternionToMatrixHomo");
 
 /* ------------------------------------------------------------------- */
 /* --- CONSTRUCTION -------------------------------------------------- */
@@ -55,7 +57,8 @@ PoseQuaternionToMatrixHomo::PoseQuaternionToMatrixHomo(const std::string& name)
 
   /* Commands. */
   addCommand("init",
-             makeCommandVoid0(*this, &PoseQuaternionToMatrixHomo::init, docCommandVoid0("Initialize the entity.")));
+             makeCommandVoid0(*this, &PoseQuaternionToMatrixHomo::init,
+                              docCommandVoid0("Initialize the entity.")));
 }
 
 /* ------------------------------------------------------------------- */

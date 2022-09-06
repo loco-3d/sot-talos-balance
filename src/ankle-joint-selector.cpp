@@ -16,9 +16,10 @@
 
 #include "sot/talos_balance/ankle-joint-selector.hh"
 
-#include <sot/core/debug.hh>
-#include <dynamic-graph/factory.h>
 #include <dynamic-graph/all-commands.h>
+#include <dynamic-graph/factory.h>
+
+#include <sot/core/debug.hh>
 #include <sot/core/stop-watch.hh>
 
 namespace dynamicgraph {
@@ -28,13 +29,15 @@ namespace dg = ::dynamicgraph;
 using namespace dg;
 using namespace dg::command;
 
-#define INPUT_SIGNALS                                                                                               \
-  m_phaseSIN << m_rightRollCoupledSIN << m_rightRollDecoupledSIN << m_rightPitchCoupledSIN                          \
-             << m_rightPitchDecoupledSIN << m_leftRollCoupledSIN << m_leftRollDecoupledSIN << m_leftPitchCoupledSIN \
-             << m_leftPitchDecoupledSIN
+#define INPUT_SIGNALS                                              \
+  m_phaseSIN << m_rightRollCoupledSIN << m_rightRollDecoupledSIN   \
+             << m_rightPitchCoupledSIN << m_rightPitchDecoupledSIN \
+             << m_leftRollCoupledSIN << m_leftRollDecoupledSIN     \
+             << m_leftPitchCoupledSIN << m_leftPitchDecoupledSIN
 
-#define OUTPUT_SIGNALS \
-  m_selecLeftSOUT << m_selecRightSOUT << m_rightRollSOUT << m_rightPitchSOUT << m_leftRollSOUT << m_leftPitchSOUT
+#define OUTPUT_SIGNALS                                                       \
+  m_selecLeftSOUT << m_selecRightSOUT << m_rightRollSOUT << m_rightPitchSOUT \
+                  << m_leftRollSOUT << m_leftPitchSOUT
 
 /// Define EntityClassName here rather than in the header file
 /// so that it can be used by the macros DEFINE_SIGNAL_**_FUNCTION.
@@ -59,14 +62,18 @@ AnkleJointSelector::AnkleJointSelector(const std::string& name)
       CONSTRUCT_SIGNAL_IN(leftPitchDecoupled, dynamicgraph::Vector),
       CONSTRUCT_SIGNAL_OUT(selecLeft, Flags, m_phaseSIN),
       CONSTRUCT_SIGNAL_OUT(selecRight, Flags, m_phaseSIN),
-      CONSTRUCT_SIGNAL_OUT(rightRoll, dynamicgraph::Vector,
-                           m_phaseSIN << m_rightRollCoupledSIN << m_rightRollDecoupledSIN),
-      CONSTRUCT_SIGNAL_OUT(rightPitch, dynamicgraph::Vector,
-                           m_phaseSIN << m_rightPitchCoupledSIN << m_rightPitchDecoupledSIN),
-      CONSTRUCT_SIGNAL_OUT(leftRoll, dynamicgraph::Vector,
-                           m_phaseSIN << m_leftRollCoupledSIN << m_leftRollDecoupledSIN),
-      CONSTRUCT_SIGNAL_OUT(leftPitch, dynamicgraph::Vector,
-                           m_phaseSIN << m_leftPitchCoupledSIN << m_leftPitchDecoupledSIN),
+      CONSTRUCT_SIGNAL_OUT(
+          rightRoll, dynamicgraph::Vector,
+          m_phaseSIN << m_rightRollCoupledSIN << m_rightRollDecoupledSIN),
+      CONSTRUCT_SIGNAL_OUT(
+          rightPitch, dynamicgraph::Vector,
+          m_phaseSIN << m_rightPitchCoupledSIN << m_rightPitchDecoupledSIN),
+      CONSTRUCT_SIGNAL_OUT(
+          leftRoll, dynamicgraph::Vector,
+          m_phaseSIN << m_leftRollCoupledSIN << m_leftRollDecoupledSIN),
+      CONSTRUCT_SIGNAL_OUT(
+          leftPitch, dynamicgraph::Vector,
+          m_phaseSIN << m_leftPitchCoupledSIN << m_leftPitchDecoupledSIN),
       m_zeros(),
       m_ones(true),
       m_initSucceeded(false) {
@@ -74,7 +81,8 @@ AnkleJointSelector::AnkleJointSelector(const std::string& name)
 
   /* Commands. */
   addCommand("init", makeCommandVoid1(*this, &AnkleJointSelector::init,
-                                      docCommandVoid1("Initialize the entity.", "Number of joints")));
+                                      docCommandVoid1("Initialize the entity.",
+                                                      "Number of joints")));
 }
 
 void AnkleJointSelector::init(const int& n) {

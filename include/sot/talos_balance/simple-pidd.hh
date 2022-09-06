@@ -36,7 +36,9 @@
 /* --------------------------------------------------------------------- */
 
 #include <dynamic-graph/signal-helper.h>
+
 #include <map>
+
 #include "boost/assign.hpp"
 
 namespace dynamicgraph {
@@ -84,7 +86,8 @@ class SIMPLE_PIDD_EXPORT SimplePIDD : public ::dynamicgraph::Entity {
   virtual void display(std::ostream& os) const;
 
  protected:
-  bool m_initSucceeded;                  /// true if the entity has been successfully initialized
+  bool
+      m_initSucceeded;  /// true if the entity has been successfully initialized
   dynamicgraph::Vector m_dx_ref;         // internal state
   dynamicgraph::Vector m_integralError;  // internal state
   double m_dt;

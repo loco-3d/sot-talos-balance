@@ -20,7 +20,7 @@ try:
 except NameError:
     pass
 
-runCommandClient = rospy.ServiceProxy('run_command', RunCommand)
+runCommandClient = rospy.ServiceProxy("run_command", RunCommand)
 
 
 def runVerboseCommandClient(code, verbosity=1):
@@ -56,22 +56,22 @@ def evalCommandClient(code):
 
 def launch_script(code, title, description="", verbosity=1, interactive=True):
     if interactive:
-        input(title + ':   ' + description)
+        input(title + ":   " + description)
     rospy.loginfo(title)
     rospy.loginfo(code)
-    indent = '  '
+    indent = "  "
     indenting = False
     for line in code:
         if indenting:
-            if line == '' or line.startswith(indent):
-                codeblock += '\n' + line
+            if line == "" or line.startswith(indent):
+                codeblock += "\n" + line
                 continue
             else:
                 answer = runVerboseCommandClient(str(codeblock), verbosity)
                 rospy.logdebug(answer)
                 indenting = False
-        if line != '' and line[0] != '#':
-            if line.endswith(':'):
+        if line != "" and line[0] != "#":
+            if line.endswith(":"):
                 indenting = True
                 codeblock = line
             else:
@@ -83,20 +83,22 @@ def launch_script(code, title, description="", verbosity=1, interactive=True):
 def run_test(appli, verbosity=1, interactive=True):
     try:
         rospy.loginfo("Waiting for run_command")
-        rospy.wait_for_service('/run_command')
+        rospy.wait_for_service("/run_command")
         rospy.loginfo("...ok")
 
         rospy.loginfo("Waiting for start_dynamic_graph")
-        rospy.wait_for_service('/start_dynamic_graph')
+        rospy.wait_for_service("/start_dynamic_graph")
         rospy.loginfo("...ok")
 
-        runCommandStartDynamicGraph = rospy.ServiceProxy('start_dynamic_graph', Empty)
+        runCommandStartDynamicGraph = rospy.ServiceProxy("start_dynamic_graph", Empty)
 
         initCode = open(appli, "r").read().split("\n")
 
         rospy.loginfo("Stack of Tasks launched")
 
-        launch_script(initCode, 'initialize SoT', verbosity=verbosity, interactive=interactive)
+        launch_script(
+            initCode, "initialize SoT", verbosity=verbosity, interactive=interactive
+        )
         if interactive:
             input("Wait before starting the dynamic graph")
         runCommandStartDynamicGraph()
@@ -119,7 +121,7 @@ def run_ft_calibration(sensor_name, force=False):
         cb = ask_for_confirmation("Calibrate force sensors?")
     if cb:
         print("Calibrating sensors...")
-        runCommandClient(sensor_name + '.calibrateFeetSensor()')
+        runCommandClient(sensor_name + ".calibrateFeetSensor()")
         sleep(1.0)  # TODO: get time/state from F/T sensor
         print("Sensors are calibrated!")
         print("You can now put the robot on the ground")
@@ -140,7 +142,7 @@ def run_ft_wrist_calibration(sensor_name, force=False):
     if cb:
         input("Wait before running the calibration")
         print("Calibrating sensors...")
-        runCommandClient(sensor_name + '.calibrateWristSensor()')
+        runCommandClient(sensor_name + ".calibrateWristSensor()")
         sleep(1.0)  # TODO: get time/state from F/T sensor
         print("Sensors are calibrated!")
     else:
@@ -151,26 +153,26 @@ def get_file_folder(argv, send=True):
     if len(argv) == 1:
         test_folder = None
         sot_talos_balance_folder = False
-        print('No folder data')
+        print("No folder data")
     elif len(argv) == 2:
         test_folder = argv[1]
         sot_talos_balance_folder = False
-        print('Using folder ' + test_folder)
+        print("Using folder " + test_folder)
     elif len(argv) == 3:
-        if argv[1] != '-0':
+        if argv[1] != "-0":
             raise ValueError("Unrecognized option: " + argv[1])
         test_folder = argv[2]
         sot_talos_balance_folder = True
-        print('Using folder ' + test_folder + ' from sot_talos_balance')
+        print("Using folder " + test_folder + " from sot_talos_balance")
     else:
         raise ValueError("Bad options")
 
     if send:
         print("Sending folder info...")
         if test_folder is None:
-            runCommandClient('test_folder = None')
+            runCommandClient("test_folder = None")
         else:
             runCommandClient('test_folder = "' + test_folder + '"')
-        runCommandClient('sot_talos_balance_folder = ' + str(sot_talos_balance_folder))
+        runCommandClient("sot_talos_balance_folder = " + str(sot_talos_balance_folder))
 
     return test_folder, sot_talos_balance_folder

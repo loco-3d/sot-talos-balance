@@ -34,10 +34,11 @@
 /* --------------------------------------------------------------------- */
 /* --- INCLUDE --------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
-#include <sot/core/robot-utils.hh>
 #include <dynamic-graph/signal-helper.h>
 
 #include <map>
+#include <sot/core/robot-utils.hh>
+
 #include "boost/assign.hpp"
 
 namespace dynamicgraph {
@@ -71,7 +72,8 @@ class EXAMPLE_EXPORT Example : public ::dynamicgraph::Entity {
   virtual void display(std::ostream& os) const;
 
  protected:
-  bool m_initSucceeded;  /// true if the entity has been successfully initialized
+  bool
+      m_initSucceeded;  /// true if the entity has been successfully initialized
   RobotUtilShrPtr m_robot_util;
 
 };  // class Example

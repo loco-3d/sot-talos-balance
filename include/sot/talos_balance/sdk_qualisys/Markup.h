@@ -10,8 +10,8 @@
 // This software is provided "as is", with no warranty.
 // Latest fixes enhancements and documentation at www.firstobject.com
 
-#include <vector>
 #include <string>
+#include <vector>
 
 #ifdef _DEBUG
 #define _DS(i) (i ? &((const char*)m_csDoc.c_str())[m_aPos[i].nStartL] : 0)
@@ -38,13 +38,21 @@ class CMarkup {
 
   // Create
   std::string GetDoc() const { return m_csDoc; };
-  bool AddElem(const char* szName, const char* szData = NULL) { return x_AddElem(szName, szData, false, false); };
-  bool AddChildElem(const char* szName, const char* szData = NULL) { return x_AddElem(szName, szData, false, true); };
-  bool AddAttrib(const char* szAttrib, const char* szValue) { return x_SetAttrib(m_iPos, szAttrib, szValue); };
+  bool AddElem(const char* szName, const char* szData = NULL) {
+    return x_AddElem(szName, szData, false, false);
+  };
+  bool AddChildElem(const char* szName, const char* szData = NULL) {
+    return x_AddElem(szName, szData, false, true);
+  };
+  bool AddAttrib(const char* szAttrib, const char* szValue) {
+    return x_SetAttrib(m_iPos, szAttrib, szValue);
+  };
   bool AddChildAttrib(const char* szAttrib, const char* szValue) {
     return x_SetAttrib(m_iPosChild, szAttrib, szValue);
   };
-  bool SetAttrib(const char* szAttrib, const char* szValue) { return x_SetAttrib(m_iPos, szAttrib, szValue); };
+  bool SetAttrib(const char* szAttrib, const char* szValue) {
+    return x_SetAttrib(m_iPos, szAttrib, szValue);
+  };
   bool SetChildAttrib(const char* szAttrib, const char* szValue) {
     return x_SetAttrib(m_iPosChild, szAttrib, szValue);
   };
@@ -63,8 +71,12 @@ class CMarkup {
   std::string GetChildTagName() const { return x_GetTagName(m_iPosChild); };
   std::string GetData() const { return x_GetData(m_iPos); };
   std::string GetChildData() const { return x_GetData(m_iPosChild); };
-  std::string GetAttrib(const char* szAttrib) const { return x_GetAttrib(m_iPos, szAttrib); };
-  std::string GetChildAttrib(const char* szAttrib) const { return x_GetAttrib(m_iPosChild, szAttrib); };
+  std::string GetAttrib(const char* szAttrib) const {
+    return x_GetAttrib(m_iPos, szAttrib);
+  };
+  std::string GetChildAttrib(const char* szAttrib) const {
+    return x_GetAttrib(m_iPosChild, szAttrib);
+  };
   std::string GetError() const { return m_csError; };
 
   static std::string Format(const char* fmt, ...);
@@ -168,10 +180,12 @@ class CMarkup {
   std::string x_GetTagName(int iPos) const;
   std::string x_GetData(int iPos) const;
   std::string x_GetAttrib(int iPos, const char* szAttrib) const;
-  bool x_AddElem(const char* szName, const char* szValue, bool bInsert, bool bAddChild);
+  bool x_AddElem(const char* szName, const char* szValue, bool bInsert,
+                 bool bAddChild);
   bool x_FindAttrib(TokenPos& token, const char* szAttrib = NULL) const;
   bool x_SetAttrib(int iPos, const char* szAttrib, const char* szValue);
-  void x_LocateNew(int iPosParent, int& iPosRel, int& nOffset, int nLength, int nFlags);
+  void x_LocateNew(int iPosParent, int& iPosRel, int& nOffset, int nLength,
+                   int nFlags);
   int x_ParseNode(TokenPos& token);
   void x_DocChange(int nLeft, int nReplace, const std::string& csInsert);
   void x_Adjust(int iPos, int nShift, bool bAfterPos = false);

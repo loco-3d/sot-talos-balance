@@ -15,8 +15,9 @@
 // <http://www.gnu.org/licenses/>.
 //
 
-#include <iomanip>  // std::setprecision
 #include "sot/talos_balance/utils/statistics.hh"
+
+#include <iomanip>  // std::setprecision
 
 using std::map;
 using std::ostringstream;
@@ -27,11 +28,15 @@ Statistics& getStatistics() {
   return s;
 }
 
-Statistics::Statistics() : active(true) { records_of = new map<string, QuantityData>(); }
+Statistics::Statistics() : active(true) {
+  records_of = new map<string, QuantityData>();
+}
 
 Statistics::~Statistics() { delete records_of; }
 
-bool Statistics::quantity_exists(string name) { return (records_of->find(name) != records_of->end()); }
+bool Statistics::quantity_exists(string name) {
+  return (records_of->find(name) != records_of->end());
+}
 
 void Statistics::store(string name, const double& value) {
   if (!active) return;
@@ -67,7 +72,8 @@ void Statistics::reset_all() {
 void Statistics::report_all(int precision, std::ostream& output) {
   if (!active) return;
 
-  output << "\n*** STATISTICS (min - avg - max - last - nSamples - total) ***\n";
+  output
+      << "\n*** STATISTICS (min - avg - max - last - nSamples - total) ***\n";
   map<string, QuantityData>::iterator it;
   for (it = records_of->begin(); it != records_of->end(); ++it) {
     if (it->second.stops > 0) report(it->first, precision, output);
@@ -78,7 +84,8 @@ void Statistics::reset(string name) {
   if (!active) return;
 
   // Try to recover Quantity data
-  if (!quantity_exists(name)) throw StatisticsException("Quantity not initialized.");
+  if (!quantity_exists(name))
+    throw StatisticsException("Quantity not initialized.");
 
   QuantityData& quant_info = records_of->find(name)->second;
 
@@ -103,25 +110,35 @@ void Statistics::report(string name, int precision, std::ostream& output) {
   if (!active) return;
 
   // Try to recover Quantity data
-  if (!quantity_exists(name)) throw StatisticsException("Quantity not initialized.");
+  if (!quantity_exists(name))
+    throw StatisticsException("Quantity not initialized.");
 
   QuantityData& quant_info = records_of->find(name)->second;
 
   string pad = "";
-  for (std::string::size_type i = name.length(); i < STATISTICS_MAX_NAME_LENGTH; i++) pad.append(" ");
+  for (std::string::size_type i = name.length(); i < STATISTICS_MAX_NAME_LENGTH;
+       i++)
+    pad.append(" ");
 
   output << name << pad;
-  output << std::fixed << std::setprecision(precision) << (quant_info.min) << "\t";
-  output << std::fixed << std::setprecision(precision) << (quant_info.total / (long double)quant_info.stops) << "\t";
-  output << std::fixed << std::setprecision(precision) << (quant_info.max) << "\t";
-  output << std::fixed << std::setprecision(precision) << (quant_info.last) << "\t";
-  output << std::fixed << std::setprecision(precision) << quant_info.stops << "\t";
-  output << std::fixed << std::setprecision(precision) << quant_info.total << std::endl;
+  output << std::fixed << std::setprecision(precision) << (quant_info.min)
+         << "\t";
+  output << std::fixed << std::setprecision(precision)
+         << (quant_info.total / (long double)quant_info.stops) << "\t";
+  output << std::fixed << std::setprecision(precision) << (quant_info.max)
+         << "\t";
+  output << std::fixed << std::setprecision(precision) << (quant_info.last)
+         << "\t";
+  output << std::fixed << std::setprecision(precision) << quant_info.stops
+         << "\t";
+  output << std::fixed << std::setprecision(precision) << quant_info.total
+         << std::endl;
 }
 
 long double Statistics::get_total(string name) {
   // Try to recover Quantity data
-  if (!quantity_exists(name)) throw StatisticsException("Quantity not initialized.");
+  if (!quantity_exists(name))
+    throw StatisticsException("Quantity not initialized.");
 
   QuantityData& quant_info = records_of->find(name)->second;
 
@@ -130,7 +147,8 @@ long double Statistics::get_total(string name) {
 
 long double Statistics::get_average(string name) {
   // Try to recover Quantity data
-  if (!quantity_exists(name)) throw StatisticsException("Quantity not initialized.");
+  if (!quantity_exists(name))
+    throw StatisticsException("Quantity not initialized.");
 
   QuantityData& quant_info = records_of->find(name)->second;
 
@@ -139,7 +157,8 @@ long double Statistics::get_average(string name) {
 
 long double Statistics::get_min(string name) {
   // Try to recover Quantity data
-  if (!quantity_exists(name)) throw StatisticsException("Quantity not initialized.");
+  if (!quantity_exists(name))
+    throw StatisticsException("Quantity not initialized.");
 
   QuantityData& quant_info = records_of->find(name)->second;
 
@@ -148,7 +167,8 @@ long double Statistics::get_min(string name) {
 
 long double Statistics::get_max(string name) {
   // Try to recover Quantity data
-  if (!quantity_exists(name)) throw StatisticsException("Quantity not initialized.");
+  if (!quantity_exists(name))
+    throw StatisticsException("Quantity not initialized.");
 
   QuantityData& quant_info = records_of->find(name)->second;
 
@@ -157,7 +177,8 @@ long double Statistics::get_max(string name) {
 
 long double Statistics::get_last(string name) {
   // Try to recover Quantity data
-  if (!quantity_exists(name)) throw StatisticsException("Quantity not initialized.");
+  if (!quantity_exists(name))
+    throw StatisticsException("Quantity not initialized.");
 
   QuantityData& quant_info = records_of->find(name)->second;
 

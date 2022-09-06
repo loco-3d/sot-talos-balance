@@ -16,11 +16,11 @@
 
 #include "sot/talos_balance/dummy-dcm-estimator.hh"
 
-#include <sot/core/debug.hh>
-#include <dynamic-graph/factory.h>
-#include <dynamic-graph/command-bind.h>
-
 #include <dynamic-graph/all-commands.h>
+#include <dynamic-graph/command-bind.h>
+#include <dynamic-graph/factory.h>
+
+#include <sot/core/debug.hh>
 #include <sot/core/stop-watch.hh>
 
 namespace dynamicgraph {
@@ -30,8 +30,9 @@ namespace dg = ::dynamicgraph;
 using namespace dg;
 using namespace dg::command;
 
-// Size to be aligned                              "-------------------------------------------------------"
-#define PROFILE_DUMMYDCMESTIMATOR_DCM_COMPUTATION "DummyDcmEstimator: dcm computation                     "
+// Size to be aligned "-------------------------------------------------------"
+#define PROFILE_DUMMYDCMESTIMATOR_DCM_COMPUTATION \
+  "DummyDcmEstimator: dcm computation                     "
 
 #define INPUT_SIGNALS m_omegaSIN << m_massSIN << m_comSIN << m_momentaSIN
 
@@ -58,14 +59,21 @@ DummyDcmEstimator::DummyDcmEstimator(const std::string& name)
   Entity::signalRegistration(INPUT_SIGNALS << OUTPUT_SIGNALS);
 
   /* Commands. */
-  addCommand("init", makeCommandVoid0(*this, &DummyDcmEstimator::init, docCommandVoid0("Initialize the entity.")));
+  addCommand("init",
+             makeCommandVoid0(*this, &DummyDcmEstimator::init,
+                              docCommandVoid0("Initialize the entity.")));
 }
 
 void DummyDcmEstimator::init() {
-  if (!m_omegaSIN.isPlugged()) return SEND_MSG("Init failed: signal omega is not plugged", MSG_TYPE_ERROR);
-  if (!m_massSIN.isPlugged()) return SEND_MSG("Init failed: signal mass is not plugged", MSG_TYPE_ERROR);
-  if (!m_comSIN.isPlugged()) return SEND_MSG("Init failed: signal com is not plugged", MSG_TYPE_ERROR);
-  if (!m_momentaSIN.isPlugged()) return SEND_MSG("Init failed: signal momenta is not plugged", MSG_TYPE_ERROR);
+  if (!m_omegaSIN.isPlugged())
+    return SEND_MSG("Init failed: signal omega is not plugged", MSG_TYPE_ERROR);
+  if (!m_massSIN.isPlugged())
+    return SEND_MSG("Init failed: signal mass is not plugged", MSG_TYPE_ERROR);
+  if (!m_comSIN.isPlugged())
+    return SEND_MSG("Init failed: signal com is not plugged", MSG_TYPE_ERROR);
+  if (!m_momentaSIN.isPlugged())
+    return SEND_MSG("Init failed: signal momenta is not plugged",
+                    MSG_TYPE_ERROR);
 
   m_initSucceeded = true;
 }
@@ -76,7 +84,8 @@ void DummyDcmEstimator::init() {
 
 DEFINE_SIGNAL_OUT_FUNCTION(dcm, dynamicgraph::Vector) {
   if (!m_initSucceeded) {
-    SEND_WARNING_STREAM_MSG("Cannot compute signal com_dcom before initialization!");
+    SEND_WARNING_STREAM_MSG(
+        "Cannot compute signal com_dcom before initialization!");
     return s;
   }
   if (s.size() != 3) s.resize(3);
@@ -89,7 +98,8 @@ DEFINE_SIGNAL_OUT_FUNCTION(dcm, dynamicgraph::Vector) {
   const Vector& momenta = m_momentaSIN(iter);
 
   assert(com.size() == 3 && "Unexpected size of signal com");
-  assert((momenta.size() == 3 || momenta.size() == 6) && "Unexpected size of signal momenta");
+  assert((momenta.size() == 3 || momenta.size() == 6) &&
+         "Unexpected size of signal momenta");
 
   const Eigen::Vector3d dcom = momenta.head<3>() / mass;
 

@@ -37,18 +37,18 @@
 /* --- INCLUDE --------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-#include <parametric-curves/spline.hpp>
-#include <parametric-curves/constant.hpp>
-#include <parametric-curves/text-file.hpp>
-#include <parametric-curves/minimum-jerk.hpp>
-#include <parametric-curves/linear-chirp.hpp>
-#include <parametric-curves/infinite-sinusoid.hpp>
-#include <parametric-curves/infinite-const-acc.hpp>
-
 #include <dynamic-graph/signal-helper.h>
-#include <sot/core/matrix-geometry.hh>
 
 #include <map>
+#include <parametric-curves/constant.hpp>
+#include <parametric-curves/infinite-const-acc.hpp>
+#include <parametric-curves/infinite-sinusoid.hpp>
+#include <parametric-curves/linear-chirp.hpp>
+#include <parametric-curves/minimum-jerk.hpp>
+#include <parametric-curves/spline.hpp>
+#include <parametric-curves/text-file.hpp>
+#include <sot/core/matrix-geometry.hh>
+
 #include "boost/assign.hpp"
 
 namespace dynamicgraph {
@@ -59,7 +59,8 @@ namespace talos_balance {
 /* --- CLASS ----------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-class SOTNDTRAJECTORYGENERATOR_EXPORT NdTrajectoryGenerator : public ::dynamicgraph::Entity {
+class SOTNDTRAJECTORYGENERATOR_EXPORT NdTrajectoryGenerator
+    : public ::dynamicgraph::Entity {
   typedef NdTrajectoryGenerator EntityClassName;
   DYNAMIC_GRAPH_ENTITY_DECL();
 
@@ -107,35 +108,41 @@ class SOTNDTRAJECTORYGENERATOR_EXPORT NdTrajectoryGenerator : public ::dynamicgr
 
   /** Start an infinite sinusoidal trajectory.
    * @param id integer index.
-   * @param xFinal The position of the component corresponding to the max amplitude of the sinusoid.
+   * @param xFinal The position of the component corresponding to the max
+   * amplitude of the sinusoid.
    * @param time The time to go from the current position to xFinal [sec].
    */
   void startSinusoid(const int& id, const double& xFinal, const double& time);
 
   /** Start an infinite triangle trajectory.
    * @param id integer index.
-   * @param xFinal The position of the component corresponding to the max amplitude of the trajectory.
+   * @param xFinal The position of the component corresponding to the max
+   * amplitude of the trajectory.
    * @param time The time to go from the current position to xFinal [sec].
    */
-  // void startTriangle(const int& id, const double& xFinal, const double& time, const double& Tacc);
+  // void startTriangle(const int& id, const double& xFinal, const double& time,
+  // const double& Tacc);
 
   /** Start an infinite trajectory with piece-wise constant acceleration.
    * @param id integer index.
-   * @param xFinal The position of the component corresponding to the max amplitude of the trajectory.
+   * @param xFinal The position of the component corresponding to the max
+   * amplitude of the trajectory.
    * @param time The time to go from the current position to xFinal [sec].
    * @param Tacc The time during witch acceleration is keept constant [sec].
    */
   void startConstAcc(const int& id, const double& xFinal, const double& time);
 
-  /** Start a linear-chirp trajectory, that is a sinusoidal trajectory with frequency
-   * being a linear function of time.
+  /** Start a linear-chirp trajectory, that is a sinusoidal trajectory with
+   * frequency being a linear function of time.
    * @param id integer index.
-   * @param xFinal The position of the component corresponding to the max amplitude of the sinusoid [rad].
+   * @param xFinal The position of the component corresponding to the max
+   * amplitude of the sinusoid [rad].
    * @param f0 The initial (min) frequency of the sinusoid [Hz]
    * @param f1 The final (max) frequency of the sinusoid [Hz]
    * @param time The time to get from f0 to f1 [sec]
    */
-  void startLinearChirp(const int& id, const double& xFinal, const double& f0, const double& f1, const double& time);
+  void startLinearChirp(const int& id, const double& xFinal, const double& f0,
+                        const double& f1, const double& time);
 
   /** Stop the motion of the specified component. If id is -1
    * it stops the trajectory of all the vector.
@@ -158,21 +165,25 @@ class SOTNDTRAJECTORYGENERATOR_EXPORT NdTrajectoryGenerator : public ::dynamicgr
     JTG_SPLINE
   };
 
-  bool m_initSucceeded;     /// true if the entity has been successfully initialized
-  bool m_firstIter;         /// true if it is the first iteration, false otherwise
-  double m_dt;              /// control loop time step.
-  double m_t;               /// current control loop time.
-  unsigned int m_n;         /// size of ouput vector
+  bool
+      m_initSucceeded;  /// true if the entity has been successfully initialized
+  bool m_firstIter;     /// true if it is the first iteration, false otherwise
+  double m_dt;          /// control loop time step.
+  double m_t;           /// current control loop time.
+  unsigned int m_n;     /// size of ouput vector
   unsigned int m_iterLast;  /// last iter index
   bool m_splineReady;       /// true if the spline has been successfully loaded.
 
   std::vector<JTG_Status> m_status;  /// status of the component
-  std::vector<parametriccurves::AbstractCurve<double, dynamicgraph::sot::Vector1d>*> m_currentTrajGen;
+  std::vector<
+      parametriccurves::AbstractCurve<double, dynamicgraph::sot::Vector1d>*>
+      m_currentTrajGen;
   std::vector<parametriccurves::Constant<double, 1>*> m_noTrajGen;
   std::vector<parametriccurves::MinimumJerk<double, 1>*> m_minJerkTrajGen;
   std::vector<parametriccurves::InfiniteSinusoid<double, 1>*> m_sinTrajGen;
   std::vector<parametriccurves::LinearChirp<double, 1>*> m_linChirpTrajGen;
-  // std::vector<parametriccurves::InfiniteTriangular<double,1>* >            m_triangleTrajGen;
+  // std::vector<parametriccurves::InfiniteTriangular<double,1>* >
+  // m_triangleTrajGen;
   std::vector<parametriccurves::InfiniteConstAcc<double, 1>*> m_constAccTrajGen;
   parametriccurves::TextFile<double, Eigen::Dynamic>* m_textFileTrajGen;
   parametriccurves::Spline<double, Eigen::Dynamic>* m_splineTrajGen;

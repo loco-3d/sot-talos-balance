@@ -2,10 +2,16 @@
 from dynamic_graph import plug
 from dynamic_graph.ros import RosPublish, RosSubscribe
 from dynamic_graph.sot.core import SOT, FeaturePosture, Task
-from dynamic_graph.sot.core.meta_tasks_kine import MetaTaskKine6d, MetaTaskKineCom, gotoNd
+from dynamic_graph.sot.core.meta_tasks_kine import (
+    MetaTaskKine6d,
+    MetaTaskKineCom,
+    gotoNd,
+)
 from dynamic_graph.sot.core.operator import Add_of_vector, Selec_of_vector
 
-from dynamic_graph.sot_talos_balance.coupled_admittance_controller import CoupledAdmittanceController
+from dynamic_graph.sot_talos_balance.coupled_admittance_controller import (
+    CoupledAdmittanceController,
+)
 from dynamic_graph.sot_talos_balance.create_entities_utils import *
 from dynamic_graph.sot_talos_balance.meta_task_joint import MetaTaskKineJoint
 
@@ -93,8 +99,8 @@ plug(robot.rollController.dqRefL, robot.taskLR.featureDes.errordotIN)
 
 # -------------------------- SOT CONTROL --------------------------
 # --- Posture
-robot.taskPosture = Task('taskPosture')
-robot.taskPosture.feature = FeaturePosture('featurePosture')
+robot.taskPosture = Task("taskPosture")
+robot.taskPosture.feature = FeaturePosture("featurePosture")
 
 q = list(robot.dynamic.position.value)
 robot.taskPosture.feature.state.value = q
@@ -108,7 +114,7 @@ robot.taskPosture.add(robot.taskPosture.feature.name)
 plug(robot.dynamic.position, robot.taskPosture.feature.state)
 
 # --- SOT
-robot.sot = SOT('sot')
+robot.sot = SOT("sot")
 robot.sot.setSize(robot.dynamic.getDimension())
 plug(robot.sot.control, robot.device.control)
 
@@ -121,22 +127,46 @@ robot.device.control.recompute(0)
 
 # -------------------------- PLOTS --------------------------
 # --- ROS PUBLISHER
-robot.publisher = create_rospublish(robot, 'robot_publisher')
+robot.publisher = create_rospublish(robot, "robot_publisher")
 
-create_topic(robot.publisher, robot.pitchController, 'tauL', robot=robot, data_type='vector')
-create_topic(robot.publisher, robot.rollController, 'tauL', robot=robot, data_type='vector')
-create_topic(robot.publisher, robot.pitchController, 'tauR', robot=robot, data_type='vector')
-create_topic(robot.publisher, robot.rollController, 'tauR', robot=robot, data_type='vector')
+create_topic(
+    robot.publisher, robot.pitchController, "tauL", robot=robot, data_type="vector"
+)
+create_topic(
+    robot.publisher, robot.rollController, "tauL", robot=robot, data_type="vector"
+)
+create_topic(
+    robot.publisher, robot.pitchController, "tauR", robot=robot, data_type="vector"
+)
+create_topic(
+    robot.publisher, robot.rollController, "tauR", robot=robot, data_type="vector"
+)
 
-create_topic(robot.publisher, robot.pitchController, 'tauDesL', robot=robot, data_type='vector')
-create_topic(robot.publisher, robot.rollController, 'tauDesL', robot=robot, data_type='vector')
-create_topic(robot.publisher, robot.pitchController, 'tauDesR', robot=robot, data_type='vector')
-create_topic(robot.publisher, robot.rollController, 'tauDesR', robot=robot, data_type='vector')
+create_topic(
+    robot.publisher, robot.pitchController, "tauDesL", robot=robot, data_type="vector"
+)
+create_topic(
+    robot.publisher, robot.rollController, "tauDesL", robot=robot, data_type="vector"
+)
+create_topic(
+    robot.publisher, robot.pitchController, "tauDesR", robot=robot, data_type="vector"
+)
+create_topic(
+    robot.publisher, robot.rollController, "tauDesR", robot=robot, data_type="vector"
+)
 
-create_topic(robot.publisher, robot.pitchController, 'dqRefL', robot=robot, data_type='vector')
-create_topic(robot.publisher, robot.rollController, 'dqRefL', robot=robot, data_type='vector')
-create_topic(robot.publisher, robot.pitchController, 'dqRefR', robot=robot, data_type='vector')
-create_topic(robot.publisher, robot.rollController, 'dqRefR', robot=robot, data_type='vector')
+create_topic(
+    robot.publisher, robot.pitchController, "dqRefL", robot=robot, data_type="vector"
+)
+create_topic(
+    robot.publisher, robot.rollController, "dqRefL", robot=robot, data_type="vector"
+)
+create_topic(
+    robot.publisher, robot.pitchController, "dqRefR", robot=robot, data_type="vector"
+)
+create_topic(
+    robot.publisher, robot.rollController, "dqRefR", robot=robot, data_type="vector"
+)
 
 # # --- ROS SUBSCRIBER
 robot.subscriber = RosSubscribe("ankle_joint_subscriber")

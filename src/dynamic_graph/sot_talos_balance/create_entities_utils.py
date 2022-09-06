@@ -5,9 +5,15 @@ from dynamic_graph import plug
 from dynamic_graph.sot.core.madgwickahrs import MadgwickAHRS
 from dynamic_graph.sot.core.operator import Mix_of_vector, Selec_of_vector
 from dynamic_graph.sot.core.parameter_server import ParameterServer
-from dynamic_graph.sot_talos_balance.admittance_controller_end_effector import AdmittanceControllerEndEffector
-from dynamic_graph.sot_talos_balance.ankle_admittance_controller import AnkleAdmittanceController
-from dynamic_graph.sot_talos_balance.com_admittance_controller import ComAdmittanceController
+from dynamic_graph.sot_talos_balance.admittance_controller_end_effector import (
+    AdmittanceControllerEndEffector,
+)
+from dynamic_graph.sot_talos_balance.ankle_admittance_controller import (
+    AnkleAdmittanceController,
+)
+from dynamic_graph.sot_talos_balance.com_admittance_controller import (
+    ComAdmittanceController,
+)
 from dynamic_graph.sot_talos_balance.dcm_com_controller import DcmComController
 from dynamic_graph.sot_talos_balance.dcm_controller import DcmController
 from dynamic_graph.sot_talos_balance.dcm_estimator import DcmEstimator
@@ -16,15 +22,26 @@ from dynamic_graph.sot_talos_balance.dummy_dcm_estimator import DummyDcmEstimato
 from dynamic_graph.sot_talos_balance.example import Example
 from dynamic_graph.sot_talos_balance.ft_calibration import FtCalibration
 from dynamic_graph.sot_talos_balance.ft_wrist_calibration import FtWristCalibration
-from dynamic_graph.sot_talos_balance.hip_flexibility_compensation import HipFlexibilityCompensation
-from dynamic_graph.sot_talos_balance.joint_position_controller import JointPositionController
-from dynamic_graph.sot_talos_balance.nd_trajectory_generator import NdTrajectoryGenerator
+from dynamic_graph.sot_talos_balance.hip_flexibility_compensation import (
+    HipFlexibilityCompensation,
+)
+from dynamic_graph.sot_talos_balance.joint_position_controller import (
+    JointPositionController,
+)
+from dynamic_graph.sot_talos_balance.nd_trajectory_generator import (
+    NdTrajectoryGenerator,
+)
 from dynamic_graph.sot_talos_balance.qualisys_client import QualisysClient
-from dynamic_graph.sot_talos_balance.simple_admittance_controller import SimpleAdmittanceController
-from dynamic_graph.sot_talos_balance.simple_distribute_wrench import SimpleDistributeWrench
+from dynamic_graph.sot_talos_balance.simple_admittance_controller import (
+    SimpleAdmittanceController,
+)
+from dynamic_graph.sot_talos_balance.simple_distribute_wrench import (
+    SimpleDistributeWrench,
+)
 from dynamic_graph.sot_talos_balance.simple_zmp_estimator import SimpleZmpEstimator
 from dynamic_graph.sot_talos_balance.talos_base_estimator import TalosBaseEstimator
 from dynamic_graph.sot_talos_balance.talos_control_manager import TalosControlManager
+
 # python
 from dynamic_graph.sot_talos_balance.utils import filter_utils
 from dynamic_graph.sot_talos_balance.utils.sot_utils import Bunch
@@ -34,7 +51,7 @@ N_JOINTS = 32
 
 
 def create_qualisys_client(address):
-    mocap = QualisysClient('mocap')
+    mocap = QualisysClient("mocap")
     mocap.setMocapIPAdress(address)
     mocap.init()
     return mocap
@@ -94,7 +111,7 @@ def create_config_trajectory_generator(dt, robot):
 def create_torque_trajectory_generator(dt, robot):
     N_CONFIG = N_JOINTS + 6
     jtg = NdTrajectoryGenerator("torqueTrajGen")
-    jtg.initial_value.value = [0.] * N_CONFIG
+    jtg.initial_value.value = [0.0] * N_CONFIG
     jtg.trigger.value = 1
     jtg.init(dt, N_CONFIG)
     return jtg
@@ -167,13 +184,15 @@ def create_end_effector_admittance_controller(robot, endEffector, name):
     controller = AdmittanceControllerEndEffector(name)
 
     # Filter and plug the force from force calibrator
-    if endEffector == 'rightWrist':
+    if endEffector == "rightWrist":
         plug(robot.forceCalibrator.rightWristForceOut, controller.force)
-    elif endEffector == 'leftWrist':
+    elif endEffector == "leftWrist":
         plug(robot.forceCalibrator.leftWristForceOut, controller.force)
     else:
-        print('Error in create_end_effector_admittance_controller : end \
-        effector unknown')
+        print(
+            "Error in create_end_effector_admittance_controller : end \
+        effector unknown"
+        )
 
     plug(robot.e2q.quaternion, controller.q)
 
@@ -182,13 +201,15 @@ def create_end_effector_admittance_controller(robot, endEffector, name):
     controller.w_forceDes.value = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
     controller.dqSaturation.value = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 
-    if endEffector == 'rightWrist':
-        controller.init(timeStep, "wrist_right_ft_link", 'arm_right_7_joint')
-    elif endEffector == 'leftWrist':
-        controller.init(timeStep, "wrist_left_ft_link", 'arm_left_7_joint')
+    if endEffector == "rightWrist":
+        controller.init(timeStep, "wrist_right_ft_link", "arm_right_7_joint")
+    elif endEffector == "leftWrist":
+        controller.init(timeStep, "wrist_left_ft_link", "arm_left_7_joint")
     else:
-        print('Error in create_end_effector_admittance_controller : end \
-        effector unknown')
+        print(
+            "Error in create_end_effector_admittance_controller : end \
+        effector unknown"
+        )
 
     return controller
 
@@ -204,7 +225,7 @@ def create_joint_admittance_controller(joint, Kp, dt, robot, filter=False):
 
     robot.tauselec = Selec_of_vector("tau_selec")
     robot.tauselec.selec(joint, joint + 1)
-    if filter and hasattr(robot, 'device_filters'):
+    if filter and hasattr(robot, "device_filters"):
         plug(robot.device_filters.torque_filter.x_filtered, robot.tauselec.sin)
     else:
         plug(robot.device.ptorque, robot.tauselec.sin)
@@ -216,12 +237,12 @@ def create_joint_admittance_controller(joint, Kp, dt, robot, filter=False):
     return controller
 
 
-def create_hip_flexibility_compensation(robot, conf, robot_name='robot'):
+def create_hip_flexibility_compensation(robot, conf, robot_name="robot"):
     timeStep = robot.timeStep
     hipComp = HipFlexibilityCompensation("hipFlexCompensation")
     hipComp.K_l.value = conf.flexibility_left
     hipComp.K_r.value = conf.flexibility_right
-    hipComp.q_des.value = robot.dynamic.getDimension() * [0.]
+    hipComp.q_des.value = robot.dynamic.getDimension() * [0.0]
     plug(robot.device.ptorque, hipComp.tau)
     hipComp.init(timeStep, robot_name)
 
@@ -240,7 +261,7 @@ def create_ankle_admittance_controller(gains, robot, side, name):
     elif side == "left":
         plug(robot.ftc.left_foot_force_out, controller.wrench)
     else:
-        print('Error in create_ankle_admittance_controller : side unknown')
+        print("Error in create_ankle_admittance_controller : side unknown")
 
     controller.gainsXY.value = gains
     if side == "right":
@@ -248,7 +269,7 @@ def create_ankle_admittance_controller(gains, robot, side, name):
     elif side == "left":
         plug(robot.wrenchDistributor.copLeft, controller.pRef)
     else:
-        print('Error in create_ankle_admittance_controller : side unknown')
+        print("Error in create_ankle_admittance_controller : side unknown")
 
     controller.init()
 
@@ -265,15 +286,33 @@ def create_device_filters(robot, dt):
     plug(robot.device.velocity, robot.vselec.sin)
 
     filters = Bunch()
-    filters.joints_kin = filter_utils.create_chebi1_checby2_series_filter("joints_kin", dt, N_JOINTS)
-    filters.ft_RF_filter = filter_utils.create_butter_lp_filter_Wn_04_N_2("ft_RF_filter", dt, 6)
-    filters.ft_LF_filter = filter_utils.create_butter_lp_filter_Wn_04_N_2("ft_LF_filter", dt, 6)
-    filters.ft_RH_filter = filter_utils.create_butter_lp_filter_Wn_04_N_2("ft_RH_filter", dt, 6)
-    filters.ft_LH_filter = filter_utils.create_butter_lp_filter_Wn_04_N_2("ft_LH_filter", dt, 6)
-    filters.torque_filter = filter_utils.create_chebi1_checby2_series_filter("ptorque_filter", dt, N_JOINTS)
-    filters.acc_filter = filter_utils.create_chebi1_checby2_series_filter("acc_filter", dt, 3)
-    filters.gyro_filter = filter_utils.create_chebi1_checby2_series_filter("gyro_filter", dt, 3)
-    filters.vel_filter = filter_utils.create_butter_lp_filter_Wn_04_N_2("vel_filter", dt, N_JOINTS)
+    filters.joints_kin = filter_utils.create_chebi1_checby2_series_filter(
+        "joints_kin", dt, N_JOINTS
+    )
+    filters.ft_RF_filter = filter_utils.create_butter_lp_filter_Wn_04_N_2(
+        "ft_RF_filter", dt, 6
+    )
+    filters.ft_LF_filter = filter_utils.create_butter_lp_filter_Wn_04_N_2(
+        "ft_LF_filter", dt, 6
+    )
+    filters.ft_RH_filter = filter_utils.create_butter_lp_filter_Wn_04_N_2(
+        "ft_RH_filter", dt, 6
+    )
+    filters.ft_LH_filter = filter_utils.create_butter_lp_filter_Wn_04_N_2(
+        "ft_LH_filter", dt, 6
+    )
+    filters.torque_filter = filter_utils.create_chebi1_checby2_series_filter(
+        "ptorque_filter", dt, N_JOINTS
+    )
+    filters.acc_filter = filter_utils.create_chebi1_checby2_series_filter(
+        "acc_filter", dt, 3
+    )
+    filters.gyro_filter = filter_utils.create_chebi1_checby2_series_filter(
+        "gyro_filter", dt, 3
+    )
+    filters.vel_filter = filter_utils.create_butter_lp_filter_Wn_04_N_2(
+        "vel_filter", dt, N_JOINTS
+    )
 
     #    plug(robot.pselec.sout,                               filters.joints_kin.x)
     plug(robot.device.joint_angles, filters.joints_kin.x)
@@ -292,24 +331,26 @@ def create_device_filters(robot, dt):
 
 def create_be_filters(robot, dt):
     be_filters = Bunch()
-    be_filters.test = filter_utils.create_chebi1_checby2_series_filter("test_filter", dt, N_JOINTS)
+    be_filters.test = filter_utils.create_chebi1_checby2_series_filter(
+        "test_filter", dt, N_JOINTS
+    )
     plug(robot.base_estimator.q, be_filters.test.x)
     return be_filters
 
 
-def create_ctrl_manager(conf, dt, robot_name='robot'):
+def create_ctrl_manager(conf, dt, robot_name="robot"):
     ctrl_manager = TalosControlManager("ctrl_man")
     ctrl_manager.add_commands()
     ctrl_manager.add_signals()
     ctrl_manager.init(dt, robot_name)
-    ctrl_manager.u_max.value = np.array(conf.NJ * (conf.CTRL_MAX, ))
+    ctrl_manager.u_max.value = np.array(conf.NJ * (conf.CTRL_MAX,))
     # Init should be called before addCtrlMode
     # because the size of state vector must be known.
     return ctrl_manager
 
 
 def create_base_estimator(robot, dt, conf, robot_name="robot"):
-    base_estimator = TalosBaseEstimator('base_estimator')
+    base_estimator = TalosBaseEstimator("base_estimator")
     base_estimator.init(dt, robot_name)
     # device.state, device.joint_angles or device.motor_angles ?
     # plug(robot.pselec.sout, base_estimator.joint_positions)
@@ -320,7 +361,7 @@ def create_base_estimator(robot, dt, conf, robot_name="robot"):
     plug(robot.device_filters.ft_RF_filter.dx, base_estimator.dforceRLEG)
 
     plug(robot.vselec.sout, base_estimator.joint_velocities)
-    # plug(robot.device_filters.vel_filter.x_filtered,     base_estimator.joint_velocities)
+    # plug(robot.device_filters.vel_filter.x_filtered, base_estimator.joint_velocities)
     plug(robot.imu_filters.imu_quat, base_estimator.imu_quaternion)
     plug(robot.device_filters.gyro_filter.x_filtered, base_estimator.gyroscope)
     plug(robot.device_filters.acc_filter.x_filtered, base_estimator.accelerometer)
@@ -345,12 +386,16 @@ def create_base_estimator(robot, dt, conf, robot_name="robot"):
 
 
 def create_imu_filters(robot, dt):
-    imu_filter = MadgwickAHRS('imu_filter')
+    imu_filter = MadgwickAHRS("imu_filter")
     imu_filter.init(dt)
-    imu_filter.set_imu_quat(np.array([0., 1., 0., 0.]))  # [w, x, y, z]
+    imu_filter.set_imu_quat(np.array([0.0, 1.0, 0.0, 0.0]))  # [w, x, y, z]
     imu_filter.setBeta(1e-3)
-    plug(robot.device_filters.acc_filter.x_filtered, imu_filter.accelerometer)  # no IMU compensation
-    plug(robot.device_filters.gyro_filter.x_filtered, imu_filter.gyroscope)  # no IMU compensation
+    plug(
+        robot.device_filters.acc_filter.x_filtered, imu_filter.accelerometer
+    )  # no IMU compensation
+    plug(
+        robot.device_filters.gyro_filter.x_filtered, imu_filter.gyroscope
+    )  # no IMU compensation
     return imu_filter
 
 
@@ -358,8 +403,8 @@ def addTrace(tracer, entity, signalName):
     """
     Add a signal to a tracer
     """
-    signal = '{0}.{1}'.format(entity.name, signalName)
-    filename = '{0}-{1}'.format(entity.name, signalName)
+    signal = "{0}.{1}".format(entity.name, signalName)
+    filename = "{0}-{1}".format(entity.name, signalName)
     tracer.add(signal, filename)
 
 
@@ -372,8 +417,8 @@ def addSignalsToTracer(tracer, device, outputs):
 def create_tracer(robot, entity, tracer_name, outputs=None):
     tracer = TracerRealTime(tracer_name)
     tracer.setBufferSize(80 * (2**20))
-    tracer.open('/tmp', 'dg_', '.dat')
-    robot.device.after.addSignal('{0}.triger'.format(tracer.name))
+    tracer.open("/tmp", "dg_", ".dat")
+    robot.device.after.addSignal("{0}.triger".format(tracer.name))
     if outputs is not None:
         addSignalsToTracer(tracer, entity, outputs)
     return tracer
@@ -400,25 +445,29 @@ def dump_tracer(tracer):
 
 def create_rospublish(robot, name):
     from dynamic_graph.ros import RosPublish
+
     rospub = RosPublish(name)
-    robot.device.after.addSignal(rospub.name + '.trigger')
+    robot.device.after.addSignal(rospub.name + ".trigger")
     return rospub
 
 
-def create_topic(rospub, entity, signalName, robot=None, data_type='vector'):
+def create_topic(rospub, entity, signalName, robot=None, data_type="vector"):
     # check needed to prevent creation of broken topic
     if not entity.hasSignal(signalName):
-        raise AttributeError('Entity %s does not have signal %s' % (entity.name, signalName))
-    rospub_signalName = '{0}_{1}'.format(entity.name, signalName)
-    topicname = '/sot/{0}/{1}'.format(entity.name, signalName)
+        raise AttributeError(
+            "Entity %s does not have signal %s" % (entity.name, signalName)
+        )
+    rospub_signalName = "{0}_{1}".format(entity.name, signalName)
+    topicname = "/sot/{0}/{1}".format(entity.name, signalName)
     rospub.add(data_type, rospub_signalName, topicname)
     plug(entity.signal(signalName), rospub.signal(rospub_signalName))
     if robot is not None:
-        robot.device.after.addSignal('{0}.{1}'.format(entity.name, signalName))
+        robot.device.after.addSignal("{0}.{1}".format(entity.name, signalName))
 
 
 def create_dummy_dcm_estimator(robot):
     from math import sqrt
+
     estimator = DummyDcmEstimator("dummy")
     robot.dynamic.com.recompute(0)
     mass = robot.dynamic.data.mass[0]
@@ -436,6 +485,7 @@ def create_dummy_dcm_estimator(robot):
 
 def create_cdc_dcm_estimator(robot):
     from math import sqrt
+
     estimator = DummyDcmEstimator("dummy")
     robot.dynamic.com.recompute(0)
     h = robot.dynamic.com.value[2]
@@ -466,6 +516,7 @@ def create_com_admittance_controller(Kp, dt, robot):
 
 def create_dcm_controller(Kp, Ki, dt, robot, dcmSignal):
     from math import sqrt
+
     controller = DcmController("dcmCtrl")
     robot.dynamic.com.recompute(0)
     mass = robot.dynamic.data.mass[0]
@@ -492,6 +543,7 @@ def create_dcm_controller(Kp, Ki, dt, robot, dcmSignal):
 
 def create_dcm_com_controller(Kp, Ki, dt, robot, dcmSignal):
     from math import sqrt
+
     controller = DcmComController("dcmComCtrl")
     robot.dynamic.com.recompute(0)
     mass = robot.dynamic.data.mass[0]
@@ -511,13 +563,17 @@ def create_dcm_com_controller(Kp, Ki, dt, robot, dcmSignal):
 
     robot.dynamic.com.recompute(0)
     controller.comDes.value = robot.dynamic.com.value
-    controller.dcmDes.value = (robot.dynamic.com.value[0], robot.dynamic.com.value[1], 0.0)
+    controller.dcmDes.value = (
+        robot.dynamic.com.value[0],
+        robot.dynamic.com.value[1],
+        0.0,
+    )
 
     controller.init(dt)
     return controller
 
 
-def fill_parameter_server(param_server, conf, dt, robot_name='robot'):
+def fill_parameter_server(param_server, conf, dt, robot_name="robot"):
     # Init should be called before addCtrlMode
     # because the size of state vector must be known.
     param_server.init(dt, conf.urdfFileName, robot_name)
@@ -528,12 +584,17 @@ def fill_parameter_server(param_server, conf, dt, robot_name='robot'):
 
     # Set the map joint limits for each id
     for key in conf.mapJointLimits:
-        param_server.setJointLimitsFromId(key, conf.mapJointLimits[key][0], conf.mapJointLimits[key][1])
+        param_server.setJointLimitsFromId(
+            key, conf.mapJointLimits[key][0], conf.mapJointLimits[key][1]
+        )
 
     # Set the force limits for each id
     for key in conf.mapForceIdToForceLimits:
-        param_server.setForceLimitsFromId(key, np.array(conf.mapForceIdToForceLimits[key][0]),
-                                          np.array(conf.mapForceIdToForceLimits[key][1]))
+        param_server.setForceLimitsFromId(
+            key,
+            np.array(conf.mapForceIdToForceLimits[key][0]),
+            np.array(conf.mapForceIdToForceLimits[key][1]),
+        )
 
     # Set the force sensor id for each sensor name
     for key in conf.mapNameToForceId:
@@ -555,21 +616,21 @@ def fill_parameter_server(param_server, conf, dt, robot_name='robot'):
     return param_server
 
 
-def create_parameter_server(conf, dt, robot_name='robot'):
+def create_parameter_server(conf, dt, robot_name="robot"):
     param_server = ParameterServer("param_server")
     fill_parameter_server(param_server, conf, dt, robot_name)
 
 
-def create_example(robot_name='robot', firstAdd=0., secondAdd=0.):
-    example = Example('example')
+def create_example(robot_name="robot", firstAdd=0.0, secondAdd=0.0):
+    example = Example("example")
     example.firstAddend.value = firstAdd
     example.secondAddend.value = secondAdd
     example.init(robot_name)
     return example
 
 
-def create_dcm_estimator(robot, dt, robot_name='robot'):
-    dcm_estimator = DcmEstimator('dcm_estimator')
+def create_dcm_estimator(robot, dt, robot_name="robot"):
+    dcm_estimator = DcmEstimator("dcm_estimator")
     dcm_estimator.init(dt, robot_name)
     plug(robot.base_estimator.q, dcm_estimator.q)
     plug(robot.base_estimator.v, dcm_estimator.v)
@@ -577,7 +638,7 @@ def create_dcm_estimator(robot, dt, robot_name='robot'):
 
 
 def create_distribute_wrench(conf):
-    distribute = DistributeWrench('distribute')
+    distribute = DistributeWrench("distribute")
 
     distribute.phase.value = 0
     distribute.rho.value = 0.5
@@ -595,7 +656,7 @@ def create_distribute_wrench(conf):
     return distribute
 
 
-def create_simple_distribute_wrench(name='distribute'):
+def create_simple_distribute_wrench(name="distribute"):
     distribute = SimpleDistributeWrench(name)
 
     distribute.phase.value = 0
@@ -608,7 +669,7 @@ def create_zmp_estimator(robot, filter=False):
     estimator = SimpleZmpEstimator("zmpEst")
     plug(robot.dynamic.LF, estimator.poseLeft)
     plug(robot.dynamic.RF, estimator.poseRight)
-    if filter and hasattr(robot, 'device_filters'):
+    if filter and hasattr(robot, "device_filters"):
         plug(robot.device_filters.ft_LF_filter.x_filtered, estimator.wrenchLeft)
         plug(robot.device_filters.ft_RF_filter.x_filtered, estimator.wrenchRight)
     else:
@@ -620,7 +681,7 @@ def create_zmp_estimator(robot, filter=False):
 
 
 def create_ft_calibrator(robot, conf):
-    ftc = FtCalibration('ftc')
+    ftc = FtCalibration("ftc")
     ftc.init(robot.name)
     ftc.setRightFootWeight(conf.rfw)
     ftc.setLeftFootWeight(conf.lfw)
@@ -630,19 +691,21 @@ def create_ft_calibrator(robot, conf):
 
 
 def create_ft_wrist_calibrator(robot, endEffectorWeight, rightOC, leftOC):
-    forceCalibrator = FtWristCalibration('forceCalibrator')
+    forceCalibrator = FtWristCalibration("forceCalibrator")
     forceCalibrator.init(robot.name)
     forceCalibrator.setRightHandConf(endEffectorWeight, rightOC)
     forceCalibrator.setLeftHandConf(endEffectorWeight, leftOC)
     forceCalibrator.setRemoveWeight(True)
     plug(robot.e2q.quaternion, forceCalibrator.q)
-    plug(robot.device_filters.ft_RH_filter.x_filtered, forceCalibrator.rightWristForceIn)
+    plug(
+        robot.device_filters.ft_RH_filter.x_filtered, forceCalibrator.rightWristForceIn
+    )
     plug(robot.device_filters.ft_LH_filter.x_filtered, forceCalibrator.leftWristForceIn)
     return forceCalibrator
 
 
 def set_trigger(robot, on):
-    robot.triggerTrajGen.sin.value = 1. if on else 0.
+    robot.triggerTrajGen.sin.value = 1.0 if on else 0.0
 
 
 def get_trigger(robot):
@@ -660,22 +723,22 @@ def load_folder(robot, folder, zmp=False):
         print("Warning: trigger is still active. Not loading folder")
         return
     if folder is not None:
-        robot.comTrajGen.playTrajectoryFile(folder + 'CoM.dat')
-        robot.lfTrajGen.playTrajectoryFile(folder + 'LeftFoot.dat')
-        robot.rfTrajGen.playTrajectoryFile(folder + 'RightFoot.dat')
+        robot.comTrajGen.playTrajectoryFile(folder + "CoM.dat")
+        robot.lfTrajGen.playTrajectoryFile(folder + "LeftFoot.dat")
+        robot.rfTrajGen.playTrajectoryFile(folder + "RightFoot.dat")
         if zmp:
-            robot.zmpTrajGen.playTrajectoryFile(folder + 'ZMP.dat')
-        robot.waistTrajGen.playTrajectoryFile(folder + 'WaistOrientation.dat')
+            robot.zmpTrajGen.playTrajectoryFile(folder + "ZMP.dat")
+        robot.waistTrajGen.playTrajectoryFile(folder + "WaistOrientation.dat")
         try:
-            robot.rhoTrajGen.playTrajectoryFile(folder + 'Rho.dat')
+            robot.rhoTrajGen.playTrajectoryFile(folder + "Rho.dat")
         except AttributeError:
             pass
         try:
-            robot.phaseTrajGen.playTrajectoryFile(folder + 'Phase.dat')
+            robot.phaseTrajGen.playTrajectoryFile(folder + "Phase.dat")
         except AttributeError:
             pass
         try:
-            robot.torqueTrajGen.playTrajectoryFile(folder + 'Torques.dat')
+            robot.torqueTrajGen.playTrajectoryFile(folder + "Torques.dat")
         except AttributeError:
             pass
 

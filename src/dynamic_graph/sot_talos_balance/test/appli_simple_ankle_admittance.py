@@ -1,11 +1,17 @@
 # flake8: noqa
 from dynamic_graph import plug
 from dynamic_graph.sot.core import SOT, FeaturePosture, Task
-from dynamic_graph.sot.core.meta_tasks_kine import MetaTaskKine6d, MetaTaskKineCom, gotoNd
+from dynamic_graph.sot.core.meta_tasks_kine import (
+    MetaTaskKine6d,
+    MetaTaskKineCom,
+    gotoNd,
+)
 from dynamic_graph.sot.core.operator import Selec_of_vector
 
 from dynamic_graph.sot_talos_balance.meta_task_joint import MetaTaskKineJoint
-from dynamic_graph.sot_talos_balance.simple_admittance_controller import SimpleAdmittanceController
+from dynamic_graph.sot_talos_balance.simple_admittance_controller import (
+    SimpleAdmittanceController,
+)
 
 N_JOINTS = 32
 N_CONFIG = N_JOINTS + 6
@@ -44,7 +50,10 @@ robot.rightAnklePitchTask = MetaTaskKineJoint(robot.dynamic, RightPitchJoint)
 robot.rightAnklePitchTask.task.controlGain.value = 0
 robot.rightAnklePitchTask.task.setWithDerivative(True)
 plug(robot.rightPitchAnkleController.qRef, robot.rightAnklePitchTask.featureDes.errorIN)
-plug(robot.rightPitchAnkleController.dqRef, robot.rightAnklePitchTask.featureDes.errordotIN)
+plug(
+    robot.rightPitchAnkleController.dqRef,
+    robot.rightAnklePitchTask.featureDes.errordotIN,
+)
 
 # --- RIGHT ANKLE ROLL
 controller = SimpleAdmittanceController("rightRollAnkleController")
@@ -69,7 +78,9 @@ robot.rightAnkleRollTask = MetaTaskKineJoint(robot.dynamic, RightRollJoint)
 robot.rightAnkleRollTask.task.controlGain.value = 0
 robot.rightAnkleRollTask.task.setWithDerivative(True)
 plug(robot.rightRollAnkleController.qRef, robot.rightAnkleRollTask.featureDes.errorIN)
-plug(robot.rightRollAnkleController.dqRef, robot.rightAnkleRollTask.featureDes.errordotIN)
+plug(
+    robot.rightRollAnkleController.dqRef, robot.rightAnkleRollTask.featureDes.errordotIN
+)
 
 # --- LEFT ANKLE PITCH
 controller = SimpleAdmittanceController("leftPitchAnkleController")
@@ -94,7 +105,9 @@ robot.leftAnklePitchTask = MetaTaskKineJoint(robot.dynamic, LeftPitchJoint)
 robot.leftAnklePitchTask.task.controlGain.value = 0
 robot.leftAnklePitchTask.task.setWithDerivative(True)
 plug(robot.leftPitchAnkleController.qRef, robot.leftAnklePitchTask.featureDes.errorIN)
-plug(robot.leftPitchAnkleController.dqRef, robot.leftAnklePitchTask.featureDes.errordotIN)
+plug(
+    robot.leftPitchAnkleController.dqRef, robot.leftAnklePitchTask.featureDes.errordotIN
+)
 
 # --- LEFT ANKLE ROLL
 controller = SimpleAdmittanceController("leftRollAnkleController")
@@ -123,8 +136,8 @@ plug(robot.leftRollAnkleController.dqRef, robot.leftAnkleRollTask.featureDes.err
 
 # -------------------------- SOT CONTROL --------------------------
 # --- Posture
-robot.taskPosture = Task('taskPosture')
-robot.taskPosture.feature = FeaturePosture('featurePosture')
+robot.taskPosture = Task("taskPosture")
+robot.taskPosture.feature = FeaturePosture("featurePosture")
 
 q = list(robot.dynamic.position.value)
 robot.taskPosture.feature.state.value = q
@@ -139,21 +152,25 @@ plug(robot.dynamic.position, robot.taskPosture.feature.state)
 
 # --- CONTACTS
 # define contactLF and contactRF
-robot.contactLF = MetaTaskKine6d('contactLF', robot.dynamic, 'LF', robot.OperationalPointsMap['left-ankle'])
-robot.contactLF.feature.frame('desired')
+robot.contactLF = MetaTaskKine6d(
+    "contactLF", robot.dynamic, "LF", robot.OperationalPointsMap["left-ankle"]
+)
+robot.contactLF.feature.frame("desired")
 robot.contactLF.gain.setConstant(100)
 robot.contactLF.keep()
-locals()['contactLF'] = robot.contactLF
+locals()["contactLF"] = robot.contactLF
 
-robot.contactRF = MetaTaskKine6d('contactRF', robot.dynamic, 'RF', robot.OperationalPointsMap['right-ankle'])
-robot.contactRF.feature.frame('desired')
+robot.contactRF = MetaTaskKine6d(
+    "contactRF", robot.dynamic, "RF", robot.OperationalPointsMap["right-ankle"]
+)
+robot.contactRF.feature.frame("desired")
 robot.contactRF.gain.setConstant(100)
 robot.contactRF.keep()
-locals()['contactRF'] = robot.contactRF
+locals()["contactRF"] = robot.contactRF
 
 # --- SOT
 
-robot.sot = SOT('sot')
+robot.sot = SOT("sot")
 robot.sot.setSize(robot.dynamic.getDimension())
 plug(robot.sot.control, robot.device.control)
 

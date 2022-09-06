@@ -3,20 +3,24 @@
 from dynamic_graph import plug
 from dynamic_graph.sot.core import SOT
 from dynamic_graph.sot.core.meta_tasks_kine import MetaTaskKine6d, MetaTaskKineCom
-from dynamic_graph.sot_talos_balance.create_entities_utils import (create_com_trajectory_generator, create_example,
-                                                                   create_parameter_server)
+from dynamic_graph.sot_talos_balance.create_entities_utils import (
+    create_com_trajectory_generator,
+    create_example,
+    create_parameter_server,
+)
 from dynamic_graph.sot_talos_balance.utils.sot_utils import Bunch
 
 
 def get_default_conf():
-    import dynamic_graph.sot_talos_balance.talos.control_manager_conf as param_server_conf
+    import dynamic_graph.sot_talos_balance.talos.control_manager_conf as param_server
+
     conf = Bunch()
-    conf.param_server = param_server_conf
+    conf.param_server = param_server
     return conf
 
 
 def main(robot, conf=None):
-    if (conf is None):
+    if conf is None:
         conf = get_default_conf()
     robot.timeStep = robot.device.getTimeStep()
     dt = robot.timeStep
@@ -31,20 +35,24 @@ def main(robot, conf=None):
 
     # --- CONTACTS
     # define contactLF and contactRF
-    robot.contactLF = MetaTaskKine6d('contactLF', robot.dynamic, 'LF', robot.OperationalPointsMap['left-ankle'])
-    robot.contactLF.feature.frame('desired')
+    robot.contactLF = MetaTaskKine6d(
+        "contactLF", robot.dynamic, "LF", robot.OperationalPointsMap["left-ankle"]
+    )
+    robot.contactLF.feature.frame("desired")
     robot.contactLF.gain.setConstant(100)
     robot.contactLF.keep()
-    locals()['contactLF'] = robot.contactLF
+    locals()["contactLF"] = robot.contactLF
 
-    robot.contactRF = MetaTaskKine6d('contactRF', robot.dynamic, 'RF', robot.OperationalPointsMap['right-ankle'])
-    robot.contactRF.feature.frame('desired')
+    robot.contactRF = MetaTaskKine6d(
+        "contactRF", robot.dynamic, "RF", robot.OperationalPointsMap["right-ankle"]
+    )
+    robot.contactRF.feature.frame("desired")
     robot.contactRF.gain.setConstant(100)
     robot.contactRF.keep()
-    locals()['contactRF'] = robot.contactRF
+    locals()["contactRF"] = robot.contactRF
 
     # --- SOT
-    robot.sot = SOT('sot')
+    robot.sot = SOT("sot")
     robot.sot.setSize(robot.dynamic.getDimension())
     plug(robot.sot.control, robot.device.control)
 
@@ -67,5 +75,6 @@ def main(robot, conf=None):
     # robot.comTrajGen.startSinusoid(1,0.05,8.0);
     # sleep(1.0)
     # robot.example.nbJoints.recompute(1)
-    # # outputs the number of joints of the robot thanks to a pointer to the RobotUtil created in parameter server
+    # outputs the number of joints of the robot thanks to a pointer to the RobotUtil
+    # created in parameter server
     # print(robot.example.nbJoints.value)

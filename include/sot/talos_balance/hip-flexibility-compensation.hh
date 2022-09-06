@@ -34,10 +34,11 @@
 /* --------------------------------------------------------------------- */
 /* --- INCLUDE --------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
-#include <sot/core/robot-utils.hh>
 #include <dynamic-graph/signal-helper.h>
 
 #include <map>
+#include <sot/core/robot-utils.hh>
+
 #include "boost/assign.hpp"
 
 namespace dynamicgraph {
@@ -48,7 +49,8 @@ namespace talos_balance {
 /* --- CLASS ----------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-class HIPFLEXIBILITYCOMPENSATION_EXPORT HipFlexibilityCompensation : public ::dynamicgraph::Entity {
+class HIPFLEXIBILITYCOMPENSATION_EXPORT HipFlexibilityCompensation
+    : public ::dynamicgraph::Entity {
   DYNAMIC_GRAPH_ENTITY_DECL();
 
  public:
@@ -76,8 +78,8 @@ class HIPFLEXIBILITYCOMPENSATION_EXPORT HipFlexibilityCompensation : public ::dy
   DECLARE_SIGNAL_OUT(tau_filt, dynamicgraph::Vector);
   /// \brief  Angular correction of the flexibility
   DECLARE_SIGNAL_OUT(delta_q, dynamicgraph::Vector);
-  /// \brief  Corrected desired joint configuration of the robot with flexibility joint configuration
-  /// q_cmd = q_des + RateLimiter(delta_q)
+  /// \brief  Corrected desired joint configuration of the robot with
+  /// flexibility joint configuration q_cmd = q_des + RateLimiter(delta_q)
   DECLARE_SIGNAL_OUT(q_cmd, dynamicgraph::Vector);
 
   /* --- COMMANDS --- */
@@ -88,19 +90,25 @@ class HIPFLEXIBILITYCOMPENSATION_EXPORT HipFlexibilityCompensation : public ::dy
   void init(const double& dt, const std::string& robotName);
   /// \brief Set the LowPassFilter frequency for the torque computation.
   void setTorqueLowPassFilterFrequency(const double& frequency);
-  /// \brief Set the value of the saturation for the angular correction computation.
+  /// \brief Set the value of the saturation for the angular correction
+  /// computation.
   void setAngularSaturation(const double& saturation);
   /// \brief Set the value of the limiter for the the rate limiter of delta_q.
   void setRateLimiter(const double& rate);
-  /// \brief Compute the low pass filter of a signal given a frequency and the previous signal.
-  dynamicgraph::Vector lowPassFilter(const double& frequency, const dynamicgraph::Vector& signal,
+  /// \brief Compute the low pass filter of a signal given a frequency and the
+  /// previous signal.
+  dynamicgraph::Vector lowPassFilter(const double& frequency,
+                                     const dynamicgraph::Vector& signal,
                                      dynamicgraph::Vector& previous_signal);
-  /// \brief Compute the limiter of a signal given the previous signal (based on first derivative).
-  void rateLimiter(const dynamicgraph::Vector& signal, dynamicgraph::Vector& previous_signal,
+  /// \brief Compute the limiter of a signal given the previous signal (based on
+  /// first derivative).
+  void rateLimiter(const dynamicgraph::Vector& signal,
+                   dynamicgraph::Vector& previous_signal,
                    dynamicgraph::Vector& output);
 
  protected:
-  bool m_initSucceeded;  /// true if the entity has been successfully initialized
+  bool
+      m_initSucceeded;  /// true if the entity has been successfully initialized
   // time step of the robot
   double m_dt;
   double m_torqueLowPassFilterFrequency;

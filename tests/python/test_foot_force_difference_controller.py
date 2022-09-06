@@ -1,24 +1,26 @@
 from __future__ import print_function
 
 import numpy as np
-from dynamic_graph.sot_talos_balance.foot_force_difference_controller import FootForceDifferenceController
+from dynamic_graph.sot_talos_balance.foot_force_difference_controller import (
+    FootForceDifferenceController,
+)
 from numpy.testing import assert_almost_equal
 
 controller = FootForceDifferenceController("footController")
 controller.init()
 
-controller.dfzAdmittance.value = 1.
-controller.vdcFrequency.value = 0.
-controller.vdcDamping.value = 0.
+controller.dfzAdmittance.value = 1.0
+controller.vdcFrequency.value = 0.0
+controller.vdcDamping.value = 0.0
 
-gainSwing = 1.
-gainStance = 2.
-gainDouble = 3.
+gainSwing = 1.0
+gainStance = 2.0
+gainDouble = 3.0
 
-controller.wrenchRight.value = np.array([0.] * 2 + [500.] + [0.] * 3)
-controller.wrenchLeft.value = np.array([0.] * 2 + [300.] + [0.] * 3)
-controller.wrenchRightDes.value = np.array([0.] * 2 + [400.] + [0.] * 3)
-controller.wrenchLeftDes.value = np.array([0.] * 2 + [400.] + [0.] * 3)
+controller.wrenchRight.value = np.array([0.0] * 2 + [500.0] + [0.0] * 3)
+controller.wrenchLeft.value = np.array([0.0] * 2 + [300.0] + [0.0] * 3)
+controller.wrenchRightDes.value = np.array([0.0] * 2 + [400.0] + [0.0] * 3)
+controller.wrenchLeftDes.value = np.array([0.0] * 2 + [400.0] + [0.0] * 3)
 
 controller.gainSwing.value = gainSwing
 controller.gainStance.value = gainStance
@@ -52,8 +54,8 @@ controller.gainLeft.recompute(0)
 
 # There is more pressure on the right foot.
 # Therefore, the right foot must go up to reduce it
-vRight = [0.] * 2 + [100.] + [0.] * 3
-vLeft = [0.] * 2 + [-100.] + [0.] * 3
+vRight = [0.0] * 2 + [100.0] + [0.0] * 3
+vLeft = [0.0] * 2 + [-100.0] + [0.0] * 3
 
 print("Expected vRight: %s" % str(vRight))
 print("Actual vRight:   %s" % str(controller.vRight.value))
@@ -82,8 +84,8 @@ print("vRight:   %s" % str(controller.vRight.value))
 print("vLeft:    %s" % str(controller.vLeft.value))
 print()
 
-assert_almost_equal([0.] * 6, controller.vRight.value)
-assert_almost_equal([0.] * 6, controller.vLeft.value)
+assert_almost_equal([0.0] * 6, controller.vRight.value)
+assert_almost_equal([0.0] * 6, controller.vLeft.value)
 
 print("gainRight:   %s" % str(controller.gainRight.value))
 print("gainLeft:    %s" % str(controller.gainLeft.value))
@@ -103,8 +105,8 @@ print("vRight:   %s" % str(controller.vRight.value))
 print("vLeft:    %s" % str(controller.vLeft.value))
 print()
 
-assert_almost_equal([0.] * 6, controller.vRight.value)
-assert_almost_equal([0.] * 6, controller.vLeft.value)
+assert_almost_equal([0.0] * 6, controller.vRight.value)
+assert_almost_equal([0.0] * 6, controller.vLeft.value)
 
 print("gainRight:   %s" % str(controller.gainRight.value))
 print("gainLeft:    %s" % str(controller.gainLeft.value))

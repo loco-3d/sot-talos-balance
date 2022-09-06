@@ -16,11 +16,11 @@
 
 #include "sot/talos_balance/simple-reference-frame.hh"
 
-#include <sot/core/debug.hh>
-#include <dynamic-graph/factory.h>
-#include <dynamic-graph/command-bind.h>
-
 #include <dynamic-graph/all-commands.h>
+#include <dynamic-graph/command-bind.h>
+#include <dynamic-graph/factory.h>
+
+#include <sot/core/debug.hh>
 #include <sot/core/stop-watch.hh>
 
 namespace dynamicgraph {
@@ -30,8 +30,9 @@ namespace dg = ::dynamicgraph;
 using namespace dg;
 using namespace dg::command;
 
-// Size to be aligned                                         "-------------------------------------------------------"
-#define PROFILE_SIMPLEREFERENCEFRAME_DCM_COMPUTATION "SimpleReferenceFrame: dcm computation          "
+// Size to be aligned "-------------------------------------------------------"
+#define PROFILE_SIMPLEREFERENCEFRAME_DCM_COMPUTATION \
+  "SimpleReferenceFrame: dcm computation          "
 
 #define INPUT_SIGNALS m_footLeftSIN << m_footRightSIN << m_resetSIN
 
@@ -42,7 +43,8 @@ using namespace dg::command;
 typedef SimpleReferenceFrame EntityClassName;
 
 /* --- DG FACTORY ---------------------------------------------------- */
-DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(SimpleReferenceFrame, "SimpleReferenceFrame");
+DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(SimpleReferenceFrame,
+                                   "SimpleReferenceFrame");
 
 /* ------------------------------------------------------------------- */
 /* --- CONSTRUCTION -------------------------------------------------- */
@@ -52,7 +54,8 @@ SimpleReferenceFrame::SimpleReferenceFrame(const std::string& name)
       CONSTRUCT_SIGNAL_IN(footLeft, MatrixHomogeneous),
       CONSTRUCT_SIGNAL_IN(footRight, MatrixHomogeneous),
       CONSTRUCT_SIGNAL_IN(reset, bool),
-      CONSTRUCT_SIGNAL_OUT(referenceFrame, MatrixHomogeneous, m_footLeftSIN << m_footRightSIN << m_resetSIN),
+      CONSTRUCT_SIGNAL_OUT(referenceFrame, MatrixHomogeneous,
+                           m_footLeftSIN << m_footRightSIN << m_resetSIN),
       m_first(true),
       m_initSucceeded(false) {
   Entity::signalRegistration(INPUT_SIGNALS << OUTPUT_SIGNALS);
@@ -60,7 +63,8 @@ SimpleReferenceFrame::SimpleReferenceFrame(const std::string& name)
 
   /* Commands. */
   addCommand("init", makeCommandVoid1(*this, &SimpleReferenceFrame::init,
-                                      docCommandVoid1("Initialize the entity.", "Robot name")));
+                                      docCommandVoid1("Initialize the entity.",
+                                                      "Robot name")));
 }
 
 void SimpleReferenceFrame::init(const std::string& robotName) {
@@ -70,11 +74,13 @@ void SimpleReferenceFrame::init(const std::string& robotName) {
     if (isNameInRobotUtil(localName)) {
       m_robot_util = getRobotUtil(localName);
     } else {
-      SEND_ERROR_STREAM_MSG("You should have a robotUtil pointer initialized before");
+      SEND_ERROR_STREAM_MSG(
+          "You should have a robotUtil pointer initialized before");
       return;
     }
   } catch (const std::exception& e) {
-    SEND_ERROR_STREAM_MSG("Init failed: Could load URDF :" + m_robot_util->m_urdf_filename);
+    SEND_ERROR_STREAM_MSG("Init failed: Could load URDF :" +
+                          m_robot_util->m_urdf_filename);
     return;
   }
 
@@ -89,7 +95,8 @@ void SimpleReferenceFrame::init(const std::string& robotName) {
 
 DEFINE_SIGNAL_OUT_FUNCTION(referenceFrame, MatrixHomogeneous) {
   if (!m_initSucceeded) {
-    SEND_WARNING_STREAM_MSG("Cannot compute signal referenceFrame before initialization!");
+    SEND_WARNING_STREAM_MSG(
+        "Cannot compute signal referenceFrame before initialization!");
     return s;
   }
 
@@ -98,7 +105,9 @@ DEFINE_SIGNAL_OUT_FUNCTION(referenceFrame, MatrixHomogeneous) {
   const bool reset = m_resetSIN.isPlugged() ? m_resetSIN(iter) : false;
 
   if (reset || m_first) {
-    Eigen::Vector3d centerTranslation = (footLeft.translation() + footRight.translation()) / 2 + m_rightFootSoleXYZ;
+    Eigen::Vector3d centerTranslation =
+        (footLeft.translation() + footRight.translation()) / 2 +
+        m_rightFootSoleXYZ;
     centerTranslation[2] = 0;
 
     m_referenceFrame.linear() = footRight.linear();

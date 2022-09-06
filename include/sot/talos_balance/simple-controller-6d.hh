@@ -35,12 +35,13 @@
 /* --- INCLUDE --------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-#include <dynamic-graph/signal-helper.h>
-#include <map>
-#include "boost/assign.hpp"
-
-#include <sot/core/matrix-geometry.hh>
 #include <dynamic-graph/linear-algebra.h>
+#include <dynamic-graph/signal-helper.h>
+
+#include <map>
+#include <sot/core/matrix-geometry.hh>
+
+#include "boost/assign.hpp"
 
 namespace dynamicgraph {
 namespace sot {
@@ -50,7 +51,8 @@ namespace talos_balance {
 /* --- CLASS ----------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-class SIMPLE_CONTROLLER_6D_EXPORT SimpleController6d : public ::dynamicgraph::Entity {
+class SIMPLE_CONTROLLER_6D_EXPORT SimpleController6d
+    : public ::dynamicgraph::Entity {
   DYNAMIC_GRAPH_ENTITY_DECL();
 
  public:
@@ -78,7 +80,8 @@ class SIMPLE_CONTROLLER_6D_EXPORT SimpleController6d : public ::dynamicgraph::En
   virtual void display(std::ostream& os) const;
 
  protected:
-  bool m_initSucceeded;  /// true if the entity has been successfully initialized
+  bool
+      m_initSucceeded;  /// true if the entity has been successfully initialized
 
 };  // class SimpleController6d
 

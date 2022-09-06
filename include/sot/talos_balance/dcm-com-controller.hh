@@ -36,7 +36,9 @@
 /* --------------------------------------------------------------------- */
 
 #include <dynamic-graph/signal-helper.h>
+
 #include <map>
+
 #include "boost/assign.hpp"
 
 namespace dynamicgraph {
@@ -80,7 +82,8 @@ class DCMCOMCONTROLLER_EXPORT DcmComController : public ::dynamicgraph::Entity {
   virtual void display(std::ostream& os) const;
 
  protected:
-  bool m_initSucceeded;                     /// true if the entity has been successfully initialized
+  bool
+      m_initSucceeded;  /// true if the entity has been successfully initialized
   dynamicgraph::Vector m_dcmIntegralError;  // internal state
   double m_dt;
 

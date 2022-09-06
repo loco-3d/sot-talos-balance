@@ -5,7 +5,11 @@ from time import sleep
 from dynamic_graph import plug
 from dynamic_graph.sot.core import SOT
 from dynamic_graph.sot.core.matrix_util import matrixToTuple
-from dynamic_graph.sot.core.meta_tasks_kine import MetaTaskKine6d, MetaTaskKineCom, gotoNd
+from dynamic_graph.sot.core.meta_tasks_kine import (
+    MetaTaskKine6d,
+    MetaTaskKineCom,
+    gotoNd,
+)
 
 import dynamic_graph.sot_talos_balance.talos.parameter_server_conf as param_server_conf
 from dynamic_graph.sot_talos_balance.create_entities_utils import *
@@ -25,20 +29,24 @@ def main(robot):
 
     # --- CONTACTS
     # define contactLF and contactRF
-    robot.contactLF = MetaTaskKine6d('contactLF', robot.dynamic, 'LF', robot.OperationalPointsMap['left-ankle'])
-    robot.contactLF.feature.frame('desired')
+    robot.contactLF = MetaTaskKine6d(
+        "contactLF", robot.dynamic, "LF", robot.OperationalPointsMap["left-ankle"]
+    )
+    robot.contactLF.feature.frame("desired")
     robot.contactLF.gain.setConstant(100)
     robot.contactLF.keep()
-    locals()['contactLF'] = robot.contactLF
+    locals()["contactLF"] = robot.contactLF
 
-    robot.contactRF = MetaTaskKine6d('contactRF', robot.dynamic, 'RF', robot.OperationalPointsMap['right-ankle'])
-    robot.contactRF.feature.frame('desired')
+    robot.contactRF = MetaTaskKine6d(
+        "contactRF", robot.dynamic, "RF", robot.OperationalPointsMap["right-ankle"]
+    )
+    robot.contactRF.feature.frame("desired")
     robot.contactRF.gain.setConstant(100)
     robot.contactRF.keep()
-    locals()['contactRF'] = robot.contactRF
+    locals()["contactRF"] = robot.contactRF
 
     # --- SOT
-    robot.sot = SOT('sot')
+    robot.sot = SOT("sot")
     robot.sot.setSize(robot.dynamic.getDimension())
     plug(robot.sot.control, robot.device.control)
 
@@ -56,11 +64,13 @@ def main(robot):
     robot.be_filters = create_be_filters(robot, dt)
 
     # --- TRACERS
-    outputs = ['robotState']
-    robot.device_tracer = create_tracer(robot, robot.device, 'device_tracer', outputs)
-    outputs = ['q']
-    robot.estimator_tracer = create_tracer(robot, robot.base_estimator, 'estimator_tracer', outputs)
-    robot.device.after.addSignal('base_estimator.q')
+    outputs = ["robotState"]
+    robot.device_tracer = create_tracer(robot, robot.device, "device_tracer", outputs)
+    outputs = ["q"]
+    robot.estimator_tracer = create_tracer(
+        robot, robot.base_estimator, "estimator_tracer", outputs
+    )
+    robot.device.after.addSignal("base_estimator.q")
 
     # --- RUN SIMULATION
     plug(robot.comTrajGen.x, robot.taskCom.featureDes.errorIN)
@@ -77,11 +87,11 @@ def main(robot):
     sleep(3.0)
     dump_tracer(robot.device_tracer)
     dump_tracer(robot.estimator_tracer)
-    print('data dumped')
+    print("data dumped")
 
     # --- DISPLAY
-    device_data = read_tracer_file('/tmp/dg_' + robot.device.name + '-robotState.dat')
-    estimator_data = read_tracer_file('/tmp/dg_' + robot.base_estimator.name + '-q.dat')
+    device_data = read_tracer_file("/tmp/dg_" + robot.device.name + "-robotState.dat")
+    estimator_data = read_tracer_file("/tmp/dg_" + robot.base_estimator.name + "-q.dat")
     plot_select_traj(device_data, [10, 23, 15])
     plot_select_traj(estimator_data, [10, 23, 15])
-    write_pdf_graph('/tmp/')
+    write_pdf_graph("/tmp/")

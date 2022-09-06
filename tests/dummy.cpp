@@ -1,7 +1,6 @@
-#include <iostream>
-
 #include <boost/test/unit_test.hpp>
 #include <boost/utility/binary.hpp>
+#include <iostream>
 
 BOOST_AUTO_TEST_SUITE(BOOST_TEST_MODULE)
 

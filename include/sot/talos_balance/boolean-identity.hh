@@ -38,6 +38,7 @@
 #include <dynamic-graph/signal-helper.h>
 
 #include <map>
+
 #include "boost/assign.hpp"
 
 namespace dynamicgraph {

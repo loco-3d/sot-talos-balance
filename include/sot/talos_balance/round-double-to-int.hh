@@ -38,6 +38,7 @@
 #include <dynamic-graph/signal-helper.h>
 
 #include <map>
+
 #include "boost/assign.hpp"
 
 namespace dynamicgraph {
@@ -48,7 +49,8 @@ namespace talos_balance {
 /* --- CLASS ----------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-class ROUND_DOUBLE_TO_INT_EXPORT RoundDoubleToInt : public ::dynamicgraph::Entity {
+class ROUND_DOUBLE_TO_INT_EXPORT RoundDoubleToInt
+    : public ::dynamicgraph::Entity {
   DYNAMIC_GRAPH_ENTITY_DECL();
 
  public:

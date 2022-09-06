@@ -34,18 +34,18 @@
 /* --------------------------------------------------------------------- */
 /* --- INCLUDE --------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
-#include <sot/core/robot-utils.hh>
 #include <dynamic-graph/signal-helper.h>
 
-#include <map>
-#include "boost/assign.hpp"
-#include <boost/thread.hpp>
 #include <boost/chrono.hpp>
+#include <boost/thread.hpp>
+#include <map>
+#include <sot/core/robot-utils.hh>
 
-#include "sot/talos_balance/sdk_qualisys/RTProtocol.h"
+#include "boost/assign.hpp"
 #include "sot/talos_balance/sdk_qualisys/Markup.h"
 #include "sot/talos_balance/sdk_qualisys/Network.h"
 #include "sot/talos_balance/sdk_qualisys/RTPacket.h"
+#include "sot/talos_balance/sdk_qualisys/RTProtocol.h"
 
 namespace dynamicgraph {
 namespace sot {
@@ -73,7 +73,8 @@ class QUALISYS_CLIENT_EXPORT QualisysClient : public ::dynamicgraph::Entity {
   /* --- COMMANDS --- */
   void registerRigidBody(const std::string& RBname);
   void setMocapIPAdress(const std::string& ipAdress);
-  void getRigidBodyList();  /// If connected, return the list of all the rigid bodies available.
+  void getRigidBodyList();  /// If connected, return the list of all the rigid
+                            /// bodies available.
 
   /* --- ENTITY INHERITANCE --- */
   virtual void display(std::ostream& os) const;
@@ -81,13 +82,15 @@ class QUALISYS_CLIENT_EXPORT QualisysClient : public ::dynamicgraph::Entity {
  protected:
   bool m_initSucceeded;  // true if the entity has been successfully initialized
   bool m_printRigidBodyList = false;
-  std::vector<std::string> m_RBnames;     // vector of names of registered rigid bodies
+  std::vector<std::string>
+      m_RBnames;  // vector of names of registered rigid bodies
   std::vector<dg::Vector> m_RBpositions;  // vector of rigid bodies positions
   void manageNetworkFrame();
   boost::thread m_thread{&QualisysClient::manageNetworkFrame, this};
   boost::mutex m_mutex;
   std::string m_serverAddr = "127.0.0.1";
-  dg::Vector& readGenericRigidBody(const int RBidx, dg::Vector& res, const int& time);
+  dg::Vector& readGenericRigidBody(const int RBidx, dg::Vector& res,
+                                   const int& time);
 };  // class QualisysClient
 
 }  // namespace talos_balance

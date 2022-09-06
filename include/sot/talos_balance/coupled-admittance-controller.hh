@@ -36,7 +36,9 @@
 /* --------------------------------------------------------------------- */
 
 #include <dynamic-graph/signal-helper.h>
+
 #include <map>
+
 #include "boost/assign.hpp"
 
 namespace dynamicgraph {
@@ -47,7 +49,8 @@ namespace talos_balance {
 /* --- CLASS ----------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-class COUPLEDADMITTANCECONTROLLER_EXPORT CoupledAdmittanceController : public ::dynamicgraph::Entity {
+class COUPLEDADMITTANCECONTROLLER_EXPORT CoupledAdmittanceController
+    : public ::dynamicgraph::Entity {
   DYNAMIC_GRAPH_ENTITY_DECL();
 
  public:

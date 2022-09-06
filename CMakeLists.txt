@@ -1,116 +1,117 @@
 # Copyright 2018, 2021, Gepetto team, LAAS-CNRS
 #
 
-CMAKE_MINIMUM_REQUIRED(VERSION 3.1)
+cmake_minimum_required(VERSION 3.1)
 
 # Project properties
-SET(PROJECT_ORG loco-3d)
-SET(PROJECT_NAME sot-talos-balance)
-SET(PROJECT_DESCRIPTION "Collection of dynamic-graph entities aimed at implementing balance control on talos.")
-SET(PROJECT_URL "https://github.com/${PROJECT_ORG}/${PROJECT_NAME}")
+set(PROJECT_ORG loco-3d)
+set(PROJECT_NAME sot-talos-balance)
+set(PROJECT_DESCRIPTION
+    "Collection of dynamic-graph entities aimed at implementing balance control on talos."
+)
+set(PROJECT_URL "https://github.com/${PROJECT_ORG}/${PROJECT_NAME}")
 
 # Project options
-OPTION(BUILD_PYTHON_INTERFACE "Build the python bindings" ON)
-OPTION(INSTALL_PYTHON_INTERFACE_ONLY "Install *ONLY* the python bindings" OFF)
-OPTION(SUFFIX_SO_VERSION "Suffix library name with its version" ON)
-OPTION(INITIALIZE_WITH_NAN "Initialize Eigen entries with NaN" OFF)
-OPTION(BUILD_ROS_PACKAGES "Build ros packages" ON)
+option(BUILD_PYTHON_INTERFACE "Build the python bindings" ON)
+option(INSTALL_PYTHON_INTERFACE_ONLY "Install *ONLY* the python bindings" OFF)
+option(SUFFIX_SO_VERSION "Suffix library name with its version" ON)
+option(INITIALIZE_WITH_NAN "Initialize Eigen entries with NaN" OFF)
+option(BUILD_ROS_PACKAGES "Build ros packages" ON)
 
 # Project configuration
-IF(NOT INSTALL_PYTHON_INTERFACE_ONLY)
-  SET(PROJECT_USE_CMAKE_EXPORT TRUE)
-ENDIF(NOT INSTALL_PYTHON_INTERFACE_ONLY)
-SET(CUSTOM_HEADER_DIR "sot/talos_balance")
-SET(CXX_DISABLE_WERROR TRUE)
-SET(DOXYGEN_USE_MATHJAX YES)
+if(NOT INSTALL_PYTHON_INTERFACE_ONLY)
+  set(PROJECT_USE_CMAKE_EXPORT TRUE)
+endif(NOT INSTALL_PYTHON_INTERFACE_ONLY)
+set(CUSTOM_HEADER_DIR "sot/talos_balance")
+set(CXX_DISABLE_WERROR TRUE)
+set(DOXYGEN_USE_MATHJAX YES)
 
 # JRL-cmakemodule setup
-INCLUDE(cmake/base.cmake)
-INCLUDE(cmake/boost.cmake)
+include(cmake/base.cmake)
+include(cmake/boost.cmake)
 
 # Project definition
-COMPUTE_PROJECT_ARGS(PROJECT_ARGS LANGUAGES CXX C)
-PROJECT(${PROJECT_NAME} ${PROJECT_ARGS})
-CHECK_MINIMAL_CXX_STANDARD(11 REQUIRED)
+compute_project_args(PROJECT_ARGS LANGUAGES CXX C)
+project(${PROJECT_NAME} ${PROJECT_ARGS})
+check_minimal_cxx_standard(11 REQUIRED)
 
-IF(INITIALIZE_WITH_NAN)
-  MESSAGE(STATUS "Initialize with NaN all the Eigen entries.")
-  ADD_DEFINITIONS(-DEIGEN_INITIALIZE_MATRICES_BY_NAN)
-ENDIF(INITIALIZE_WITH_NAN)
+if(INITIALIZE_WITH_NAN)
+  message(STATUS "Initialize with NaN all the Eigen entries.")
+  add_definitions(-DEIGEN_INITIALIZE_MATRICES_BY_NAN)
+endif(INITIALIZE_WITH_NAN)
 
 # Project dependencies
 
-IF(BUILD_PYTHON_INTERFACE)
-  ADD_PROJECT_DEPENDENCY(dynamic-graph-python 4.0.0 REQUIRED)
-  STRING(REGEX REPLACE "-" "_" PROJECT_NAME_UNDERSCORE ${PROJECT_NAME})
-  SET(PY_NAME ${PROJECT_NAME_UNDERSCORE})
-ENDIF(BUILD_PYTHON_INTERFACE)
+if(BUILD_PYTHON_INTERFACE)
+  add_project_dependency(dynamic-graph-python 4.0.0 REQUIRED)
+  string(REGEX REPLACE "-" "_" PROJECT_NAME_UNDERSCORE ${PROJECT_NAME})
+  set(PY_NAME ${PROJECT_NAME_UNDERSCORE})
+endif(BUILD_PYTHON_INTERFACE)
 
-IF(BUILD_TESTING)
-  FIND_PACKAGE(Boost REQUIRED COMPONENTS unit_test_framework)
-ENDIF(BUILD_TESTING)
+if(BUILD_TESTING)
+  find_package(Boost REQUIRED COMPONENTS unit_test_framework)
+endif(BUILD_TESTING)
 
-IF(Boost_VERSION GREATER 107299 OR Boost_VERSION_MACRO GREATER 107299)
+if(Boost_VERSION GREATER 107299 OR Boost_VERSION_MACRO GREATER 107299)
   # Silence a warning about a deprecated use of boost bind by boost >= 1.73
   # without dropping support for boost < 1.73
-  ADD_DEFINITIONS(-DBOOST_BIND_GLOBAL_PLACEHOLDERS)
-ENDIF()
+  add_definitions(-DBOOST_BIND_GLOBAL_PLACEHOLDERS)
+endif()
 
-ADD_PROJECT_DEPENDENCY(dynamic-graph 4.4.0 REQUIRED)
-ADD_PROJECT_DEPENDENCY(sot-core REQUIRED)
-ADD_PROJECT_DEPENDENCY(eiquadprog REQUIRED)
-ADD_PROJECT_DEPENDENCY(parametric-curves REQUIRED)
+add_project_dependency(dynamic-graph 4.4.0 REQUIRED)
+add_project_dependency(sot-core REQUIRED)
+add_project_dependency(eiquadprog REQUIRED)
+add_project_dependency(parametric-curves REQUIRED)
 
 # Verbosity level
-IF (NOT (\"${CMAKE_VERBOSITY_LEVEL}\" STREQUAL \"\"))
-  ADD_DEFINITIONS(-DVP_DEBUG_MODE=${CMAKE_VERBOSITY_LEVEL} -DVP_DEBUG)
-ENDIF (NOT (\"${CMAKE_VERBOSITY_LEVEL}\" STREQUAL \"\"))
+if(NOT (\"${CMAKE_VERBOSITY_LEVEL}\" STREQUAL \"\"))
+  add_definitions(-DVP_DEBUG_MODE=${CMAKE_VERBOSITY_LEVEL} -DVP_DEBUG)
+endif(NOT (\"${CMAKE_VERBOSITY_LEVEL}\" STREQUAL \"\"))
 
-SET(${LIBRARY_NAME}_HEADERS
-  include/${CUSTOM_HEADER_DIR}/utils/commands-helper.hh
-  include/${CUSTOM_HEADER_DIR}/utils/statistics.hh
-  include/${CUSTOM_HEADER_DIR}/math/fwd.hh
-  include/${CUSTOM_HEADER_DIR}/robot/fwd.hh
-  include/${CUSTOM_HEADER_DIR}/robot/robot-wrapper.hh
-  include/${CUSTOM_HEADER_DIR}/sdk_qualisys/Network.h
-  include/${CUSTOM_HEADER_DIR}/sdk_qualisys/RTPacket.h
-  include/${CUSTOM_HEADER_DIR}/sdk_qualisys/RTProtocol.h
-  include/${CUSTOM_HEADER_DIR}/sdk_qualisys/Markup.h
-  )
+set(${LIBRARY_NAME}_HEADERS
+    include/${CUSTOM_HEADER_DIR}/utils/commands-helper.hh
+    include/${CUSTOM_HEADER_DIR}/utils/statistics.hh
+    include/${CUSTOM_HEADER_DIR}/math/fwd.hh
+    include/${CUSTOM_HEADER_DIR}/robot/fwd.hh
+    include/${CUSTOM_HEADER_DIR}/robot/robot-wrapper.hh
+    include/${CUSTOM_HEADER_DIR}/sdk_qualisys/Network.h
+    include/${CUSTOM_HEADER_DIR}/sdk_qualisys/RTPacket.h
+    include/${CUSTOM_HEADER_DIR}/sdk_qualisys/RTProtocol.h
+    include/${CUSTOM_HEADER_DIR}/sdk_qualisys/Markup.h)
 
-SET(${PROJECT_NAME}_SOURCES
-  src/utils/statistics.cpp
-  src/robot/robot-wrapper.cpp
-  src/sdk_qualisys/Network.cpp
-  src/sdk_qualisys/RTPacket.cpp
-  src/sdk_qualisys/RTProtocol.cpp
-  src/sdk_qualisys/Markup.cpp
-  )
+set(${PROJECT_NAME}_SOURCES
+    src/utils/statistics.cpp src/robot/robot-wrapper.cpp
+    src/sdk_qualisys/Network.cpp src/sdk_qualisys/RTPacket.cpp
+    src/sdk_qualisys/RTProtocol.cpp src/sdk_qualisys/Markup.cpp)
 
-ADD_LIBRARY(${PROJECT_NAME} SHARED
-  ${${PROJECT_NAME}_SOURCES} ${${PROJECT_NAME}_HEADERS})
-TARGET_INCLUDE_DIRECTORIES(${PROJECT_NAME} PUBLIC $<INSTALL_INTERFACE:include>)
-TARGET_LINK_LIBRARIES(${PROJECT_NAME} PUBLIC
-  sot-core::sot-core parametric-curves::parametric-curves)
+add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}_SOURCES}
+                                   ${${PROJECT_NAME}_HEADERS})
+target_include_directories(${PROJECT_NAME} PUBLIC $<INSTALL_INTERFACE:include>)
+target_link_libraries(
+  ${PROJECT_NAME} PUBLIC sot-core::sot-core
+                         parametric-curves::parametric-curves)
 
-IF(SUFFIX_SO_VERSION)
-  SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES SOVERSION ${PROJECT_VERSION})
-ENDIF(SUFFIX_SO_VERSION)
+if(SUFFIX_SO_VERSION)
+  set_target_properties(${PROJECT_NAME} PROPERTIES SOVERSION ${PROJECT_VERSION})
+endif(SUFFIX_SO_VERSION)
 
-IF(NOT INSTALL_PYTHON_INTERFACE_ONLY)
-  INSTALL(TARGETS ${PROJECT_NAME} EXPORT ${TARGETS_EXPORT_NAME} DESTINATION lib)
-ENDIF(NOT INSTALL_PYTHON_INTERFACE_ONLY)
+if(NOT INSTALL_PYTHON_INTERFACE_ONLY)
+  install(
+    TARGETS ${PROJECT_NAME}
+    EXPORT ${TARGETS_EXPORT_NAME}
+    DESTINATION lib)
+endif(NOT INSTALL_PYTHON_INTERFACE_ONLY)
 
-ADD_SUBDIRECTORY(src)
+add_subdirectory(src)
 
-IF(BUILD_ROS_PACKAGES AND NOT INSTALL_PYTHON_INTERFACE_ONLY)
-  ADD_SUBDIRECTORY(ros)
-ENDIF(BUILD_ROS_PACKAGES AND NOT INSTALL_PYTHON_INTERFACE_ONLY)
+if(BUILD_ROS_PACKAGES AND NOT INSTALL_PYTHON_INTERFACE_ONLY)
+  add_subdirectory(ros)
+endif(BUILD_ROS_PACKAGES AND NOT INSTALL_PYTHON_INTERFACE_ONLY)
 
-IF(BUILD_TESTING)
-  ADD_SUBDIRECTORY(tests)
-ENDIF(BUILD_TESTING)
+if(BUILD_TESTING)
+  add_subdirectory(tests)
+endif(BUILD_TESTING)
 
-IF(NOT INSTALL_PYTHON_INTERFACE_ONLY)
-  INSTALL(FILES package.xml DESTINATION share/${PROJECT_NAME})
-ENDIF(NOT INSTALL_PYTHON_INTERFACE_ONLY)
+if(NOT INSTALL_PYTHON_INTERFACE_ONLY)
+  install(FILES package.xml DESTINATION share/${PROJECT_NAME})
+endif(NOT INSTALL_PYTHON_INTERFACE_ONLY)

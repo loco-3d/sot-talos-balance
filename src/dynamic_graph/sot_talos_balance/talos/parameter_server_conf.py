@@ -10,42 +10,44 @@ from example_robot_data.path import EXAMPLE_ROBOT_DATA_MODEL_DIR
 
 NJ = 32
 model_path = [EXAMPLE_ROBOT_DATA_MODEL_DIR]
-urdfFileName = join(EXAMPLE_ROBOT_DATA_MODEL_DIR, "talos_data/robots/talos_reduced.urdf")
+urdfFileName = join(
+    EXAMPLE_ROBOT_DATA_MODEL_DIR, "talos_data/robots/talos_reduced.urdf"
+)
 ImuJointName = "imu_joint"
 
 mapJointNameToID = {
-    'lhy': 0,
-    'lhr': 1,
-    'lhp': 2,
-    'lk': 3,
-    'lap': 4,
-    'lar': 5,
-    'rhy': 6,
-    'rhr': 7,
-    'rhp': 8,
-    'rk': 9,
-    'rap': 10,
-    'rar': 11,
-    'ty': 12,
-    'tp': 13,
-    'lsy': 14,
-    'lsr': 15,
-    'lay': 16,
-    'le': 17,
-    'lwy': 18,
-    'lwp': 19,
-    'lwr': 20,
-    'lh': 21,
-    'rsy': 22,
-    'rsr': 23,
-    'ray': 24,
-    're': 25,
-    'rwy': 26,
-    'rwp': 27,
-    'rwr': 28,
-    'rh': 29,
-    'hp': 30,
-    'hy': 31
+    "lhy": 0,
+    "lhr": 1,
+    "lhp": 2,
+    "lk": 3,
+    "lap": 4,
+    "lar": 5,
+    "rhy": 6,
+    "rhr": 7,
+    "rhp": 8,
+    "rk": 9,
+    "rap": 10,
+    "rar": 11,
+    "ty": 12,
+    "tp": 13,
+    "lsy": 14,
+    "lsr": 15,
+    "lay": 16,
+    "le": 17,
+    "lwy": 18,
+    "lwp": 19,
+    "lwr": 20,
+    "lh": 21,
+    "rsy": 22,
+    "rsr": 23,
+    "ray": 24,
+    "re": 25,
+    "rwy": 26,
+    "rwp": 27,
+    "rwr": 28,
+    "rh": 29,
+    "hp": 30,
+    "hy": 31,
 }
 
 mapJointLimits = {
@@ -80,13 +82,18 @@ mapJointLimits = {
     28: [-0.698131700798, 0.698131700798],
     29: [-1.0471975512, 0.0],
     30: [-0.261799387799, 0.785398163397],
-    31: [-1.308996939, 1.308996939]
+    31: [-1.308996939, 1.308996939],
 }
 
 vfMax = [100.0, 100.0, 300.0, 80.0, 80.0, 30.0]
 vfMin = [-100.0, -100.0, -300.0, -80.0, -80.0, -30.0]
 
-mapForceIdToForceLimits = {0: [vfMin, vfMax], 1: [vfMin, vfMax], 2: [vfMin, vfMax], 3: [vfMin, vfMax]}
+mapForceIdToForceLimits = {
+    0: [vfMin, vfMax],
+    1: [vfMin, vfMax],
+    2: [vfMin, vfMax],
+    3: [vfMin, vfMax],
+}
 
 mapNameToForceId = {"rf": 0, "lf": 1, "rh": 2, "lh": 3}
 
@@ -97,5 +104,37 @@ footFrameNames = {"Right": "leg_right_6_joint", "Left": "leg_left_6_joint"}
 rightFootSensorXYZ = (0.0, 0.0, -0.085)
 rightFootSoleXYZ = (0.0, 0.0, -0.105)
 
-urdftosot = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28,
-             29, 30, 31)
+urdftosot = (
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+)

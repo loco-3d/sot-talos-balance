@@ -16,11 +16,12 @@
 
 #include "sot/talos_balance/simple-pid.hh"
 
-#include <sot/core/debug.hh>
-#include <dynamic-graph/factory.h>
-#include <dynamic-graph/command-bind.h>
-
 #include <dynamic-graph/all-commands.h>
+#include <dynamic-graph/command-bind.h>
+#include <dynamic-graph/factory.h>
+
+#include <sot/core/debug.hh>
+
 #include "sot/core/stop-watch.hh"
 
 namespace dynamicgraph {
@@ -30,10 +31,12 @@ namespace dg = ::dynamicgraph;
 using namespace dg;
 using namespace dg::command;
 
-// Size to be aligned                           "-------------------------------------------------------"
-#define PROFILE_SIMPLE_PID_DX_REF_COMPUTATION "SimplePID: dx_ref computation                          "
+// Size to be aligned "-------------------------------------------------------"
+#define PROFILE_SIMPLE_PID_DX_REF_COMPUTATION \
+  "SimplePID: dx_ref computation                          "
 
-#define INPUT_SIGNALS m_KpSIN << m_KiSIN << m_decayFactorSIN << m_xSIN << m_x_desSIN << m_dx_desSIN
+#define INPUT_SIGNALS \
+  m_KpSIN << m_KiSIN << m_decayFactorSIN << m_xSIN << m_x_desSIN << m_dx_desSIN
 
 #define OUTPUT_SIGNALS m_dx_refSOUT
 
@@ -60,10 +63,13 @@ SimplePID::SimplePID(const std::string& name)
   Entity::signalRegistration(INPUT_SIGNALS << OUTPUT_SIGNALS);
 
   /* Commands. */
-  addCommand("init", makeCommandVoid2(*this, &SimplePID::init,
-                                      docCommandVoid2("Initialize the entity.", "time step", "number of elements")));
+  addCommand("init", makeCommandVoid2(
+                         *this, &SimplePID::init,
+                         docCommandVoid2("Initialize the entity.", "time step",
+                                         "number of elements")));
   addCommand("resetIntegralError",
-             makeCommandVoid0(*this, &SimplePID::resetIntegralError, docCommandVoid0("Set integral error to zero.")));
+             makeCommandVoid0(*this, &SimplePID::resetIntegralError,
+                              docCommandVoid0("Set integral error to zero.")));
 }
 
 void SimplePID::init(const double& dt, const int& N) {
@@ -80,7 +86,8 @@ void SimplePID::resetIntegralError() { m_integralError.setZero(); }
 
 DEFINE_SIGNAL_OUT_FUNCTION(dx_ref, dynamicgraph::Vector) {
   if (!m_initSucceeded) {
-    SEND_WARNING_STREAM_MSG("Cannot compute signal dx_ref before initialization!");
+    SEND_WARNING_STREAM_MSG(
+        "Cannot compute signal dx_ref before initialization!");
     return s;
   }
 
@@ -97,7 +104,8 @@ DEFINE_SIGNAL_OUT_FUNCTION(dx_ref, dynamicgraph::Vector) {
 
   Vector x_err = x_des - x;
 
-  Vector ddx_ref = dx_des + Kp.cwiseProduct(x_err) + Ki.cwiseProduct(m_integralError);
+  Vector ddx_ref =
+      dx_des + Kp.cwiseProduct(x_err) + Ki.cwiseProduct(m_integralError);
 
   // update the integrator (AFTER using its value)
   m_integralError += (x_err - decayFactor * m_integralError) * m_dt;

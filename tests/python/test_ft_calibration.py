@@ -3,16 +3,16 @@ import numpy as np
 from dynamic_graph.sot_talos_balance.ft_calibration import FtCalibration
 from numpy.testing import assert_almost_equal
 
-robot_name = 'robot'
-ftc = FtCalibration('ftc')
+robot_name = "robot"
+ftc = FtCalibration("ftc")
 ftc.init(robot_name)
 rfw = conf.rfw
 lfw = conf.lfw
 ftc.setLeftFootWeight(lfw)
 ftc.setRightFootWeight(rfw)
-print('Weights of both feet set to {0}'.format(rfw))
+print("Weights of both feet set to {0}".format(rfw))
 
-print('The robot should be in the air.')
+print("The robot should be in the air.")
 
 ftc.right_foot_force_in.value = np.array([1, 1, 8, 1, 1, 1])
 ftc.left_foot_force_in.value = np.array([1, 1, 6, 1, 1, 1])

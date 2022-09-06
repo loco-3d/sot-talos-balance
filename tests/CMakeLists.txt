@@ -1,32 +1,28 @@
 # Copyright 2010, François Bleibel, Olivier Stasse, JRL, CNRS/AIST
 
-CONFIG_FILES_CMAKE(test-paths.h)
+config_files_cmake(test-paths.h)
 
 # Make Boost.Test generates the main function in test cases.
-ADD_DEFINITIONS(-DBOOST_TEST_DYN_LINK -DBOOST_TEST_MAIN)
+add_definitions(-DBOOST_TEST_DYN_LINK -DBOOST_TEST_MAIN)
 
-SET(test_distribute_deps
-  distribute-wrench
-  sot-core::sot-core
-  sot-core::parameter-server
-  )
+set(test_distribute_deps distribute-wrench sot-core::sot-core
+                         sot-core::parameter-server)
 
-#test paths and names (without .cpp extension)
-SET(tests
-  dummy
-  test_distribute
-  )
+# test paths and names (without .cpp extension)
+set(tests dummy test_distribute)
 
-ADD_DEFINITIONS(-DDEBUG=2)
+add_definitions(-DDEBUG=2)
 
-FOREACH(test ${tests})
-  ADD_UNIT_TEST(${test} ${test}.cpp)
-  TARGET_LINK_LIBRARIES(${test} PRIVATE ${PROJECT_NAME} ${${test}_deps} Boost::unit_test_framework)
-  TARGET_INCLUDE_DIRECTORIES(${test} PRIVATE $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>)
-ENDFOREACH(test)
+foreach(test ${tests})
+  add_unit_test(${test} ${test}.cpp)
+  target_link_libraries(${test} PRIVATE ${PROJECT_NAME} ${${test}_deps}
+                                        Boost::unit_test_framework)
+  target_include_directories(
+    ${test} PRIVATE $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>)
+endforeach(test)
 
-TARGET_LINK_LIBRARIES(test_distribute PRIVATE eiquadprog::eiquadprog)
+target_link_libraries(test_distribute PRIVATE eiquadprog::eiquadprog)
 
-IF(BUILD_PYTHON_INTERFACE)
-  ADD_SUBDIRECTORY(python)
-ENDIF(BUILD_PYTHON_INTERFACE)
+if(BUILD_PYTHON_INTERFACE)
+  add_subdirectory(python)
+endif(BUILD_PYTHON_INTERFACE)

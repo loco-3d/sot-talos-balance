@@ -16,17 +16,15 @@
 
 #include "sot/talos_balance/simple-distribute-wrench.hh"
 
-#include <iostream>
-
-#include <sot/core/debug.hh>
-#include <dynamic-graph/factory.h>
 #include <dynamic-graph/all-commands.h>
+#include <dynamic-graph/factory.h>
 
-#include <sot/core/stop-watch.hh>
-
-#include <pinocchio/parsers/urdf.hpp>
-#include <pinocchio/algorithm/kinematics.hpp>
+#include <iostream>
 #include <pinocchio/algorithm/frames.hpp>
+#include <pinocchio/algorithm/kinematics.hpp>
+#include <pinocchio/parsers/urdf.hpp>
+#include <sot/core/debug.hh>
+#include <sot/core/stop-watch.hh>
 
 namespace dynamicgraph {
 namespace sot {
@@ -35,7 +33,7 @@ namespace dg = ::dynamicgraph;
 using namespace dg;
 using namespace dg::command;
 
-// Size to be aligned                                      "-------------------------------------------------------"
+// Size to be aligned "-------------------------------------------------------"
 #define PROFILE_SIMPLE_DISTRIBUTE_WRENCH_KINEMATICS_COMPUTATIONS \
   "SimpleDistributeWrench: kinematics computations              "
 #define PROFILE_SIMPLE_DISTRIBUTE_WRENCH_WRENCHES_COMPUTATIONS \
@@ -45,17 +43,20 @@ using namespace dg::command;
 
 #define INNER_SIGNALS m_kinematics_computations << m_wrenches
 
-#define OUTPUT_SIGNALS                                                                                        \
-  m_wrenchLeftSOUT << m_ankleWrenchLeftSOUT << m_surfaceWrenchLeftSOUT << m_copLeftSOUT << m_wrenchRightSOUT  \
-                   << m_ankleWrenchRightSOUT << m_surfaceWrenchRightSOUT << m_copRightSOUT << m_wrenchRefSOUT \
-                   << m_zmpRefSOUT << m_emergencyStopSOUT
+#define OUTPUT_SIGNALS                                                   \
+  m_wrenchLeftSOUT << m_ankleWrenchLeftSOUT << m_surfaceWrenchLeftSOUT   \
+                   << m_copLeftSOUT << m_wrenchRightSOUT                 \
+                   << m_ankleWrenchRightSOUT << m_surfaceWrenchRightSOUT \
+                   << m_copRightSOUT << m_wrenchRefSOUT << m_zmpRefSOUT  \
+                   << m_emergencyStopSOUT
 
 /// Define EntityClassName here rather than in the header file
 /// so that it can be used by the macros DEFINE_SIGNAL_**_FUNCTION.
 typedef SimpleDistributeWrench EntityClassName;
 
 /* --- DG FACTORY ---------------------------------------------------- */
-DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(SimpleDistributeWrench, "SimpleDistributeWrench");
+DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(SimpleDistributeWrench,
+                                   "SimpleDistributeWrench");
 
 /* ------------------------------------------------------------------- */
 /* --- CONSTRUCTION -------------------------------------------------- */
@@ -68,16 +69,22 @@ SimpleDistributeWrench::SimpleDistributeWrench(const std::string& name)
       CONSTRUCT_SIGNAL_IN(phase, int),
       CONSTRUCT_SIGNAL_INNER(kinematics_computations, int, m_qSIN),
       CONSTRUCT_SIGNAL_INNER(wrenches, int,
-                             m_wrenchDesSIN << m_rhoSIN << m_phaseSIN << m_kinematics_computationsSINNER),
+                             m_wrenchDesSIN << m_rhoSIN << m_phaseSIN
+                                            << m_kinematics_computationsSINNER),
       CONSTRUCT_SIGNAL_OUT(wrenchLeft, dynamicgraph::Vector, m_wrenchesSINNER),
-      CONSTRUCT_SIGNAL_OUT(ankleWrenchLeft, dynamicgraph::Vector, m_wrenchLeftSOUT),
-      CONSTRUCT_SIGNAL_OUT(surfaceWrenchLeft, dynamicgraph::Vector, m_wrenchLeftSOUT),
+      CONSTRUCT_SIGNAL_OUT(ankleWrenchLeft, dynamicgraph::Vector,
+                           m_wrenchLeftSOUT),
+      CONSTRUCT_SIGNAL_OUT(surfaceWrenchLeft, dynamicgraph::Vector,
+                           m_wrenchLeftSOUT),
       CONSTRUCT_SIGNAL_OUT(copLeft, dynamicgraph::Vector, m_wrenchLeftSOUT),
       CONSTRUCT_SIGNAL_OUT(wrenchRight, dynamicgraph::Vector, m_wrenchesSINNER),
-      CONSTRUCT_SIGNAL_OUT(ankleWrenchRight, dynamicgraph::Vector, m_wrenchRightSOUT),
-      CONSTRUCT_SIGNAL_OUT(surfaceWrenchRight, dynamicgraph::Vector, m_wrenchRightSOUT),
+      CONSTRUCT_SIGNAL_OUT(ankleWrenchRight, dynamicgraph::Vector,
+                           m_wrenchRightSOUT),
+      CONSTRUCT_SIGNAL_OUT(surfaceWrenchRight, dynamicgraph::Vector,
+                           m_wrenchRightSOUT),
       CONSTRUCT_SIGNAL_OUT(copRight, dynamicgraph::Vector, m_wrenchRightSOUT),
-      CONSTRUCT_SIGNAL_OUT(wrenchRef, dynamicgraph::Vector, m_wrenchLeftSOUT << m_wrenchRightSOUT),
+      CONSTRUCT_SIGNAL_OUT(wrenchRef, dynamicgraph::Vector,
+                           m_wrenchLeftSOUT << m_wrenchRightSOUT),
       CONSTRUCT_SIGNAL_OUT(zmpRef, dynamicgraph::Vector, m_wrenchRefSOUT),
       CONSTRUCT_SIGNAL_OUT(emergencyStop, bool, m_zmpRefSOUT),
       m_initSucceeded(false),
@@ -87,12 +94,16 @@ SimpleDistributeWrench::SimpleDistributeWrench(const std::string& name)
 
   /* Commands. */
   addCommand("init", makeCommandVoid1(*this, &SimpleDistributeWrench::init,
-                                      docCommandVoid1("Initialize the entity.", "Robot name")));
+                                      docCommandVoid1("Initialize the entity.",
+                                                      "Robot name")));
 }
 
 void SimpleDistributeWrench::init(const std::string& robotName) {
-  if (!m_wrenchDesSIN.isPlugged()) return SEND_MSG("Init failed: signal wrenchDes is not plugged", MSG_TYPE_ERROR);
-  if (!m_qSIN.isPlugged()) return SEND_MSG("Init failed: signal q is not plugged", MSG_TYPE_ERROR);
+  if (!m_wrenchDesSIN.isPlugged())
+    return SEND_MSG("Init failed: signal wrenchDes is not plugged",
+                    MSG_TYPE_ERROR);
+  if (!m_qSIN.isPlugged())
+    return SEND_MSG("Init failed: signal q is not plugged", MSG_TYPE_ERROR);
 
   try {
     /* Retrieve m_robot_util informations */
@@ -101,33 +112,41 @@ void SimpleDistributeWrench::init(const std::string& robotName) {
       m_robot_util = getRobotUtil(localName);
       //            std::cerr << "m_robot_util:" << m_robot_util << std::endl;
     } else {
-      SEND_MSG("You should have a robotUtil pointer initialized before", MSG_TYPE_ERROR);
+      SEND_MSG("You should have a robotUtil pointer initialized before",
+               MSG_TYPE_ERROR);
       return;
     }
 
-    pinocchio::urdf::buildModel(m_robot_util->m_urdf_filename, pinocchio::JointModelFreeFlyer(), m_model);
+    pinocchio::urdf::buildModel(m_robot_util->m_urdf_filename,
+                                pinocchio::JointModelFreeFlyer(), m_model);
     m_data = pinocchio::Data(m_model);
   } catch (const std::exception& e) {
     std::cout << e.what();
-    SEND_MSG("Init failed: Could load URDF :" + m_robot_util->m_urdf_filename, MSG_TYPE_ERROR);
+    SEND_MSG("Init failed: Could load URDF :" + m_robot_util->m_urdf_filename,
+             MSG_TYPE_ERROR);
     return;
   }
 
   assert(m_model.existFrame(m_robot_util->m_foot_util.m_Left_Foot_Frame_Name));
   assert(m_model.existFrame(m_robot_util->m_foot_util.m_Right_Foot_Frame_Name));
-  m_left_foot_id = m_model.getFrameId(m_robot_util->m_foot_util.m_Left_Foot_Frame_Name);
-  m_right_foot_id = m_model.getFrameId(m_robot_util->m_foot_util.m_Right_Foot_Frame_Name);
+  m_left_foot_id =
+      m_model.getFrameId(m_robot_util->m_foot_util.m_Left_Foot_Frame_Name);
+  m_right_foot_id =
+      m_model.getFrameId(m_robot_util->m_foot_util.m_Right_Foot_Frame_Name);
 
   // m_ankle_M_ftSens = pinocchio::SE3(Eigen::Matrix3d::Identity(),
   // m_robot_util->m_foot_util.m_Right_Foot_Force_Sensor_XYZ.head<3>());
   m_ankle_M_sole =
-      pinocchio::SE3(Eigen::Matrix3d::Identity(), m_robot_util->m_foot_util.m_Right_Foot_Sole_XYZ.head<3>());
+      pinocchio::SE3(Eigen::Matrix3d::Identity(),
+                     m_robot_util->m_foot_util.m_Right_Foot_Sole_XYZ.head<3>());
 
   m_initSucceeded = true;
 }
 
-Eigen::Vector3d SimpleDistributeWrench::computeCoP(const dg::Vector& wrenchGlobal, const pinocchio::SE3& pose) const {
-  const pinocchio::Force::Vector6& wrench = pose.actInv(pinocchio::Force(wrenchGlobal)).toVector();
+Eigen::Vector3d SimpleDistributeWrench::computeCoP(
+    const dg::Vector& wrenchGlobal, const pinocchio::SE3& pose) const {
+  const pinocchio::Force::Vector6& wrench =
+      pose.actInv(pinocchio::Force(wrenchGlobal)).toVector();
 
   const double h = pose.translation()[2];
 
@@ -164,7 +183,8 @@ Eigen::Vector3d SimpleDistributeWrench::computeCoP(const dg::Vector& wrenchGloba
 
 DEFINE_SIGNAL_INNER_FUNCTION(kinematics_computations, int) {
   if (!m_initSucceeded) {
-    SEND_WARNING_STREAM_MSG("Cannot compute signal kinematics_computations before initialization!");
+    SEND_WARNING_STREAM_MSG(
+        "Cannot compute signal kinematics_computations before initialization!");
     return s;
   }
 
@@ -185,7 +205,8 @@ DEFINE_SIGNAL_INNER_FUNCTION(kinematics_computations, int) {
   return s;
 }
 
-void SimpleDistributeWrench::distributeWrench(const Eigen::VectorXd& wrenchDes, const double rho) {
+void SimpleDistributeWrench::distributeWrench(const Eigen::VectorXd& wrenchDes,
+                                              const double rho) {
   Eigen::Vector3d forceLeft = wrenchDes.head<3>() / 2;
   Eigen::Vector3d forceRight = forceLeft;
   forceLeft[2] = rho * wrenchDes[2];
@@ -206,7 +227,8 @@ void SimpleDistributeWrench::distributeWrench(const Eigen::VectorXd& wrenchDes, 
   m_emergency_stop_triggered = !success;
 }
 
-void SimpleDistributeWrench::saturateWrench(const Eigen::VectorXd& wrenchDes, const int phase) {
+void SimpleDistributeWrench::saturateWrench(const Eigen::VectorXd& wrenchDes,
+                                            const int phase) {
   const bool success = true;
 
   m_emergency_stop_triggered = !success;
@@ -224,7 +246,8 @@ void SimpleDistributeWrench::saturateWrench(const Eigen::VectorXd& wrenchDes, co
 
 DEFINE_SIGNAL_INNER_FUNCTION(wrenches, int) {
   if (!m_initSucceeded) {
-    SEND_WARNING_STREAM_MSG("Cannot compute signal wrenches before initialization!");
+    SEND_WARNING_STREAM_MSG(
+        "Cannot compute signal wrenches before initialization!");
     return s;
   }
 
@@ -257,7 +280,8 @@ DEFINE_SIGNAL_INNER_FUNCTION(wrenches, int) {
 
 DEFINE_SIGNAL_OUT_FUNCTION(wrenchLeft, dynamicgraph::Vector) {
   if (!m_initSucceeded) {
-    SEND_WARNING_STREAM_MSG("Cannot compute signal wrenchLeft before initialization!");
+    SEND_WARNING_STREAM_MSG(
+        "Cannot compute signal wrenchLeft before initialization!");
     return s;
   }
   if (s.size() != 6) s.resize(6);
@@ -270,7 +294,8 @@ DEFINE_SIGNAL_OUT_FUNCTION(wrenchLeft, dynamicgraph::Vector) {
 
 DEFINE_SIGNAL_OUT_FUNCTION(wrenchRight, dynamicgraph::Vector) {
   if (!m_initSucceeded) {
-    SEND_WARNING_STREAM_MSG("Cannot compute signal wrenchRight before initialization!");
+    SEND_WARNING_STREAM_MSG(
+        "Cannot compute signal wrenchRight before initialization!");
     return s;
   }
   if (s.size() != 6) s.resize(6);
@@ -283,35 +308,42 @@ DEFINE_SIGNAL_OUT_FUNCTION(wrenchRight, dynamicgraph::Vector) {
 
 DEFINE_SIGNAL_OUT_FUNCTION(ankleWrenchLeft, dynamicgraph::Vector) {
   if (!m_initSucceeded) {
-    SEND_WARNING_STREAM_MSG("Cannot compute signal ankleWrenchLeft before initialization!");
+    SEND_WARNING_STREAM_MSG(
+        "Cannot compute signal ankleWrenchLeft before initialization!");
     return s;
   }
   if (s.size() != 6) s.resize(6);
 
   const Eigen::VectorXd& wrenchLeft = m_wrenchLeftSOUT(iter);
 
-  s = m_data.oMf[m_left_foot_id].actInv(pinocchio::Force(wrenchLeft)).toVector();
+  s = m_data.oMf[m_left_foot_id]
+          .actInv(pinocchio::Force(wrenchLeft))
+          .toVector();
 
   return s;
 }
 
 DEFINE_SIGNAL_OUT_FUNCTION(ankleWrenchRight, dynamicgraph::Vector) {
   if (!m_initSucceeded) {
-    SEND_WARNING_STREAM_MSG("Cannot compute signal ankleWrenchRight before initialization!");
+    SEND_WARNING_STREAM_MSG(
+        "Cannot compute signal ankleWrenchRight before initialization!");
     return s;
   }
   if (s.size() != 6) s.resize(6);
 
   const Eigen::VectorXd& wrenchRight = m_wrenchRightSOUT(iter);
 
-  s = m_data.oMf[m_right_foot_id].actInv(pinocchio::Force(wrenchRight)).toVector();
+  s = m_data.oMf[m_right_foot_id]
+          .actInv(pinocchio::Force(wrenchRight))
+          .toVector();
 
   return s;
 }
 
 DEFINE_SIGNAL_OUT_FUNCTION(surfaceWrenchLeft, dynamicgraph::Vector) {
   if (!m_initSucceeded) {
-    SEND_WARNING_STREAM_MSG("Cannot compute signal surfaceWrenchLeft before initialization!");
+    SEND_WARNING_STREAM_MSG(
+        "Cannot compute signal surfaceWrenchLeft before initialization!");
     return s;
   }
   if (s.size() != 6) s.resize(6);
@@ -325,7 +357,8 @@ DEFINE_SIGNAL_OUT_FUNCTION(surfaceWrenchLeft, dynamicgraph::Vector) {
 
 DEFINE_SIGNAL_OUT_FUNCTION(surfaceWrenchRight, dynamicgraph::Vector) {
   if (!m_initSucceeded) {
-    SEND_WARNING_STREAM_MSG("Cannot compute signal surfaceWrenchRight before initialization!");
+    SEND_WARNING_STREAM_MSG(
+        "Cannot compute signal surfaceWrenchRight before initialization!");
     return s;
   }
   if (s.size() != 6) s.resize(6);
@@ -339,7 +372,8 @@ DEFINE_SIGNAL_OUT_FUNCTION(surfaceWrenchRight, dynamicgraph::Vector) {
 
 DEFINE_SIGNAL_OUT_FUNCTION(copLeft, dynamicgraph::Vector) {
   if (!m_initSucceeded) {
-    SEND_WARNING_STREAM_MSG("Cannot compute signal copLeft before initialization!");
+    SEND_WARNING_STREAM_MSG(
+        "Cannot compute signal copLeft before initialization!");
     return s;
   }
   if (s.size() != 3) s.resize(3);
@@ -358,7 +392,8 @@ DEFINE_SIGNAL_OUT_FUNCTION(copLeft, dynamicgraph::Vector) {
 
 DEFINE_SIGNAL_OUT_FUNCTION(copRight, dynamicgraph::Vector) {
   if (!m_initSucceeded) {
-    SEND_WARNING_STREAM_MSG("Cannot compute signal copRight before initialization!");
+    SEND_WARNING_STREAM_MSG(
+        "Cannot compute signal copRight before initialization!");
     return s;
   }
   if (s.size() != 3) s.resize(3);
@@ -377,7 +412,8 @@ DEFINE_SIGNAL_OUT_FUNCTION(copRight, dynamicgraph::Vector) {
 
 DEFINE_SIGNAL_OUT_FUNCTION(wrenchRef, dynamicgraph::Vector) {
   if (!m_initSucceeded) {
-    SEND_WARNING_STREAM_MSG("Cannot compute signal wrenchRef before initialization!");
+    SEND_WARNING_STREAM_MSG(
+        "Cannot compute signal wrenchRef before initialization!");
     return s;
   }
   if (s.size() != 6) s.resize(6);
@@ -392,7 +428,8 @@ DEFINE_SIGNAL_OUT_FUNCTION(wrenchRef, dynamicgraph::Vector) {
 
 DEFINE_SIGNAL_OUT_FUNCTION(zmpRef, dynamicgraph::Vector) {
   if (!m_initSucceeded) {
-    SEND_WARNING_STREAM_MSG("Cannot compute signal zmpRef before initialization!");
+    SEND_WARNING_STREAM_MSG(
+        "Cannot compute signal zmpRef before initialization!");
     return s;
   }
   if (s.size() != 3) s.resize(3);
@@ -433,8 +470,9 @@ DEFINE_SIGNAL_OUT_FUNCTION(zmpRef, dynamicgraph::Vector) {
 }
 
 DEFINE_SIGNAL_OUT_FUNCTION(emergencyStop, bool) {
-  const dynamicgraph::Vector& zmp = m_zmpRefSOUT(iter);  // dummy to trigger zmp computation
-  (void)zmp;                                             // disable unused variable warning
+  const dynamicgraph::Vector& zmp =
+      m_zmpRefSOUT(iter);  // dummy to trigger zmp computation
+  (void)zmp;               // disable unused variable warning
   s = m_emergency_stop_triggered;
   return s;
 }

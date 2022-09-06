@@ -26,15 +26,16 @@
 /* --- INCLUDE --------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-#include <pinocchio/fwd.hpp>
-#include <sot/core/robot-utils.hh>
-#include <dynamic-graph/signal-helper.h>
 #include <dynamic-graph/real-time-logger.h>
-#include <sot/core/matrix-geometry.hh>
-#include <map>
-#include "boost/assign.hpp"
+#include <dynamic-graph/signal-helper.h>
 
+#include <map>
+#include <pinocchio/fwd.hpp>
+#include <sot/core/matrix-geometry.hh>
+#include <sot/core/robot-utils.hh>
 #include <sot/talos_balance/robot/robot-wrapper.hh>
+
+#include "boost/assign.hpp"
 
 namespace dynamicgraph {
 namespace sot {
@@ -66,7 +67,8 @@ class SOTFTCALIBRATION_EXPORT FtCalibration : public ::dynamicgraph::Entity {
   void setRightFootWeight(const double &rightW);
   void setLeftFootWeight(const double &leftW);
 
-  /// Command to calibrate the foot sensors when the robot is standing in the air with horizontal feet
+  /// Command to calibrate the foot sensors when the robot is standing in the
+  /// air with horizontal feet
   void calibrateFeetSensor();
 
   void displayRobotUtil();
@@ -80,16 +82,25 @@ class SOTFTCALIBRATION_EXPORT FtCalibration : public ::dynamicgraph::Entity {
  protected:
   RobotUtilShrPtr m_robot_util;
   int m_right_calibration_iter =
-      -1;  /// Number of iteration left for calibration (-1= not cailbrated, 0=caibration done)
+      -1;  /// Number of iteration left for calibration (-1= not cailbrated,
+           /// 0=caibration done)
   int m_left_calibration_iter =
-      -1;                      /// Number of iteration left for calibration (-1= not cailbrated, 0=caibration done)
-  Vector6d m_right_FT_offset;  /// Offset or bias to be removed from Right FT sensor
-  Vector6d m_left_FT_offset;   /// Offset or bias to be removed from Left FT sensor
-  Vector6d m_right_FT_offset_calibration_sum;  /// Variable used durring average computation of the offset
-  Vector6d m_left_FT_offset_calibration_sum;   /// Variable used durring average computation of the offset
-  bool m_initSucceeded;                        /// true if the entity has been successfully initialized
-  Vector6d m_right_foot_weight;                // weight of the right feet underneath the ft sensor
-  Vector6d m_left_foot_weight;                 // weight of the left feet underneath the ft sensor
+      -1;  /// Number of iteration left for calibration (-1= not cailbrated,
+           /// 0=caibration done)
+  Vector6d
+      m_right_FT_offset;  /// Offset or bias to be removed from Right FT sensor
+  Vector6d
+      m_left_FT_offset;  /// Offset or bias to be removed from Left FT sensor
+  Vector6d m_right_FT_offset_calibration_sum;  /// Variable used durring average
+                                               /// computation of the offset
+  Vector6d m_left_FT_offset_calibration_sum;   /// Variable used durring average
+                                               /// computation of the offset
+  bool
+      m_initSucceeded;  /// true if the entity has been successfully initialized
+  Vector6d
+      m_right_foot_weight;  // weight of the right feet underneath the ft sensor
+  Vector6d
+      m_left_foot_weight;  // weight of the left feet underneath the ft sensor
 
 };  // class FtCalibration
 

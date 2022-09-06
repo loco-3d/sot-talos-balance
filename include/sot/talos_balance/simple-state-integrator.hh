@@ -35,13 +35,13 @@
 /* --- INCLUDE --------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
+#include <dynamic-graph/linear-algebra.h>
 #include <dynamic-graph/signal-helper.h>
 
 #include <map>
-#include "boost/assign.hpp"
-
 #include <sot/core/matrix-geometry.hh>
-#include <dynamic-graph/linear-algebra.h>
+
+#include "boost/assign.hpp"
 
 namespace dynamicgraph {
 namespace sot {
@@ -51,7 +51,8 @@ namespace talos_balance {
 /* --- CLASS ----------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-class SIMPLE_STATE_INTEGRATOR_EXPORT SimpleStateIntegrator : public ::dynamicgraph::Entity {
+class SIMPLE_STATE_INTEGRATOR_EXPORT SimpleStateIntegrator
+    : public ::dynamicgraph::Entity {
   DYNAMIC_GRAPH_ENTITY_DECL();
 
  protected:
@@ -91,9 +92,11 @@ class SIMPLE_STATE_INTEGRATOR_EXPORT SimpleStateIntegrator : public ::dynamicgra
  protected:
   /// Integrate the freeflyer state (to obtain position).
   /// Compute roll pitch yaw angles
-  void integrateRollPitchYaw(::dynamicgraph::Vector& state, const ::dynamicgraph::Vector& control, double dt);
+  void integrateRollPitchYaw(::dynamicgraph::Vector& state,
+                             const ::dynamicgraph::Vector& control, double dt);
   // Computes Euler angles in good range : [-pi:pi]x[-pi/2:pi/2]x[-pi:pi]
-  void rotationMatrixToEuler(const Eigen::Matrix3d& rotationMatrix, Eigen::Vector3d& rollPitchYaw);
+  void rotationMatrixToEuler(const Eigen::Matrix3d& rotationMatrix,
+                             Eigen::Vector3d& rollPitchYaw);
 
 };  // class SimpleStateIntegrator
 

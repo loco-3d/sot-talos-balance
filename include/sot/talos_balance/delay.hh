@@ -27,11 +27,11 @@
 #ifndef __sot_talos_balance_delay_H__
 #define __sot_talos_balance_delay_H__
 
-#include <dynamic-graph/entity.h>
-#include <dynamic-graph/signal.h>
-#include <dynamic-graph/signal-ptr.h>
-#include <dynamic-graph/factory.h>
 #include <dynamic-graph/command-bind.h>
+#include <dynamic-graph/entity.h>
+#include <dynamic-graph/factory.h>
+#include <dynamic-graph/signal-ptr.h>
+#include <dynamic-graph/signal.h>
 
 #if defined(WIN32)
 #if defined(delay_EXPORTS)
@@ -64,7 +64,8 @@ class DELAY_EXPORT Delay : public dynamicgraph::Entity {
     std::string docstring =
         "\n"
         "    Set current value in memory\n";
-    addCommand("setMemory", makeCommandVoid1(*this, &Delay::setMemory, docstring));
+    addCommand("setMemory",
+               makeCommandVoid1(*this, &Delay::setMemory, docstring));
   }
 
   ~Delay() {}
@@ -72,7 +73,8 @@ class DELAY_EXPORT Delay : public dynamicgraph::Entity {
   /// Header documentation of the python class
   virtual std::string getDocString() const {
     return "Enable delayed signal in SoT.\n"
-           "Signal previous at time t+1 will return the value of signal current "
+           "Signal previous at time t+1 will return the value of signal "
+           "current "
            " at time <= t (the last time signal current was called).";
   }
 

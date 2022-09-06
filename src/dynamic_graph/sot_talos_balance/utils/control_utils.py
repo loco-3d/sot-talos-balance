@@ -4,7 +4,7 @@ def setComAdmittance(robot, deltaComDes, Kp_adm=None, Kp_dcm=None, Ki_dcm=None):
     comDes[1] += deltaComDes[1]
     comDes = tuple(comDes)
     dcmDes = comDes
-    zmpDes = comDes[:2] + (0.0, )
+    zmpDes = comDes[:2] + (0.0,)
     ddcomDes = (0.0, 0.0, 0.0)
     if Kp_adm is not None:
         robot.com_admittance_control.Kp.value = Kp_adm

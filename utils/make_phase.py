@@ -1,10 +1,10 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-folder = 'ros/sot_talos_balance/data/TestKajita2003WalkingOnSpot64/DSP20SSP780/'
+folder = "ros/sot_talos_balance/data/TestKajita2003WalkingOnSpot64/DSP20SSP780/"
 
-LF = np.loadtxt(folder + 'LeftFoot.dat')
-RF = np.loadtxt(folder + 'RightFoot.dat')
+LF = np.loadtxt(folder + "LeftFoot.dat")
+RF = np.loadtxt(folder + "RightFoot.dat")
 
 T = LF.shape[0]
 phase = np.zeros([T, 3])
@@ -30,7 +30,7 @@ def min_jerk(x_init, x_final, t, t_max):
     td3 = td2 * td
     td4 = td3 * td
     td5 = td4 * td
-    p = 10. * td3 - 15 * td4 + 6 * td5
+    p = 10.0 * td3 - 15 * td4 + 6 * td5
     x = x_init + (x_final - x_init) * p
 
     dp = (30 * td2 - 60 * td3 + 30 * td4) / t_max
@@ -88,12 +88,12 @@ scale = 0.1
 bias = LF[0, 2]
 plt.plot(phase[:, 0] * scale + bias)
 plt.plot(rho[:, 0])
-plt.legend(['left', 'right', 'phase', 'rho'])
-leg = plt.legend(['left', 'right', 'phase', 'rho'])
+plt.legend(["left", "right", "phase", "rho"])
+leg = plt.legend(["left", "right", "phase", "rho"])
 if leg:
     leg.draggable()
 
 plt.show()
 
-np.savetxt(folder + 'Phase.dat', phase, fmt='%d')
-np.savetxt(folder + 'Rho.dat', rho)
+np.savetxt(folder + "Phase.dat", phase, fmt="%d")
+np.savetxt(folder + "Rho.dat", rho)

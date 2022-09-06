@@ -16,12 +16,12 @@
 
 #include "sot/talos_balance/quat-to-euler.hh"
 
-#include <sot/core/debug.hh>
-#include <dynamic-graph/factory.h>
 #include <dynamic-graph/all-commands.h>
-#include <sot/core/stop-watch.hh>
+#include <dynamic-graph/factory.h>
 
 #include <Eigen/Core>
+#include <sot/core/debug.hh>
+#include <sot/core/stop-watch.hh>
 
 namespace dynamicgraph {
 namespace sot {
@@ -30,8 +30,9 @@ namespace dg = ::dynamicgraph;
 using namespace dg;
 using namespace dg::command;
 
-// Size to be aligned                       "-------------------------------------------------------"
-#define PROFILE_QUATTOEULER_COMPUTATION "QuatToEuler computation                                "
+// Size to be aligned "-------------------------------------------------------"
+#define PROFILE_QUATTOEULER_COMPUTATION \
+  "QuatToEuler computation                                "
 
 #define INPUT_SIGNALS m_quaternionSIN
 
@@ -54,7 +55,9 @@ QuatToEuler::QuatToEuler(const std::string& name)
   Entity::signalRegistration(INPUT_SIGNALS << OUTPUT_SIGNALS);
 
   /* Commands. */
-  addCommand("init", makeCommandVoid0(*this, &QuatToEuler::init, docCommandVoid0("Initialize the entity.")));
+  addCommand("init",
+             makeCommandVoid0(*this, &QuatToEuler::init,
+                              docCommandVoid0("Initialize the entity.")));
 }
 
 /* ------------------------------------------------------------------- */

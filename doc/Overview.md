@@ -26,4 +26,3 @@ The library sot-talos-balance allows to execute your trajectory with the help of
 You can find the full installation procedure <a href="md_doc_installation.html">in the installation page</a>
 
 Quick instructions on how to run a test can be found <a href="md_doc_running.html">here</a>
-

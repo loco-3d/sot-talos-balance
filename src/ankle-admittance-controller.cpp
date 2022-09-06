@@ -16,11 +16,12 @@
 
 #include "sot/talos_balance/ankle-admittance-controller.hh"
 
+#include <dynamic-graph/all-commands.h>
+#include <dynamic-graph/command-bind.h>
+#include <dynamic-graph/factory.h>
+
 #include <sot/core/debug.hh>
 #include <sot/core/stop-watch.hh>
-#include <dynamic-graph/factory.h>
-#include <dynamic-graph/command-bind.h>
-#include <dynamic-graph/all-commands.h>
 
 namespace dynamicgraph {
 namespace sot {
@@ -29,7 +30,8 @@ namespace dg = ::dynamicgraph;
 using namespace dg;
 using namespace dg::command;
 
-#define PROFILE_ANKLEADMITTANCECONTROLLER_DRP_COMPUTATION "AnkleAdmittanceController: dRP computation                "
+#define PROFILE_ANKLEADMITTANCECONTROLLER_DRP_COMPUTATION \
+  "AnkleAdmittanceController: dRP computation                "
 
 #define INPUT_SIGNALS m_gainsXYSIN << m_wrenchSIN << m_pRefSIN
 
@@ -40,7 +42,8 @@ using namespace dg::command;
 typedef AnkleAdmittanceController EntityClassName;
 
 /* --- DG FACTORY ---------------------------------------------------- */
-DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(AnkleAdmittanceController, "AnkleAdmittanceController");
+DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(AnkleAdmittanceController,
+                                   "AnkleAdmittanceController");
 
 /* ------------------------------------------------------------------- */
 /* --- CONSTRUCTION -------------------------------------------------- */
@@ -57,14 +60,20 @@ AnkleAdmittanceController::AnkleAdmittanceController(const std::string& name)
 
   /* Commands. */
   addCommand("init",
-             makeCommandVoid0(*this, &AnkleAdmittanceController::init, docCommandVoid0("Initialize the entity.")));
+             makeCommandVoid0(*this, &AnkleAdmittanceController::init,
+                              docCommandVoid0("Initialize the entity.")));
 }
 
 void AnkleAdmittanceController::init() {
   ;
-  if (!m_gainsXYSIN.isPlugged()) return SEND_MSG("Init failed: signal gainsXY is not plugged", MSG_TYPE_ERROR);
-  if (!m_wrenchSIN.isPlugged()) return SEND_MSG("Init failed: signal wrench is not plugged", MSG_TYPE_ERROR);
-  if (!m_pRefSIN.isPlugged()) return SEND_MSG("Init failed: signal pRef is not plugged", MSG_TYPE_ERROR);
+  if (!m_gainsXYSIN.isPlugged())
+    return SEND_MSG("Init failed: signal gainsXY is not plugged",
+                    MSG_TYPE_ERROR);
+  if (!m_wrenchSIN.isPlugged())
+    return SEND_MSG("Init failed: signal wrench is not plugged",
+                    MSG_TYPE_ERROR);
+  if (!m_pRefSIN.isPlugged())
+    return SEND_MSG("Init failed: signal pRef is not plugged", MSG_TYPE_ERROR);
 
   m_initSucceeded = true;
 }

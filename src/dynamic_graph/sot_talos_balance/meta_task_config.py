@@ -11,9 +11,9 @@ class MetaTaskConfig(object):
         self.name = name
         self.config = config
 
-        self.feature = FeatureGeneric('feature' + name)
-        self.featureDes = FeatureGeneric('featureDes' + name)
-        self.gain = GainAdaptive('gain' + name)
+        self.feature = FeatureGeneric("feature" + name)
+        self.featureDes = FeatureGeneric("featureDes" + name)
+        self.gain = GainAdaptive("gain" + name)
 
         plug(dyn.position, self.feature.errorIN)
         robotDim = dyn.getDimension()
@@ -39,5 +39,5 @@ class MetaTaskConfig(object):
 class MetaTaskKineConfig(MetaTaskConfig):
     def __init__(self, dyn, config=None, name="config"):
         MetaTaskConfig.__init__(self, dyn, config, name)
-        self.task = Task('task' + name)
+        self.task = Task("task" + name)
         self.plugTask()

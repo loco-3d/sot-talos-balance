@@ -16,11 +16,11 @@
 
 #include "sot/talos_balance/simple-zmp-estimator.hh"
 
-#include <sot/core/debug.hh>
-#include <dynamic-graph/factory.h>
-#include <dynamic-graph/command-bind.h>
-
 #include <dynamic-graph/all-commands.h>
+#include <dynamic-graph/command-bind.h>
+#include <dynamic-graph/factory.h>
+
+#include <sot/core/debug.hh>
 #include <sot/core/stop-watch.hh>
 
 namespace dynamicgraph {
@@ -30,14 +30,19 @@ namespace dg = ::dynamicgraph;
 using namespace dg;
 using namespace dg::command;
 
-// Size to be aligned                                    "-------------------------------------------------------"
-#define PROFILE_SIMPLEZMPESTIMATOR_ZMP_COMPUTATION "SimpleZmpEstimator: zmp computation                    "
-#define PROFILE_SIMPLEZMPESTIMATOR_COPLEFT_COMPUTATION "SimpleZmpEstimator: copLeft computation                "
-#define PROFILE_SIMPLEZMPESTIMATOR_COPRIGHT_COMPUTATION "SimpleZmpEstimator: copRight computation               "
+// Size to be aligned "-------------------------------------------------------"
+#define PROFILE_SIMPLEZMPESTIMATOR_ZMP_COMPUTATION \
+  "SimpleZmpEstimator: zmp computation                    "
+#define PROFILE_SIMPLEZMPESTIMATOR_COPLEFT_COMPUTATION \
+  "SimpleZmpEstimator: copLeft computation                "
+#define PROFILE_SIMPLEZMPESTIMATOR_COPRIGHT_COMPUTATION \
+  "SimpleZmpEstimator: copRight computation               "
 
-#define INPUT_SIGNALS m_wrenchLeftSIN << m_wrenchRightSIN << m_poseLeftSIN << m_poseRightSIN
+#define INPUT_SIGNALS \
+  m_wrenchLeftSIN << m_wrenchRightSIN << m_poseLeftSIN << m_poseRightSIN
 
-#define OUTPUT_SIGNALS m_copLeftSOUT << m_copRightSOUT << m_zmpSOUT << m_emergencyStopSOUT
+#define OUTPUT_SIGNALS \
+  m_copLeftSOUT << m_copRightSOUT << m_zmpSOUT << m_emergencyStopSOUT
 
 /// Define EntityClassName here rather than in the header file
 /// so that it can be used by the macros DEFINE_SIGNAL_**_FUNCTION.
@@ -49,32 +54,52 @@ DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(SimpleZmpEstimator, "SimpleZmpEstimator");
 /* ------------------------------------------------------------------- */
 /* --- CONSTRUCTION -------------------------------------------------- */
 /* ------------------------------------------------------------------- */
-SimpleZmpEstimator::SimpleZmpEstimator(const std::string& name, const double& eps)
+SimpleZmpEstimator::SimpleZmpEstimator(const std::string& name,
+                                       const double& eps)
     : Entity(name),
       CONSTRUCT_SIGNAL_IN(wrenchLeft, dynamicgraph::Vector),
       CONSTRUCT_SIGNAL_IN(wrenchRight, dynamicgraph::Vector),
       CONSTRUCT_SIGNAL_IN(poseLeft, MatrixHomogeneous),
       CONSTRUCT_SIGNAL_IN(poseRight, MatrixHomogeneous),
-      CONSTRUCT_SIGNAL_OUT(copLeft, dynamicgraph::Vector, m_wrenchLeftSIN << m_poseLeftSIN),
-      CONSTRUCT_SIGNAL_OUT(copRight, dynamicgraph::Vector, m_wrenchRightSIN << m_poseRightSIN),
+      CONSTRUCT_SIGNAL_OUT(copLeft, dynamicgraph::Vector,
+                           m_wrenchLeftSIN << m_poseLeftSIN),
+      CONSTRUCT_SIGNAL_OUT(copRight, dynamicgraph::Vector,
+                           m_wrenchRightSIN << m_poseRightSIN),
       CONSTRUCT_SIGNAL_OUT(zmp, dynamicgraph::Vector,
-                           m_wrenchLeftSIN << m_wrenchRightSIN << m_copLeftSOUT << m_copRightSOUT),
+                           m_wrenchLeftSIN << m_wrenchRightSIN << m_copLeftSOUT
+                                           << m_copRightSOUT),
       CONSTRUCT_SIGNAL_OUT(emergencyStop, bool, m_zmpSOUT),
       m_eps(eps),
       m_initSucceeded(false) {
   Entity::signalRegistration(INPUT_SIGNALS << OUTPUT_SIGNALS);
 
   /* Commands. */
-  addCommand("init", makeCommandVoid0(*this, &SimpleZmpEstimator::init, docCommandVoid0("Initialize the entity.")));
-  addCommand("getForceThreshold", makeDirectGetter(*this, &m_eps, docDirectGetter("Get force threshold", "double")));
-  addCommand("setForceThreshold", makeDirectSetter(*this, &m_eps, docDirectSetter("Set force threshold", "double")));
+  addCommand("init",
+             makeCommandVoid0(*this, &SimpleZmpEstimator::init,
+                              docCommandVoid0("Initialize the entity.")));
+  addCommand(
+      "getForceThreshold",
+      makeDirectGetter(*this, &m_eps,
+                       docDirectGetter("Get force threshold", "double")));
+  addCommand(
+      "setForceThreshold",
+      makeDirectSetter(*this, &m_eps,
+                       docDirectSetter("Set force threshold", "double")));
 }
 
 void SimpleZmpEstimator::init() {
-  if (!m_wrenchLeftSIN.isPlugged()) return SEND_MSG("Init failed: signal wrenchLeft is not plugged", MSG_TYPE_ERROR);
-  if (!m_poseLeftSIN.isPlugged()) return SEND_MSG("Init failed: signal poseLeft is not plugged", MSG_TYPE_ERROR);
-  if (!m_wrenchRightSIN.isPlugged()) return SEND_MSG("Init failed: signal wrenchRight is not plugged", MSG_TYPE_ERROR);
-  if (!m_poseRightSIN.isPlugged()) return SEND_MSG("Init failed: signal poseRight is not plugged", MSG_TYPE_ERROR);
+  if (!m_wrenchLeftSIN.isPlugged())
+    return SEND_MSG("Init failed: signal wrenchLeft is not plugged",
+                    MSG_TYPE_ERROR);
+  if (!m_poseLeftSIN.isPlugged())
+    return SEND_MSG("Init failed: signal poseLeft is not plugged",
+                    MSG_TYPE_ERROR);
+  if (!m_wrenchRightSIN.isPlugged())
+    return SEND_MSG("Init failed: signal wrenchRight is not plugged",
+                    MSG_TYPE_ERROR);
+  if (!m_poseRightSIN.isPlugged())
+    return SEND_MSG("Init failed: signal poseRight is not plugged",
+                    MSG_TYPE_ERROR);
 
   m_initSucceeded = true;
 }
@@ -83,7 +108,8 @@ void SimpleZmpEstimator::init() {
 /* --- SIGNALS ------------------------------------------------------- */
 /* ------------------------------------------------------------------- */
 
-Eigen::Vector3d SimpleZmpEstimator::computeCoP(const dg::Vector& wrench, const MatrixHomogeneous& pose) const {
+Eigen::Vector3d SimpleZmpEstimator::computeCoP(
+    const dg::Vector& wrench, const MatrixHomogeneous& pose) const {
   const double h = pose(2, 3);
 
   const double fx = wrench[0];
@@ -114,7 +140,8 @@ Eigen::Vector3d SimpleZmpEstimator::computeCoP(const dg::Vector& wrench, const M
 
 DEFINE_SIGNAL_OUT_FUNCTION(copLeft, dynamicgraph::Vector) {
   if (!m_initSucceeded) {
-    SEND_WARNING_STREAM_MSG("Cannot compute signal copLeft before initialization!");
+    SEND_WARNING_STREAM_MSG(
+        "Cannot compute signal copLeft before initialization!");
     return s;
   }
   if (s.size() != 3) s.resize(3);
@@ -135,7 +162,8 @@ DEFINE_SIGNAL_OUT_FUNCTION(copLeft, dynamicgraph::Vector) {
 
 DEFINE_SIGNAL_OUT_FUNCTION(copRight, dynamicgraph::Vector) {
   if (!m_initSucceeded) {
-    SEND_WARNING_STREAM_MSG("Cannot compute signal copRight before initialization!");
+    SEND_WARNING_STREAM_MSG(
+        "Cannot compute signal copRight before initialization!");
     return s;
   }
   if (s.size() != 3) s.resize(3);
@@ -199,8 +227,9 @@ DEFINE_SIGNAL_OUT_FUNCTION(zmp, dynamicgraph::Vector) {
 }
 
 DEFINE_SIGNAL_OUT_FUNCTION(emergencyStop, bool) {
-  const dynamicgraph::Vector& zmp = m_zmpSOUT(iter);  // dummy to trigger zmp computation
-  (void)zmp;                                          // disable unused variable warning
+  const dynamicgraph::Vector& zmp =
+      m_zmpSOUT(iter);  // dummy to trigger zmp computation
+  (void)zmp;            // disable unused variable warning
   s = m_emergency_stop_triggered;
   return s;
 }

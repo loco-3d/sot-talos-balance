@@ -18,15 +18,14 @@
 #ifndef __invdyn_robot_wrapper_hpp__
 #define __invdyn_robot_wrapper_hpp__
 
-#include "sot/talos_balance/math/fwd.hh"
-#include "sot/talos_balance/robot/fwd.hh"
-
-#include <pinocchio/multibody/model.hpp>
 #include <pinocchio/multibody/data.hpp>
+#include <pinocchio/multibody/model.hpp>
 #include <pinocchio/spatial/fwd.hpp>
-
 #include <string>
 #include <vector>
+
+#include "sot/talos_balance/math/fwd.hh"
+#include "sot/talos_balance/robot/fwd.hh"
 namespace dynamicgraph {
 namespace sot {
 namespace talos_balance {
@@ -52,10 +51,14 @@ class RobotWrapper {
   typedef math::RefVector RefVector;
   typedef math::ConstRefVector ConstRefVector;
 
-  RobotWrapper(const std::string& filename, const std::vector<std::string>& package_dirs, bool verbose = false);
+  RobotWrapper(const std::string& filename,
+               const std::vector<std::string>& package_dirs,
+               bool verbose = false);
 
-  RobotWrapper(const std::string& filename, const std::vector<std::string>& package_dirs,
-               const pinocchio::JointModelVariant& rootJoint, bool verbose = false);
+  RobotWrapper(const std::string& filename,
+               const std::vector<std::string>& package_dirs,
+               const pinocchio::JointModelVariant& rootJoint,
+               bool verbose = false);
 
   virtual int nq() const;
   virtual int nv() const;
@@ -76,7 +79,8 @@ class RobotWrapper {
   bool rotor_inertias(ConstRefVector rotor_inertias);
   bool gear_ratios(ConstRefVector gear_ratios);
 
-  void com(const Data& data, RefVector com_pos, RefVector com_vel, RefVector com_acc) const;
+  void com(const Data& data, RefVector com_pos, RefVector com_vel,
+           RefVector com_acc) const;
 
   const Vector3& com(const Data& data) const;
 
@@ -94,31 +98,42 @@ class RobotWrapper {
 
   const Motion& velocity(const Data& data, const Model::JointIndex index) const;
 
-  const Motion& acceleration(const Data& data, const Model::JointIndex index) const;
+  const Motion& acceleration(const Data& data,
+                             const Model::JointIndex index) const;
 
-  void jacobianWorld(const Data& data, const Model::JointIndex index, Data::Matrix6x& J) const;
+  void jacobianWorld(const Data& data, const Model::JointIndex index,
+                     Data::Matrix6x& J) const;
 
-  void jacobianLocal(const Data& data, const Model::JointIndex index, Data::Matrix6x& J) const;
+  void jacobianLocal(const Data& data, const Model::JointIndex index,
+                     Data::Matrix6x& J) const;
 
   SE3 framePosition(const Data& data, const Model::FrameIndex index) const;
 
-  void framePosition(const Data& data, const Model::FrameIndex index, SE3& framePosition) const;
+  void framePosition(const Data& data, const Model::FrameIndex index,
+                     SE3& framePosition) const;
 
   Motion frameVelocity(const Data& data, const Model::FrameIndex index) const;
 
-  void frameVelocity(const Data& data, const Model::FrameIndex index, Motion& frameVelocity) const;
+  void frameVelocity(const Data& data, const Model::FrameIndex index,
+                     Motion& frameVelocity) const;
 
-  Motion frameAcceleration(const Data& data, const Model::FrameIndex index) const;
+  Motion frameAcceleration(const Data& data,
+                           const Model::FrameIndex index) const;
 
-  void frameAcceleration(const Data& data, const Model::FrameIndex index, Motion& frameAcceleration) const;
+  void frameAcceleration(const Data& data, const Model::FrameIndex index,
+                         Motion& frameAcceleration) const;
 
-  Motion frameClassicAcceleration(const Data& data, const Model::FrameIndex index) const;
+  Motion frameClassicAcceleration(const Data& data,
+                                  const Model::FrameIndex index) const;
 
-  void frameClassicAcceleration(const Data& data, const Model::FrameIndex index, Motion& frameAcceleration) const;
+  void frameClassicAcceleration(const Data& data, const Model::FrameIndex index,
+                                Motion& frameAcceleration) const;
 
-  void frameJacobianWorld(Data& data, const Model::FrameIndex index, Data::Matrix6x& J) const;
+  void frameJacobianWorld(Data& data, const Model::FrameIndex index,
+                          Data::Matrix6x& J) const;
 
-  void frameJacobianLocal(Data& data, const Model::FrameIndex index, Data::Matrix6x& J) const;
+  void frameJacobianLocal(Data& data, const Model::FrameIndex index,
+                          Data::Matrix6x& J) const;
 
  protected:
   void updateMd();

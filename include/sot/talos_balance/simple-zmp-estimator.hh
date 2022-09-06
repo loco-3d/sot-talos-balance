@@ -35,11 +35,13 @@
 /* --- INCLUDE --------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-#include <dynamic-graph/signal-helper.h>
-#include <map>
-#include "boost/assign.hpp"
-#include <sot/core/matrix-geometry.hh>
 #include <dynamic-graph/linear-algebra.h>
+#include <dynamic-graph/signal-helper.h>
+
+#include <map>
+#include <sot/core/matrix-geometry.hh>
+
+#include "boost/assign.hpp"
 
 namespace dynamicgraph {
 namespace sot {
@@ -49,7 +51,8 @@ namespace talos_balance {
 /* --- CLASS ----------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-class SIMPLEZMPESTIMATOR_EXPORT SimpleZmpEstimator : public ::dynamicgraph::Entity {
+class SIMPLEZMPESTIMATOR_EXPORT SimpleZmpEstimator
+    : public ::dynamicgraph::Entity {
   DYNAMIC_GRAPH_ENTITY_DECL();
 
  public:
@@ -78,10 +81,12 @@ class SIMPLEZMPESTIMATOR_EXPORT SimpleZmpEstimator : public ::dynamicgraph::Enti
   /* --- ENTITY INHERITANCE --- */
   virtual void display(std::ostream& os) const;
 
-  Eigen::Vector3d computeCoP(const dynamicgraph::Vector& wrench, const MatrixHomogeneous& pose) const;
+  Eigen::Vector3d computeCoP(const dynamicgraph::Vector& wrench,
+                             const MatrixHomogeneous& pose) const;
 
  protected:
-  bool m_initSucceeded;  /// true if the entity has been successfully initialized
+  bool
+      m_initSucceeded;  /// true if the entity has been successfully initialized
   bool m_emergency_stop_triggered;
 
 };  // class SimpleZmpEstimator

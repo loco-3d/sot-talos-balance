@@ -16,9 +16,10 @@
 
 #include "sot/talos_balance/example.hh"
 
-#include <sot/core/debug.hh>
-#include <dynamic-graph/factory.h>
 #include <dynamic-graph/all-commands.h>
+#include <dynamic-graph/factory.h>
+
+#include <sot/core/debug.hh>
 #include <sot/core/stop-watch.hh>
 
 namespace dynamicgraph {
@@ -28,9 +29,11 @@ namespace dg = ::dynamicgraph;
 using namespace dg;
 using namespace dg::command;
 
-// Size to be aligned                         "-------------------------------------------------------"
-#define PROFILE_EXAMPLE_SUM_COMPUTATION "Example: sum computation                               "
-#define PROFILE_EXAMPLE_NBJOINTS_COMPUTATION "Example: nbJoints extraction                           "
+// Size to be aligned "-------------------------------------------------------"
+#define PROFILE_EXAMPLE_SUM_COMPUTATION \
+  "Example: sum computation                               "
+#define PROFILE_EXAMPLE_NBJOINTS_COMPUTATION \
+  "Example: nbJoints extraction                           "
 
 #define INPUT_SIGNALS m_firstAddendSIN << m_secondAddendSIN
 
@@ -56,19 +59,25 @@ Example::Example(const std::string& name)
   Entity::signalRegistration(INPUT_SIGNALS << OUTPUT_SIGNALS);
 
   /* Commands. */
-  addCommand("init", makeCommandVoid1(*this, &Example::init, docCommandVoid1("Initialize the entity.", "Robot name")));
+  addCommand("init", makeCommandVoid1(*this, &Example::init,
+                                      docCommandVoid1("Initialize the entity.",
+                                                      "Robot name")));
 }
 
 void Example::init(const std::string& robotName) {
-  if (!m_firstAddendSIN.isPlugged()) return SEND_MSG("Init failed: signal firstAddend is not plugged", MSG_TYPE_ERROR);
+  if (!m_firstAddendSIN.isPlugged())
+    return SEND_MSG("Init failed: signal firstAddend is not plugged",
+                    MSG_TYPE_ERROR);
   if (!m_secondAddendSIN.isPlugged())
-    return SEND_MSG("Init failed: signal secondAddend is not plugged", MSG_TYPE_ERROR);
+    return SEND_MSG("Init failed: signal secondAddend is not plugged",
+                    MSG_TYPE_ERROR);
 
   /*std::string & robotName_nonconst = const_cast<std::string &>(robotName);*/
   std::string robotName_nonconst(robotName);
 
   if (!isNameInRobotUtil(robotName_nonconst)) {
-    SEND_MSG("You should have a robotUtil pointer initialized before", MSG_TYPE_ERROR);
+    SEND_MSG("You should have a robotUtil pointer initialized before",
+             MSG_TYPE_ERROR);
   } else {
     m_robot_util = getRobotUtil(robotName_nonconst);
     std::cerr << "m_robot_util:" << m_robot_util << std::endl;
@@ -108,7 +117,8 @@ DEFINE_SIGNAL_OUT_FUNCTION(sum, double) {
 
 DEFINE_SIGNAL_OUT_FUNCTION(nbJoints, int) {
   if (!m_initSucceeded) {
-    SEND_WARNING_STREAM_MSG("Cannot compute signal nbJoints before initialization!");
+    SEND_WARNING_STREAM_MSG(
+        "Cannot compute signal nbJoints before initialization!");
     return s;
   }
   (void)iter;

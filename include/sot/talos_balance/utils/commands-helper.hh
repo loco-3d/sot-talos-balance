@@ -20,10 +20,10 @@
 #include <boost/function.hpp>
 
 /* --- COMMON INCLUDE -------------------------------------------------- */
-#include <dynamic-graph/command.h>
-#include <dynamic-graph/command-direct-setter.h>
-#include <dynamic-graph/command-direct-getter.h>
 #include <dynamic-graph/command-bind.h>
+#include <dynamic-graph/command-direct-getter.h>
+#include <dynamic-graph/command-direct-setter.h>
+#include <dynamic-graph/command.h>
 
 /* --- HELPER ---------------------------------------------------------- */
 namespace dynamicgraph {
@@ -53,7 +53,7 @@ using ::dynamicgraph::command::makeCommandVoid7;
 using ::dynamicgraph::command::makeCommandVoid8;
 using ::dynamicgraph::command::makeDirectGetter;
 using ::dynamicgraph::command::makeDirectSetter;
-}  // namespace torquecontrol
+}  // namespace talos_balance
 }  // namespace sot
 }  // namespace dynamicgraph
 

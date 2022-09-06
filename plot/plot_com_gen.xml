@@ -116,4 +116,3 @@ function quaternionToYaw(x, y, z, w)
   </snippet>
  </snippets>
 </root>
-

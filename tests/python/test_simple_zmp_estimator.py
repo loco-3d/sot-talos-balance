@@ -22,16 +22,28 @@ print("--- Test vs precomputed ---")
 estimator.wrenchLeft.value = np.array([0.0, 0.0, 10.0, 0.0, 0.0, 0.0])
 estimator.wrenchRight.value = np.array([0.0, 0.0, 10.0, 0.0, 0.0, 0.0])
 
-estimator.poseLeft.value = np.array([[1.0, 0.0, 0.0, 1.0], [0.0, 1.0, 0.0, 0.0], [0.0, 0.0, 1.0, 0.1],
-                                     [0.0, 0.0, 0.0, 1.0]])
-estimator.poseRight.value = np.array([[1.0, 0.0, 0.0, 0.0], [0.0, 1.0, 0.0, 1.0], [0.0, 0.0, 1.0, 0.1],
-                                      [0.0, 0.0, 0.0, 1.0]])
+estimator.poseLeft.value = np.array(
+    [
+        [1.0, 0.0, 0.0, 1.0],
+        [0.0, 1.0, 0.0, 0.0],
+        [0.0, 0.0, 1.0, 0.1],
+        [0.0, 0.0, 0.0, 1.0],
+    ]
+)
+estimator.poseRight.value = np.array(
+    [
+        [1.0, 0.0, 0.0, 0.0],
+        [0.0, 1.0, 0.0, 1.0],
+        [0.0, 0.0, 1.0, 0.1],
+        [0.0, 0.0, 0.0, 1.0],
+    ]
+)
 
 print()
-print("wrenchLeft:  %s" % (estimator.wrenchLeft.value, ))
-print("wrenchRight: %s" % (estimator.wrenchRight.value, ))
-print("poseLeft:\n%s" % (np.array(estimator.poseLeft.value), ))
-print("poseRight:\n%s" % (np.array(estimator.poseRight.value), ))
+print("wrenchLeft:  %s" % (estimator.wrenchLeft.value,))
+print("wrenchRight: %s" % (estimator.wrenchRight.value,))
+print("poseLeft:\n%s" % (np.array(estimator.poseLeft.value),))
+print("poseRight:\n%s" % (np.array(estimator.poseRight.value),))
 
 estimator.init()
 
@@ -42,11 +54,11 @@ copRight = np.array((0.0, 1.0, 0.0))
 zmp = np.array((0.5, 0.5, 0.0))
 
 print()
-print("copLeft:  %s" % (estimator.copLeft.value, ))
+print("copLeft:  %s" % (estimator.copLeft.value,))
 assert_almost_equal(estimator.copLeft.value, copLeft)
-print("copRight: %s" % (estimator.copRight.value, ))
+print("copRight: %s" % (estimator.copRight.value,))
 assert_almost_equal(estimator.copRight.value, copRight)
-print("zmp:      %s" % (estimator.zmp.value, ))
+print("zmp:      %s" % (estimator.zmp.value,))
 assert_almost_equal(estimator.zmp.value, zmp)
 
 # --- Test emergency stop
@@ -81,12 +93,14 @@ estimator = SimpleZmpEstimator("ciao2")
 
 model = pin.buildSampleModelHumanoid()
 data = model.createData()
-rightId = model.getFrameId('rleg_effector_body')
-leftId = model.getFrameId('lleg_effector_body')
+rightId = model.getFrameId("rleg_effector_body")
+leftId = model.getFrameId("lleg_effector_body")
 
 q = pin.neutral(model)
 q[:3] = np.array([1.0, 0.0, 0.0]).T  # displace freeflyer along x for testing
-q[3:7] = np.array([np.sqrt(2) / 2, 0.0, np.sqrt(2) / 2, 0.0]).T  # orient the base so that the feet are flat
+q[3:7] = np.array(
+    [np.sqrt(2) / 2, 0.0, np.sqrt(2) / 2, 0.0]
+).T  # orient the base so that the feet are flat
 pin.framesForwardKinematics(model, data, q)
 
 poseRight = data.oMf[rightId].homogeneous
@@ -111,18 +125,18 @@ estimator.poseLeft.value = poseLeft
 estimator.poseRight.value = poseRight
 
 print()
-print("wrenchLeft:  %s" % (estimator.wrenchLeft.value, ))
-print("wrenchRight: %s" % (estimator.wrenchRight.value, ))
-print("poseLeft:\n%s" % (np.array(estimator.poseLeft.value), ))
-print("poseRight:\n%s" % (np.array(estimator.poseRight.value), ))
+print("wrenchLeft:  %s" % (estimator.wrenchLeft.value,))
+print("wrenchRight: %s" % (estimator.wrenchRight.value,))
+print("poseLeft:\n%s" % (np.array(estimator.poseLeft.value),))
+print("poseRight:\n%s" % (np.array(estimator.poseRight.value),))
 
 estimator.init()
 
 estimator.zmp.recompute(0)
 
-print("copLeft:  %s" % (estimator.copLeft.value, ))
-print("copRight: %s" % (estimator.copRight.value, ))
-print("zmp:      %s" % (estimator.zmp.value, ))
-print("com:      %s" % (com, ))
+print("copLeft:  %s" % (estimator.copLeft.value,))
+print("copRight: %s" % (estimator.copRight.value,))
+print("zmp:      %s" % (estimator.zmp.value,))
+print("com:      %s" % (com,))
 
 assert_almost_equal(estimator.zmp.value[0], com)

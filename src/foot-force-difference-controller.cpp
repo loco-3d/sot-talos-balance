@@ -16,11 +16,12 @@
 
 #include "sot/talos_balance/foot-force-difference-controller.hh"
 
+#include <dynamic-graph/all-commands.h>
+#include <dynamic-graph/command-bind.h>
+#include <dynamic-graph/factory.h>
+
 #include <sot/core/debug.hh>
 #include <sot/core/stop-watch.hh>
-#include <dynamic-graph/factory.h>
-#include <dynamic-graph/command-bind.h>
-#include <dynamic-graph/all-commands.h>
 
 namespace dynamicgraph {
 namespace sot {
@@ -29,27 +30,32 @@ namespace dg = ::dynamicgraph;
 using namespace dg;
 using namespace dg::command;
 
-#define INPUT_SIGNALS                                                                                           \
-  m_phaseSIN << m_gainSwingSIN << m_gainStanceSIN << m_gainDoubleSIN << m_dfzAdmittanceSIN << m_vdcFrequencySIN \
-             << m_vdcDampingSIN << m_swingAdmittanceSIN << m_wrenchRightDesSIN << m_wrenchLeftDesSIN            \
-             << m_wrenchRightSIN << m_wrenchLeftSIN << m_posRightDesSIN << m_posLeftDesSIN << m_posRightSIN     \
+#define INPUT_SIGNALS                                                      \
+  m_phaseSIN << m_gainSwingSIN << m_gainStanceSIN << m_gainDoubleSIN       \
+             << m_dfzAdmittanceSIN << m_vdcFrequencySIN << m_vdcDampingSIN \
+             << m_swingAdmittanceSIN << m_wrenchRightDesSIN                \
+             << m_wrenchLeftDesSIN << m_wrenchRightSIN << m_wrenchLeftSIN  \
+             << m_posRightDesSIN << m_posLeftDesSIN << m_posRightSIN       \
              << m_posLeftSIN
 
 #define INNER_SIGNALS m_dz_ctrlSOUT << m_dz_posSOUT
 
-#define OUTPUT_SIGNALS m_vRightSOUT << m_vLeftSOUT << m_gainRightSOUT << m_gainLeftSOUT
+#define OUTPUT_SIGNALS \
+  m_vRightSOUT << m_vLeftSOUT << m_gainRightSOUT << m_gainLeftSOUT
 
 /// Define EntityClassName here rather than in the header file
 /// so that it can be used by the macros DEFINE_SIGNAL_**_FUNCTION.
 typedef FootForceDifferenceController EntityClassName;
 
 /* --- DG FACTORY ---------------------------------------------------- */
-DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(FootForceDifferenceController, "FootForceDifferenceController");
+DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(FootForceDifferenceController,
+                                   "FootForceDifferenceController");
 
 /* ------------------------------------------------------------------- */
 /* --- CONSTRUCTION -------------------------------------------------- */
 /* ------------------------------------------------------------------- */
-FootForceDifferenceController::FootForceDifferenceController(const std::string& name)
+FootForceDifferenceController::FootForceDifferenceController(
+    const std::string& name)
     : Entity(name),
       CONSTRUCT_SIGNAL_IN(phase, int),
       CONSTRUCT_SIGNAL_IN(gainSwing, double),
@@ -68,33 +74,51 @@ FootForceDifferenceController::FootForceDifferenceController(const std::string& 
       CONSTRUCT_SIGNAL_IN(posRight, MatrixHomogeneous),
       CONSTRUCT_SIGNAL_IN(posLeft, MatrixHomogeneous),
       CONSTRUCT_SIGNAL_INNER(dz_ctrl, double,
-                             m_dfzAdmittanceSIN << m_vdcDampingSIN << m_wrenchRightDesSIN << m_wrenchLeftDesSIN
-                                                << m_wrenchRightSIN << m_wrenchLeftSIN << m_posRightSIN
-                                                << m_posLeftSIN),
-      CONSTRUCT_SIGNAL_INNER(
-          dz_pos, double, m_vdcFrequencySIN << m_posRightDesSIN << m_posLeftDesSIN << m_posRightSIN << m_posLeftSIN),
-      CONSTRUCT_SIGNAL_OUT(
-          vRight, dynamicgraph::Vector,
-          m_phaseSIN << m_dz_ctrlSINNER << m_dz_posSINNER << m_swingAdmittanceSIN << m_wrenchRightSIN),
+                             m_dfzAdmittanceSIN
+                                 << m_vdcDampingSIN << m_wrenchRightDesSIN
+                                 << m_wrenchLeftDesSIN << m_wrenchRightSIN
+                                 << m_wrenchLeftSIN << m_posRightSIN
+                                 << m_posLeftSIN),
+      CONSTRUCT_SIGNAL_INNER(dz_pos, double,
+                             m_vdcFrequencySIN
+                                 << m_posRightDesSIN << m_posLeftDesSIN
+                                 << m_posRightSIN << m_posLeftSIN),
+      CONSTRUCT_SIGNAL_OUT(vRight, dynamicgraph::Vector,
+                           m_phaseSIN << m_dz_ctrlSINNER << m_dz_posSINNER
+                                      << m_swingAdmittanceSIN
+                                      << m_wrenchRightSIN),
       CONSTRUCT_SIGNAL_OUT(vLeft, dynamicgraph::Vector,
-                           m_phaseSIN << m_dz_ctrlSINNER << m_dz_posSINNER << m_swingAdmittanceSIN << m_wrenchLeftSIN),
-      CONSTRUCT_SIGNAL_OUT(gainRight, double, m_phaseSIN << m_gainSwingSIN << m_gainStanceSIN << m_gainDoubleSIN),
-      CONSTRUCT_SIGNAL_OUT(gainLeft, double, m_phaseSIN << m_gainSwingSIN << m_gainStanceSIN << m_gainDoubleSIN),
+                           m_phaseSIN << m_dz_ctrlSINNER << m_dz_posSINNER
+                                      << m_swingAdmittanceSIN
+                                      << m_wrenchLeftSIN),
+      CONSTRUCT_SIGNAL_OUT(
+          gainRight, double,
+          m_phaseSIN << m_gainSwingSIN << m_gainStanceSIN << m_gainDoubleSIN),
+      CONSTRUCT_SIGNAL_OUT(
+          gainLeft, double,
+          m_phaseSIN << m_gainSwingSIN << m_gainStanceSIN << m_gainDoubleSIN),
       m_eps(15),
       m_initSucceeded(false) {
   Entity::signalRegistration(INPUT_SIGNALS << OUTPUT_SIGNALS);
 
   /* Commands. */
   addCommand("init",
-             makeCommandVoid0(*this, &FootForceDifferenceController::init, docCommandVoid0("Initialize the entity.")));
-  addCommand("getForceThreshold", makeDirectGetter(*this, &m_eps, docDirectGetter("Get force threshold", "double")));
-  addCommand("setForceThreshold", makeDirectSetter(*this, &m_eps, docDirectSetter("Set force threshold", "double")));
+             makeCommandVoid0(*this, &FootForceDifferenceController::init,
+                              docCommandVoid0("Initialize the entity.")));
+  addCommand(
+      "getForceThreshold",
+      makeDirectGetter(*this, &m_eps,
+                       docDirectGetter("Get force threshold", "double")));
+  addCommand(
+      "setForceThreshold",
+      makeDirectSetter(*this, &m_eps,
+                       docDirectSetter("Set force threshold", "double")));
 }
 
 void FootForceDifferenceController::init() { m_initSucceeded = true; }
 
-Eigen::Vector3d FootForceDifferenceController::calcSwingAdmittance(const dg::Vector& wrench,
-                                                                   const dg::Vector& swingAdmittance) {
+Eigen::Vector3d FootForceDifferenceController::calcSwingAdmittance(
+    const dg::Vector& wrench, const dg::Vector& swingAdmittance) {
   assert(swingAdmittance.size() == 3);
 
   Eigen::Vector3d res;
@@ -136,7 +160,8 @@ DEFINE_SIGNAL_INNER_FUNCTION(dz_ctrl, double) {
   const double RFz = wrenchRight[2];
   const double LFz = wrenchLeft[2];
 
-  const double dz_ctrl = dfzAdmittance * ((LFz_d - RFz_d) - (LFz - RFz)) - vdcDamping * (RTz - LTz);
+  const double dz_ctrl = dfzAdmittance * ((LFz_d - RFz_d) - (LFz - RFz)) -
+                         vdcDamping * (RTz - LTz);
 
   s = dz_ctrl;
 

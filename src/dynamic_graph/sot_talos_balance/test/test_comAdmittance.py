@@ -8,8 +8,12 @@ from dynamic_graph.sot.core import SOT
 from dynamic_graph.sot.core.meta_tasks_kine import MetaTaskKine6d, MetaTaskKineCom
 from dynamic_graph.tracer_real_time import TracerRealTime
 
-from dynamic_graph.sot_talos_balance.create_entities_utils import (addTrace, create_com_admittance_controller,
-                                                                   create_dummy_dcm_estimator, dump_tracer)
+from dynamic_graph.sot_talos_balance.create_entities_utils import (
+    addTrace,
+    create_com_admittance_controller,
+    create_dummy_dcm_estimator,
+    dump_tracer,
+)
 
 
 def main(robot):
@@ -30,19 +34,23 @@ def main(robot):
 
     # --- CONTACTS
     # define contactLF and contactRF
-    robot.contactLF = MetaTaskKine6d('contactLF', robot.dynamic, 'LF', robot.OperationalPointsMap['left-ankle'])
-    robot.contactLF.feature.frame('desired')
+    robot.contactLF = MetaTaskKine6d(
+        "contactLF", robot.dynamic, "LF", robot.OperationalPointsMap["left-ankle"]
+    )
+    robot.contactLF.feature.frame("desired")
     robot.contactLF.gain.setConstant(100)
     robot.contactLF.keep()
-    locals()['contactLF'] = robot.contactLF
+    locals()["contactLF"] = robot.contactLF
 
-    robot.contactRF = MetaTaskKine6d('contactRF', robot.dynamic, 'RF', robot.OperationalPointsMap['right-ankle'])
-    robot.contactRF.feature.frame('desired')
+    robot.contactRF = MetaTaskKine6d(
+        "contactRF", robot.dynamic, "RF", robot.OperationalPointsMap["right-ankle"]
+    )
+    robot.contactRF.feature.frame("desired")
     robot.contactRF.gain.setConstant(100)
     robot.contactRF.keep()
-    locals()['contactRF'] = robot.contactRF
+    locals()["contactRF"] = robot.contactRF
 
-    robot.sot = SOT('sot')
+    robot.sot = SOT("sot")
     robot.sot.setSize(robot.dynamic.getDimension())
     plug(robot.sot.control, robot.device.control)
 
@@ -54,11 +62,11 @@ def main(robot):
     # --- TRACER
     robot.tracer = TracerRealTime("zmp_tracer")
     robot.tracer.setBufferSize(80 * (2**20))
-    robot.tracer.open('/tmp', 'dg_', '.dat')
-    robot.device.after.addSignal('{0}.triger'.format(robot.tracer.name))
+    robot.tracer.open("/tmp", "dg_", ".dat")
+    robot.device.after.addSignal("{0}.triger".format(robot.tracer.name))
 
-    addTrace(robot.tracer, robot.dynamic, 'zmp')
-    addTrace(robot.tracer, robot.estimator, 'dcm')
+    addTrace(robot.tracer, robot.dynamic, "zmp")
+    addTrace(robot.tracer, robot.estimator, "dcm")
 
     # SIMULATION
 
@@ -79,21 +87,21 @@ def main(robot):
     dump_tracer(robot.tracer)
 
     # --- DISPLAY
-    zmp_data = np.loadtxt('/tmp/dg_' + robot.dynamic.name + '-zmp.dat')
-    zmpDes_data = np.loadtxt('/tmp/dg_' + robot.estimator.name + '-dcm.dat')
+    zmp_data = np.loadtxt("/tmp/dg_" + robot.dynamic.name + "-zmp.dat")
+    zmpDes_data = np.loadtxt("/tmp/dg_" + robot.estimator.name + "-dcm.dat")
 
     plt.figure()
-    plt.plot(zmp_data[:, 1], 'b-')
-    plt.plot(zmpDes_data[:, 1], 'b--')
-    plt.plot(zmp_data[:, 2], 'r-')
-    plt.plot(zmpDes_data[:, 2], 'r--')
-    plt.title('ZMP real vs desired')
-    plt.legend(['Real x', 'Desired x', 'Real y', 'Desired y'])
+    plt.plot(zmp_data[:, 1], "b-")
+    plt.plot(zmpDes_data[:, 1], "b--")
+    plt.plot(zmp_data[:, 2], "r-")
+    plt.plot(zmpDes_data[:, 2], "r--")
+    plt.title("ZMP real vs desired")
+    plt.legend(["Real x", "Desired x", "Real y", "Desired y"])
 
     plt.figure()
-    plt.plot(zmp_data[:, 1] - zmpDes_data[:, 1], 'b-')
-    plt.plot(zmp_data[:, 2] - zmpDes_data[:, 2], 'r-')
-    plt.title('ZMP error')
-    plt.legend(['Error on x', 'Error on y'])
+    plt.plot(zmp_data[:, 1] - zmpDes_data[:, 1], "b-")
+    plt.plot(zmp_data[:, 2] - zmpDes_data[:, 2], "r-")
+    plt.title("ZMP error")
+    plt.legend(["Error on x", "Error on y"])
 
     plt.show()

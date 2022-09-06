@@ -3,57 +3,61 @@ from __future__ import print_function
 import dynamic_graph.sot_talos_balance.talos.parameter_server_conf as param_server_conf
 import numpy as np
 import pinocchio as pin
-from dynamic_graph.sot_talos_balance.create_entities_utils import (create_parameter_server,
-                                                                   create_simple_distribute_wrench)
+from dynamic_graph.sot_talos_balance.create_entities_utils import (
+    create_parameter_server,
+    create_simple_distribute_wrench,
+)
 from numpy.testing import assert_almost_equal
 
 # --- General ---
 print("--- General ---")
 
 dt = 0.001
-robot_name = 'robot'
+robot_name = "robot"
 
-halfSitting = np.array([
-    0.0,
-    0.0,
-    1.018213,
-    0.00,
-    0.0,
-    0.0,
-    1.0,  # Free flyer
-    0.0,
-    0.0,
-    -0.411354,
-    0.859395,
-    -0.448041,
-    -0.0,  # Left Leg
-    0.0,
-    0.0,
-    -0.411354,
-    0.859395,
-    -0.448041,
-    -0.0,  # Right Leg
-    0.0,
-    0.006761,  # Chest
-    0.25847,
-    0.173046,
-    -0.0002,
-    -0.525366,
-    0.0,
-    -0.0,
-    0.1,
-    -0.005,  # Left Arm
-    -0.25847,
-    -0.173046,
-    0.0002,
-    -0.525366,
-    0.0,
-    0.0,
-    0.1,
-    -0.005,  # Right Arm
-    0.,
-    0.  # Head
-])
+halfSitting = np.array(
+    [
+        0.0,
+        0.0,
+        1.018213,
+        0.00,
+        0.0,
+        0.0,
+        1.0,  # Free flyer
+        0.0,
+        0.0,
+        -0.411354,
+        0.859395,
+        -0.448041,
+        -0.0,  # Left Leg
+        0.0,
+        0.0,
+        -0.411354,
+        0.859395,
+        -0.448041,
+        -0.0,  # Right Leg
+        0.0,
+        0.006761,  # Chest
+        0.25847,
+        0.173046,
+        -0.0002,
+        -0.525366,
+        0.0,
+        -0.0,
+        0.1,
+        -0.005,  # Left Arm
+        -0.25847,
+        -0.173046,
+        0.0002,
+        -0.525366,
+        0.0,
+        0.0,
+        0.1,
+        -0.005,  # Right Arm
+        0.0,
+        0.0,  # Head
+    ]
+)
 
 q = halfSitting
 print("q: %s\n" % str(q.flatten().tolist()[0]))
@@ -70,13 +74,13 @@ m = data.mass[0]
 
 print("com: %s\n" % str(com.flatten().tolist()[0]))
 
-leftName = param_server_conf.footFrameNames['Left']
+leftName = param_server_conf.footFrameNames["Left"]
 leftId = model.getFrameId(leftName)
 leftPos = data.oMf[leftId]
 print("%s: %d" % (leftName, leftId))
 print(leftPos)
 
-rightName = param_server_conf.footFrameNames['Right']
+rightName = param_server_conf.footFrameNames["Right"]
 rightId = model.getFrameId(rightName)
 rightPos = data.oMf[rightId]
 # pR = leftPos.translation #  ensure perfect symmetry
@@ -132,8 +136,8 @@ print("expected global right wrench: %s" % str(wrenchRight))
 print("expected ankle left wrench: %s" % str(ankleWrenchLeft))
 print("expected ankle right wrench: %s" % str(ankleWrenchRight))
 
-copLeft = [float(com[0] - leftPos.translation[0]), 0., 0.]
-copRight = [float(com[0] - rightPos.translation[0]), 0., 0.]
+copLeft = [float(com[0] - leftPos.translation[0]), 0.0, 0.0]
+copRight = [float(com[0] - rightPos.translation[0]), 0.0, 0.0]
 
 print("expected sole left CoP: %s" % str(copLeft))
 print("expected sole right CoP: %s" % str(copRight))
@@ -171,7 +175,10 @@ np.testing.assert_equal(stop, 0)
 # --- Wrench saturation (left) ---
 print()
 print("--- Wrench saturation ---")
-print('NOTE: no actual "saturation" is performed. As such, the resulting CoP may be outside the support area')
+print(
+    'NOTE: no actual "saturation" is performed. As such, the resulting CoP may be '
+    "outside the support area"
+)
 
 # --- Wrench saturation (left) ---
 print()
@@ -186,7 +193,11 @@ print("expected global wrench: %s" % str(wrench))
 print("expected global left wrench: %s" % str(wrenchLeft))
 print("expected ankle left wrench: %s" % str(ankleWrenchLeft))
 
-copLeft = [float(com[0] - leftPos.translation[0]), float(com[1] - leftPos.translation[1]), 0.]
+copLeft = [
+    float(com[0] - leftPos.translation[0]),
+    float(com[1] - leftPos.translation[1]),
+    0.0,
+]
 
 print("expected sole left CoP: %s" % str(copLeft))
 print()
@@ -220,13 +231,19 @@ distribute.phase.value = -1
 distribute.phase.time = 2
 
 wrenchRight = wrench
-ankleWrenchRight = list(rightPos.actInv(pin.Force(np.matrix(wrenchRight).T)).vector.flat)
+ankleWrenchRight = list(
+    rightPos.actInv(pin.Force(np.matrix(wrenchRight).T)).vector.flat
+)
 
 print("expected global wrench: %s" % str(wrench))
 print("expected global right wrench: %s" % str(wrenchRight))
 print("expected ankle right wrench: %s" % str(ankleWrenchRight))
 
-copRight = [float(com[0] - rightPos.translation[0]), float(com[1] - rightPos.translation[1]), 0.]
+copRight = [
+    float(com[0] - rightPos.translation[0]),
+    float(com[1] - rightPos.translation[1]),
+    0.0,
+]
 
 print("expected sole right CoP: %s" % str(copRight))
 print()

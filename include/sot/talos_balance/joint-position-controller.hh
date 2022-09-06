@@ -36,7 +36,9 @@
 /* --------------------------------------------------------------------- */
 
 #include <dynamic-graph/signal-helper.h>
+
 #include <map>
+
 #include "boost/assign.hpp"
 
 namespace dynamicgraph {
@@ -47,7 +49,8 @@ namespace talos_balance {
 /* --- CLASS ----------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-class JOINTPOSITIONCONTROLLER_EXPORT JointPositionController : public ::dynamicgraph::Entity {
+class JOINTPOSITIONCONTROLLER_EXPORT JointPositionController
+    : public ::dynamicgraph::Entity {
   DYNAMIC_GRAPH_ENTITY_DECL();
 
  public:
@@ -72,7 +75,8 @@ class JOINTPOSITIONCONTROLLER_EXPORT JointPositionController : public ::dynamicg
 
  protected:
   int m_n;
-  bool m_initSucceeded;  /// true if the entity has been successfully initialized
+  bool
+      m_initSucceeded;  /// true if the entity has been successfully initialized
   dynamicgraph::Vector m_Kp;
 
 };  // class JointPositionController

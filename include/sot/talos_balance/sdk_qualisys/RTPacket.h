@@ -1,8 +1,8 @@
 #ifndef RTPACKET_H
 #define RTPACKET_H
 
-#include <stdio.h>
 #include <stdint.h>
+#include <stdio.h>
 
 #ifdef EXPORT_DLL
 #define DLL_EXPORT __declspec(dllexport)
@@ -57,7 +57,12 @@ class DLL_EXPORT CRTPacket {
     ComponentNone = 19
   };
 
-  enum EImageFormat { FormatRawGrayscale = 0, FormatRawBGR = 1, FormatJPG = 2, FormatPNG = 3 };
+  enum EImageFormat {
+    FormatRawGrayscale = 0,
+    FormatRawBGR = 1,
+    FormatJPG = 2,
+    FormatPNG = 3
+  };
 
   enum EEvent {
     EventConnected = 1,
@@ -76,10 +81,15 @@ class DLL_EXPORT CRTPacket {
     EventReprocessingStarted = 14,
     EventReprocessingStopped = 15,
     EventTrigger = 16,
-    EventNone = 17  // Must be the last. Not actually an event. Just used to cont number of events.
+    EventNone = 17  // Must be the last. Not actually an event. Just used to
+                    // cont number of events.
   };
 
-  enum ETimecodeType { TimecodeSMPTE = 0, TimecodeIRIG = 1, TimecodeCamerTime = 2 };
+  enum ETimecodeType {
+    TimecodeSMPTE = 0,
+    TimecodeIRIG = 1,
+    TimecodeCamerTime = 2
+  };
 
   struct SForce {
     float fForceX;
@@ -114,7 +124,8 @@ class DLL_EXPORT CRTPacket {
   };
 
  public:
-  CRTPacket(int nMajorVersion = MAJOR_VERSION, int nMinorVersion = MINOR_VERSION, bool bBigEndian = false);
+  CRTPacket(int nMajorVersion = MAJOR_VERSION,
+            int nMinorVersion = MINOR_VERSION, bool bBigEndian = false);
   void GetVersion(unsigned int &nMajorVersion, unsigned int &nMinorVersion);
   void SetVersion(unsigned int nMajorVersion, unsigned int nMinorVersion);
   bool GetEndianness();
@@ -142,7 +153,8 @@ class DLL_EXPORT CRTPacket {
   bool GetEvent(EEvent &eEvent);
   static bool GetEvent(EEvent &eEvent, char *pData, bool bBigEndian = false);
   short GetDiscoverResponseBasePort();
-  static short GetDiscoverResponseBasePort(char *pData, bool bBigEndian = false);
+  static short GetDiscoverResponseBasePort(char *pData,
+                                           bool bBigEndian = false);
 
   unsigned short GetDropRate();
   unsigned short GetOutOfSyncRate();
@@ -150,88 +162,111 @@ class DLL_EXPORT CRTPacket {
   unsigned int Get2DCameraCount();
   unsigned int Get2DMarkerCount(unsigned int nCameraIndex);
   unsigned char Get2DStatusFlags(unsigned int nCameraIndex);
-  bool Get2DMarker(unsigned int nCameraIndex, unsigned int nMarkerIndex, unsigned int &nX, unsigned int &nY,
+  bool Get2DMarker(unsigned int nCameraIndex, unsigned int nMarkerIndex,
+                   unsigned int &nX, unsigned int &nY,
                    unsigned short &nXDiameter, unsigned short &nYDiameter);
 
   unsigned int Get2DLinCameraCount();
   unsigned int Get2DLinMarkerCount(unsigned int nCameraIndex);
   unsigned char Get2DLinStatusFlags(unsigned int nCameraIndex);
-  bool Get2DLinMarker(unsigned int nCameraIndex, unsigned int nMarkerIndex, unsigned int &nX, unsigned int &nY,
+  bool Get2DLinMarker(unsigned int nCameraIndex, unsigned int nMarkerIndex,
+                      unsigned int &nX, unsigned int &nY,
                       unsigned short &nXDiameter, unsigned short &nYDiameter);
 
   unsigned int Get3DMarkerCount();
   bool Get3DMarker(unsigned int nMarkerIndex, float &fX, float &fY, float &fZ);
 
   unsigned int Get3DResidualMarkerCount();
-  bool Get3DResidualMarker(unsigned int nMarkerIndex, float &fX, float &fY, float &fZ, float &fResidual);
+  bool Get3DResidualMarker(unsigned int nMarkerIndex, float &fX, float &fY,
+                           float &fZ, float &fResidual);
 
   unsigned int Get3DNoLabelsMarkerCount();
-  bool Get3DNoLabelsMarker(unsigned int nMarkerIndex, float &fX, float &fY, float &fZ, unsigned int &nId);
+  bool Get3DNoLabelsMarker(unsigned int nMarkerIndex, float &fX, float &fY,
+                           float &fZ, unsigned int &nId);
 
   unsigned int Get3DNoLabelsResidualMarkerCount();
-  bool Get3DNoLabelsResidualMarker(unsigned int nMarkerIndex, float &fX, float &fY, float &fZ, unsigned int &nId,
+  bool Get3DNoLabelsResidualMarker(unsigned int nMarkerIndex, float &fX,
+                                   float &fY, float &fZ, unsigned int &nId,
                                    float &fResidual);
 
   unsigned int Get6DOFBodyCount();
-  bool Get6DOFBody(unsigned int nBodyIndex, float &fX, float &fY, float &fZ, float afRotMatrix[9]);
+  bool Get6DOFBody(unsigned int nBodyIndex, float &fX, float &fY, float &fZ,
+                   float afRotMatrix[9]);
 
   unsigned int Get6DOFResidualBodyCount();
-  bool Get6DOFResidualBody(unsigned int nBodyIndex, float &fX, float &fY, float &fZ, float afRotMatrix[9],
-                           float &fResidual);
+  bool Get6DOFResidualBody(unsigned int nBodyIndex, float &fX, float &fY,
+                           float &fZ, float afRotMatrix[9], float &fResidual);
 
   unsigned int Get6DOFEulerBodyCount();
-  bool Get6DOFEulerBody(unsigned int nBodyIndex, float &fX, float &fY, float &fZ, float &fAng1, float &fAng2,
-                        float &fAng3);
+  bool Get6DOFEulerBody(unsigned int nBodyIndex, float &fX, float &fY,
+                        float &fZ, float &fAng1, float &fAng2, float &fAng3);
 
   unsigned int Get6DOFEulerResidualBodyCount();
-  bool Get6DOFEulerResidualBody(unsigned int nBodyIndex, float &fX, float &fY, float &fZ, float &fAng1, float &fAng2,
+  bool Get6DOFEulerResidualBody(unsigned int nBodyIndex, float &fX, float &fY,
+                                float &fZ, float &fAng1, float &fAng2,
                                 float &fAng3, float &fResidual);
 
   unsigned int GetGazeVectorCount();
   unsigned int GetGazeVectorSampleCount(unsigned int nVectorIndex);
-  unsigned int GetGazeVectorSampleNumber(unsigned int nVectorIndex);  // Returns 0 if no sample was found.
-  bool GetGazeVector(unsigned int nVectorIndex, unsigned int nSampleIndex, SGazeVector &nGazeVector);
-  bool GetGazeVector(unsigned int nVectorIndex, SGazeVector *pGazeVectorBuf, unsigned int nBufSize);
+  unsigned int GetGazeVectorSampleNumber(
+      unsigned int nVectorIndex);  // Returns 0 if no sample was found.
+  bool GetGazeVector(unsigned int nVectorIndex, unsigned int nSampleIndex,
+                     SGazeVector &nGazeVector);
+  bool GetGazeVector(unsigned int nVectorIndex, SGazeVector *pGazeVectorBuf,
+                     unsigned int nBufSize);
 
   unsigned int GetTimecodeCount();
-  bool GetTimecodeType(unsigned int nTimecodeIndex, CRTPacket::ETimecodeType &timecodeType);
-  bool GetTimecodeSMPTE(unsigned int nTimecodeIndex, int &hours, int &minutes, int &seconds, int &frame);
-  bool GetTimecodeIRIG(unsigned int nTimecodeIndex, int &year, int &day, int &hours, int &minutes, int &seconds,
-                       int &tenths);
-  bool GetTimecodeCameraTime(unsigned int nTimecodeIndex, unsigned long long &cameraTime);
+  bool GetTimecodeType(unsigned int nTimecodeIndex,
+                       CRTPacket::ETimecodeType &timecodeType);
+  bool GetTimecodeSMPTE(unsigned int nTimecodeIndex, int &hours, int &minutes,
+                        int &seconds, int &frame);
+  bool GetTimecodeIRIG(unsigned int nTimecodeIndex, int &year, int &day,
+                       int &hours, int &minutes, int &seconds, int &tenths);
+  bool GetTimecodeCameraTime(unsigned int nTimecodeIndex,
+                             unsigned long long &cameraTime);
 
   unsigned int GetImageCameraCount();
   unsigned int GetImageCameraId(unsigned int nCameraIndex);
   bool GetImageFormat(unsigned int nCameraIndex, EImageFormat &eImageFormat);
-  bool GetImageSize(unsigned int nCameraIndex, unsigned int &nWidth, unsigned int &nHeight);
-  bool GetImageCrop(unsigned int nCameraIndex, float &fCropLeft, float &fCropTop, float &fCropRight,
-                    float &fCropBottom);
+  bool GetImageSize(unsigned int nCameraIndex, unsigned int &nWidth,
+                    unsigned int &nHeight);
+  bool GetImageCrop(unsigned int nCameraIndex, float &fCropLeft,
+                    float &fCropTop, float &fCropRight, float &fCropBottom);
   unsigned int GetImageSize(unsigned int nCameraIndex);
-  unsigned int GetImage(unsigned int nCameraIndex, char *pDataBuf, unsigned int nBufSize);
+  unsigned int GetImage(unsigned int nCameraIndex, char *pDataBuf,
+                        unsigned int nBufSize);
 
   unsigned int GetAnalogDeviceCount();
   unsigned int GetAnalogDeviceId(unsigned int nDeviceIndex);
   unsigned int GetAnalogChannelCount(unsigned int nDeviceIndex);
   unsigned int GetAnalogSampleCount(unsigned int nDeviceIndex);
-  unsigned int GetAnalogSampleNumber(unsigned int nDeviceIndex);  // Returns 0 if no sample was found.
-  unsigned int GetAnalogData(unsigned int nDeviceIndex, float *pDataBuf, unsigned int nBufSize);
-  unsigned int GetAnalogData(unsigned int nDeviceIndex, unsigned int nChannelIndex, float *pDataBuf,
+  unsigned int GetAnalogSampleNumber(
+      unsigned int nDeviceIndex);  // Returns 0 if no sample was found.
+  unsigned int GetAnalogData(unsigned int nDeviceIndex, float *pDataBuf,
                              unsigned int nBufSize);
-  bool GetAnalogData(unsigned int nDeviceIndex, unsigned int nChannelIndex, unsigned int nSampleIndex,
-                     float &fAnalogValue);
+  unsigned int GetAnalogData(unsigned int nDeviceIndex,
+                             unsigned int nChannelIndex, float *pDataBuf,
+                             unsigned int nBufSize);
+  bool GetAnalogData(unsigned int nDeviceIndex, unsigned int nChannelIndex,
+                     unsigned int nSampleIndex, float &fAnalogValue);
 
   unsigned int GetAnalogSingleDeviceCount();
   unsigned int GetAnalogSingleDeviceId(unsigned int nDeviceIndex);
   unsigned int GetAnalogSingleChannelCount(unsigned int nDeviceIndex);
-  unsigned int GetAnalogSingleData(unsigned int nDeviceIndex, float *pDataBuf, unsigned int nBufSize);
-  bool GetAnalogSingleData(unsigned int nDeviceIndex, unsigned int nChannelIndex, float &fValue);
+  unsigned int GetAnalogSingleData(unsigned int nDeviceIndex, float *pDataBuf,
+                                   unsigned int nBufSize);
+  bool GetAnalogSingleData(unsigned int nDeviceIndex,
+                           unsigned int nChannelIndex, float &fValue);
 
   unsigned int GetForcePlateCount();
   unsigned int GetForcePlateId(unsigned int nPlateIndex);
   unsigned int GetForceCount(unsigned int nPlateIndex);
-  unsigned int GetForceNumber(unsigned int nPlateIndex);  // Returns 0 if no force was found.
-  unsigned int GetForceData(unsigned int nPlateIndex, SForce *pForceBuf, unsigned int nBufSize);
-  bool GetForceData(unsigned int nPlateIndex, unsigned int nForceIndex, SForce &sForce);
+  unsigned int GetForceNumber(
+      unsigned int nPlateIndex);  // Returns 0 if no force was found.
+  unsigned int GetForceData(unsigned int nPlateIndex, SForce *pForceBuf,
+                            unsigned int nBufSize);
+  bool GetForceData(unsigned int nPlateIndex, unsigned int nForceIndex,
+                    SForce &sForce);
 
   unsigned int GetForceSinglePlateCount();
   unsigned int GetForceSinglePlateId(unsigned int nPlateIndex);
@@ -239,8 +274,10 @@ class DLL_EXPORT CRTPacket {
 
   unsigned int GetSkeletonCount();
   unsigned int GetSkeletonSegmentCount(unsigned int nSkeletonIndex);
-  bool GetSkeletonSegments(unsigned int nSkeletonIndex, SSkeletonSegment *segmentBuf, unsigned int nBufSize);
-  bool GetSkeletonSegment(unsigned int nSkeletonIndex, unsigned segmentIndex, SSkeletonSegment &segment);
+  bool GetSkeletonSegments(unsigned int nSkeletonIndex,
+                           SSkeletonSegment *segmentBuf, unsigned int nBufSize);
+  bool GetSkeletonSegment(unsigned int nSkeletonIndex, unsigned segmentIndex,
+                          SSkeletonSegment &segment);
 
  private:
   float SetByteOrder(float *pfData);

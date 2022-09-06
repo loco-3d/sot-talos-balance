@@ -36,7 +36,9 @@
 /* --------------------------------------------------------------------- */
 
 #include <dynamic-graph/signal-helper.h>
+
 #include <map>
+
 #include "boost/assign.hpp"
 
 namespace dynamicgraph {
@@ -47,7 +49,8 @@ namespace talos_balance {
 /* --- CLASS ----------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-class COMADMITTANCECONTROLLER_EXPORT ComAdmittanceController : public ::dynamicgraph::Entity {
+class COMADMITTANCECONTROLLER_EXPORT ComAdmittanceController
+    : public ::dynamicgraph::Entity {
   DYNAMIC_GRAPH_ENTITY_DECL();
 
  public:
@@ -80,7 +83,8 @@ class COMADMITTANCECONTROLLER_EXPORT ComAdmittanceController : public ::dynamicg
   virtual void display(std::ostream &os) const;
 
  protected:
-  bool m_initSucceeded;          /// true if the entity has been successfully initialized
+  bool
+      m_initSucceeded;  /// true if the entity has been successfully initialized
   dynamicgraph::Vector m_state;  // internal state
   double m_dt;
 

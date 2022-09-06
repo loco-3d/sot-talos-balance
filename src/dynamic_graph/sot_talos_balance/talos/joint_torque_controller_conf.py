@@ -21,10 +21,42 @@ k_i_vel = np.array(NJ * [0.0])
 torque_integral_saturation = np.array(NJ * [0.0])
 poly_sign_dq = 3
 # order of polynomial to approximate Coulomb friction around zero velocity
-alpha_leaking = np.array([
-    75., 75., 75., 75., 75., 75., 75., 75., 75., 75., 75., 75., 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
-])
+alpha_leaking = np.array(
+    [
+        75.0,
+        75.0,
+        75.0,
+        75.0,
+        75.0,
+        75.0,
+        75.0,
+        75.0,
+        75.0,
+        75.0,
+        75.0,
+        75.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+    ]
+)
 
 # # PARAMETERS OF R_hip_y JOINT 0
 # k_p_torque[0] = 12.0;

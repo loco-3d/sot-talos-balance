@@ -13,9 +13,9 @@ class MetaTaskJoint(object):
         self.name = name
         self.joint = joint
 
-        self.feature = FeatureGeneric('feature' + name)
-        self.featureDes = FeatureGeneric('featureDes' + name)
-        self.gain = GainAdaptive('gain' + name)
+        self.feature = FeatureGeneric("feature" + name)
+        self.featureDes = FeatureGeneric("featureDes" + name)
+        self.gain = GainAdaptive("gain" + name)
 
         self.selec = Selec_of_vector("selec" + name)
         self.selec.selec(joint, joint + 1)
@@ -24,7 +24,7 @@ class MetaTaskJoint(object):
 
         robotDim = len(dyn.position.value)
         Id = identity(robotDim)
-        J = Id[joint:joint + 1]
+        J = Id[joint : joint + 1]
         self.feature.jacobianIN.value = matrixToTuple(J)
         self.feature.setReference(self.featureDes.name)
 
@@ -45,5 +45,5 @@ class MetaTaskJoint(object):
 class MetaTaskKineJoint(MetaTaskJoint):
     def __init__(self, dyn, joint, name=None):
         MetaTaskJoint.__init__(self, dyn, joint, name)
-        self.task = Task('task' + self.name)
+        self.task = Task("task" + self.name)
         self.plugTask()

@@ -1,7 +1,11 @@
 # flake8: noqa
 from dynamic_graph import plug
 from dynamic_graph.sot.core import SOT
-from dynamic_graph.sot.core.meta_tasks_kine import MetaTaskKine6d, MetaTaskKineCom, gotoNd
+from dynamic_graph.sot.core.meta_tasks_kine import (
+    MetaTaskKine6d,
+    MetaTaskKineCom,
+    gotoNd,
+)
 
 from dynamic_graph.sot_talos_balance.create_entities_utils import *
 from dynamic_graph.sot_talos_balance.meta_task_joint import MetaTaskKineJoint
@@ -31,20 +35,24 @@ robot.admittance_control = create_joint_admittance_controller(JOINT, Kp, dt, rob
 plug(robot.admittance_control.qRef, robot.taskJoint.featureDes.errorIN)
 
 # --- CONTACTS
-#define contactLF and contactRF
-robot.contactLF = MetaTaskKine6d('contactLF', robot.dynamic, 'LF', robot.OperationalPointsMap['left-ankle'])
-robot.contactLF.feature.frame('desired')
+# define contactLF and contactRF
+robot.contactLF = MetaTaskKine6d(
+    "contactLF", robot.dynamic, "LF", robot.OperationalPointsMap["left-ankle"]
+)
+robot.contactLF.feature.frame("desired")
 robot.contactLF.gain.setConstant(100)
 robot.contactLF.keep()
-locals()['contactLF'] = robot.contactLF
+locals()["contactLF"] = robot.contactLF
 
-robot.contactRF = MetaTaskKine6d('contactRF', robot.dynamic, 'RF', robot.OperationalPointsMap['right-ankle'])
-robot.contactRF.feature.frame('desired')
+robot.contactRF = MetaTaskKine6d(
+    "contactRF", robot.dynamic, "RF", robot.OperationalPointsMap["right-ankle"]
+)
+robot.contactRF.feature.frame("desired")
 robot.contactRF.gain.setConstant(100)
 robot.contactRF.keep()
-locals()['contactRF'] = robot.contactRF
+locals()["contactRF"] = robot.contactRF
 
-robot.sot = SOT('sot')
+robot.sot = SOT("sot")
 robot.sot.setSize(robot.dynamic.getDimension())
 plug(robot.sot.control, robot.device.control)
 
@@ -53,6 +61,12 @@ robot.sot.push(robot.contactLF.task.name)
 robot.device.control.recompute(0)
 
 # --- ROS PUBLISHER
-robot.publisher = create_rospublish(robot, 'robot_publisher')
-create_topic(robot.publisher, robot.device_filters.torque_filter, 'x_filtered', robot=robot, data_type='vector')
-create_topic(robot.publisher, robot.device, 'ptorque', robot=robot, data_type='vector')
+robot.publisher = create_rospublish(robot, "robot_publisher")
+create_topic(
+    robot.publisher,
+    robot.device_filters.torque_filter,
+    "x_filtered",
+    robot=robot,
+    data_type="vector",
+)
+create_topic(robot.publisher, robot.device, "ptorque", robot=robot, data_type="vector")

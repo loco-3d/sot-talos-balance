@@ -16,11 +16,11 @@
 
 #include "sot/talos_balance/saturation.hh"
 
-#include <sot/core/debug.hh>
-#include <dynamic-graph/factory.h>
-#include <dynamic-graph/command-bind.h>
-
 #include <dynamic-graph/all-commands.h>
+#include <dynamic-graph/command-bind.h>
+#include <dynamic-graph/factory.h>
+
+#include <sot/core/debug.hh>
 #include <sot/core/stop-watch.hh>
 
 namespace dynamicgraph {
@@ -87,7 +87,8 @@ DEFINE_SIGNAL_OUT_FUNCTION(yOut, dynamicgraph::Vector) {
   } else if (-xLim < x and x <= -xLim + yLim / k) {
     r = std::min(std::max(y, -k * (x + xLim)), k * (x + xLim));
   } else if (xLim - yLim / k < x and x <= xLim) {
-    r = std::min(std::max(y, -yLim + k * (x - xLim + yLim / k)), yLim - k * (x - xLim + yLim / k));
+    r = std::min(std::max(y, -yLim + k * (x - xLim + yLim / k)),
+                 yLim - k * (x - xLim + yLim / k));
   }
 
   s[0] = r;

@@ -16,11 +16,11 @@
 
 #include "sot/talos_balance/joint-position-controller.hh"
 
-#include <sot/core/debug.hh>
-#include <dynamic-graph/factory.h>
-#include <dynamic-graph/command-bind.h>
-
 #include <dynamic-graph/all-commands.h>
+#include <dynamic-graph/command-bind.h>
+#include <dynamic-graph/factory.h>
+
+#include <sot/core/debug.hh>
 #include <sot/core/stop-watch.hh>
 
 namespace dynamicgraph {
@@ -30,8 +30,9 @@ namespace dg = ::dynamicgraph;
 using namespace dg;
 using namespace dg::command;
 
-// Size to be aligned                                      "-------------------------------------------------------"
-#define PROFILE_JOINTPOSITIONCONTROLLER_DQREF_COMPUTATION "JointPositionController: dqRef computation             "
+// Size to be aligned "-------------------------------------------------------"
+#define PROFILE_JOINTPOSITIONCONTROLLER_DQREF_COMPUTATION \
+  "JointPositionController: dqRef computation             "
 
 #define INPUT_SIGNALS m_KpSIN << m_stateSIN << m_qDesSIN << m_dqDesSIN
 
@@ -42,7 +43,8 @@ using namespace dg::command;
 typedef JointPositionController EntityClassName;
 
 /* --- DG FACTORY ---------------------------------------------------- */
-DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(JointPositionController, "JointPositionController");
+DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(JointPositionController,
+                                   "JointPositionController");
 
 /* ------------------------------------------------------------------- */
 /* --- CONSTRUCTION -------------------------------------------------- */
@@ -59,15 +61,20 @@ JointPositionController::JointPositionController(const std::string& name)
 
   /* Commands. */
   addCommand("init", makeCommandVoid1(*this, &JointPositionController::init,
-                                      docCommandVoid1("Initialize the entity.", "Control gains")));
+                                      docCommandVoid1("Initialize the entity.",
+                                                      "Control gains")));
 }
 
 void JointPositionController::init(const unsigned& n) {
   if (n < 1) return SEND_MSG("n must be at least 1", MSG_TYPE_ERROR);
-  if (!m_KpSIN.isPlugged()) return SEND_MSG("Init failed: signal Kp is not plugged", MSG_TYPE_ERROR);
-  if (!m_stateSIN.isPlugged()) return SEND_MSG("Init failed: signal q is not plugged", MSG_TYPE_ERROR);
-  if (!m_qDesSIN.isPlugged()) return SEND_MSG("Init failed: signal qDes is not plugged", MSG_TYPE_ERROR);
-  if (!m_dqDesSIN.isPlugged()) return SEND_MSG("Init failed: signal dqDes is not plugged", MSG_TYPE_ERROR);
+  if (!m_KpSIN.isPlugged())
+    return SEND_MSG("Init failed: signal Kp is not plugged", MSG_TYPE_ERROR);
+  if (!m_stateSIN.isPlugged())
+    return SEND_MSG("Init failed: signal q is not plugged", MSG_TYPE_ERROR);
+  if (!m_qDesSIN.isPlugged())
+    return SEND_MSG("Init failed: signal qDes is not plugged", MSG_TYPE_ERROR);
+  if (!m_dqDesSIN.isPlugged())
+    return SEND_MSG("Init failed: signal dqDes is not plugged", MSG_TYPE_ERROR);
 
   m_n = n;
   m_initSucceeded = true;
@@ -79,7 +86,8 @@ void JointPositionController::init(const unsigned& n) {
 
 DEFINE_SIGNAL_OUT_FUNCTION(dqRef, dynamicgraph::Vector) {
   if (!m_initSucceeded) {
-    SEND_WARNING_STREAM_MSG("Cannot compute signal dqRef before initialization!");
+    SEND_WARNING_STREAM_MSG(
+        "Cannot compute signal dqRef before initialization!");
     return s;
   }
   if (s.size() != m_n) s.resize(m_n);

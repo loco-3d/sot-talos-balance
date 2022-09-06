@@ -17,9 +17,11 @@ class CNetwork {
   void Disconnect();
   bool Connected() const;
   bool CreateUDPSocket(unsigned short& nUDPPort, bool bBroadcast = false);
-  int Receive(char* rtDataBuff, int nDataBufSize, bool bHeader, int nTimeout, unsigned int* ipAddr = nullptr);
+  int Receive(char* rtDataBuff, int nDataBufSize, bool bHeader, int nTimeout,
+              unsigned int* ipAddr = nullptr);
   bool Send(const char* pSendBuf, int nSize);
-  bool SendUDPBroadcast(const char* pSendBuf, int nSize, short nPort, unsigned int nFilterAddr = 0);
+  bool SendUDPBroadcast(const char* pSendBuf, int nSize, short nPort,
+                        unsigned int nFilterAddr = 0);
   char* GetErrorString();
   int GetError() const;
   bool IsLocalAddress(unsigned int nAddr) const;

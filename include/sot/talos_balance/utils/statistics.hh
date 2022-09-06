@@ -84,7 +84,8 @@ class Statistics {
   void reset_all();
 
   /** Dump the data of a certain quantity record */
-  void report(std::string name, int precision = 2, std::ostream& output = std::cout);
+  void report(std::string name, int precision = 2,
+              std::ostream& output = std::cout);
 
   /** Dump the data of all the quantity records */
   void report_all(int precision = 2, std::ostream& output = std::cout);

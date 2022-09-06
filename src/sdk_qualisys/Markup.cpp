@@ -10,12 +10,13 @@
 // This software is provided "as is", with no warranty.
 // Latest fixes enhancements and documentation at www.firstobject.com
 
+#include "sot/talos_balance/sdk_qualisys/Markup.h"
+
 #include <assert.h>
-#include <algorithm>
 #include <stdarg.h>
 #include <string.h>
 
-#include "sot/talos_balance/sdk_qualisys/Markup.h"
+#include <algorithm>
 
 #ifdef _DEBUG
 #undef THIS_FILE
@@ -49,8 +50,8 @@ bool CMarkup::SetDoc(const char* szDoc) {
     m_csDoc.erase();
 
   // Starting size of position array: 1 element per 64 bytes of document
-  // Tight fit when parsing small doc, only 0 to 2 reallocs when parsing large doc
-  // Start at 8 when creating new document
+  // Tight fit when parsing small doc, only 0 to 2 reallocs when parsing large
+  // doc Start at 8 when creating new document
   std::string::size_type nStartSize = m_csDoc.length() / 64 + 8;
   if (m_aPos.size() < nStartSize) m_aPos.resize(nStartSize);
 
@@ -124,12 +125,12 @@ std::string CMarkup::GetTagName() const {
 }
 
 bool CMarkup::IntoElem() {
-  // If there is no child position and IntoElem is called it will succeed in release 6.3
-  // (A subsequent call to FindElem will find the first element)
-  // The following short-hand behavior was never part of EDOM and was misleading
-  // It would find a child element if there was no current child element position and go into it
-  // It is removed in release 6.3, this change is NOT backwards compatible!
-  // if (! m_iPosChild)
+  // If there is no child position and IntoElem is called it will succeed in
+  // release 6.3 (A subsequent call to FindElem will find the first element) The
+  // following short-hand behavior was never part of EDOM and was misleading It
+  // would find a child element if there was no current child element position
+  // and go into it It is removed in release 6.3, this change is NOT backwards
+  // compatible! if (! m_iPosChild)
   //	FindChildElem();
 
   if (m_iPos && m_nNodeType == MNT_ELEMENT) {
@@ -156,7 +157,8 @@ int CMarkup::x_GetFreePos() {
   //
   // This returns the index of the next unused ElemPos in the array
   //
-  if (m_iPosFree == (int)m_aPos.size()) m_aPos.resize(m_iPosFree + m_iPosFree / 2);
+  if (m_iPosFree == (int)m_aPos.size())
+    m_aPos.resize(m_iPosFree + m_iPosFree / 2);
   ++m_iPosFree;
   return m_iPosFree - 1;
 }
@@ -202,7 +204,8 @@ int CMarkup::x_ParseElem(int iPosParent) {
   while (csName.empty()) {
     // Look for left angle bracket of start tag
     m_aPos[iPos].nStartL = token.nNext;
-    if (!x_FindChar(token.szDoc, m_aPos[iPos].nStartL, '<')) return x_ParseError("Element tag not found");
+    if (!x_FindChar(token.szDoc, m_aPos[iPos].nStartL, '<'))
+      return x_ParseError("Element tag not found");
 
     // Set parent's End tag to start looking from here (or later)
     m_aPos[iPosParent].nEndL = m_aPos[iPos].nStartL;
@@ -218,7 +221,8 @@ int CMarkup::x_ParseElem(int iPosParent) {
       } else if (cFirstChar != '/') {
         csName = x_GetToken(token);
         // Look for end of tag
-        if (!x_FindChar(token.szDoc, token.nNext, '>')) return x_ParseError("End of tag not found");
+        if (!x_FindChar(token.szDoc, token.nNext, '>'))
+          return x_ParseError("End of tag not found");
       } else
         return x_ReleasePos();  // probably end tag of parent
     } else
@@ -264,10 +268,12 @@ int CMarkup::x_ParseElem(int iPosParent) {
       if (!token.bIsString) {
         // Is first token not an end slash mark?
         if (nTokenCount == 1 && m_csDoc[token.nL] != '/')
-          return x_ParseError("Expecting end tag of element %s", csName.c_str());
+          return x_ParseError("Expecting end tag of element %s",
+                              csName.c_str());
 
         else if (nTokenCount == 2 && !token.Match(csName.c_str()))
-          return x_ParseError("End tag does not correspond to %s", csName.c_str());
+          return x_ParseError("End tag does not correspond to %s",
+                              csName.c_str());
 
         // Else is it a right angle bracket?
         else if (m_csDoc[token.nL] == '>')
@@ -277,7 +283,8 @@ int CMarkup::x_ParseElem(int iPosParent) {
 
     // Was a right angle bracket not found?
     if (!token.szDoc[token.nL] || nTokenCount < 2)
-      return x_ParseError("End tag not completed for element %s", csName.c_str());
+      return x_ParseError("End tag not completed for element %s",
+                          csName.c_str());
     m_aPos[iPos].nEndR = token.nL;
   }
 
@@ -302,8 +309,8 @@ bool CMarkup::x_FindChar(const char* szDoc, int& nChar, char c) {
 
 bool CMarkup::x_FindAny(const char* szDoc, int& nChar) {
   // Starting at nChar, find a non-whitespace char
-  // return false if no non-whitespace before end of document, nChar points to end
-  // otherwise return true and nChar points to non-whitespace char
+  // return false if no non-whitespace before end of document, nChar points to
+  // end otherwise return true and nChar points to non-whitespace char
   while (szDoc[nChar] && strchr(" \t\n\r", szDoc[nChar])) ++nChar;
   return szDoc[nChar] != '\0';
 }
@@ -345,7 +352,8 @@ bool CMarkup::x_FindToken(CMarkup::TokenPos& token) {
   } else {
     // Go until special char or whitespace
     token.nL = nChar;
-    while (szDoc[nChar] && !strchr(" \t\n\r<>=\\/?!", szDoc[nChar])) nChar += 1;  //_tclen(&szDoc[nChar]);
+    while (szDoc[nChar] && !strchr(" \t\n\r<>=\\/?!", szDoc[nChar]))
+      nChar += 1;  //_tclen(&szDoc[nChar]);
 
     // Adjust end position if it is one special char
     if (nChar == token.nL) ++nChar;  // it is a special char
@@ -361,7 +369,9 @@ std::string CMarkup::x_GetToken(const CMarkup::TokenPos& token) const {
   // The token contains indexes into the document identifying a small substring
   // Build the substring from those indexes and return it
   if (token.nL > token.nR) return "";
-  return Mid(m_csDoc, token.nL, token.nR - token.nL + ((token.nR < (int)(m_csDoc.length())) ? 1 : 0));
+  return Mid(
+      m_csDoc, token.nL,
+      token.nR - token.nL + ((token.nR < (int)(m_csDoc.length())) ? 1 : 0));
 }
 
 int CMarkup::x_FindElem(int iPosParent, int iPos, const char* szPath) {
@@ -473,7 +483,8 @@ std::string CMarkup::x_GetTagName(int iPos) const {
   return x_GetToken(token);
 }
 
-bool CMarkup::x_FindAttrib(CMarkup::TokenPos& token, const char* szAttrib) const {
+bool CMarkup::x_FindAttrib(CMarkup::TokenPos& token,
+                           const char* szAttrib) const {
   // If szAttrib is NULL find next attrib, otherwise find named attrib
   // Return true if found
   int nAttrib = 0;
@@ -481,7 +492,8 @@ bool CMarkup::x_FindAttrib(CMarkup::TokenPos& token, const char* szAttrib) const
     if (!token.bIsString) {
       // Is it the right angle bracket?
       char cChar = m_csDoc[token.nL];
-      if (cChar == '>' || cChar == '/' || cChar == '?') break;  // attrib not found
+      if (cChar == '>' || cChar == '/' || cChar == '?')
+        break;  // attrib not found
 
       // Equal sign
       if (cChar == '=') continue;
@@ -489,7 +501,8 @@ bool CMarkup::x_FindAttrib(CMarkup::TokenPos& token, const char* szAttrib) const
       // Potential attribute
       if (!nAttrib && nCount) {
         // Attribute name search?
-        if (!szAttrib || !szAttrib[0]) return true;  // return with token at attrib name
+        if (!szAttrib || !szAttrib[0])
+          return true;  // return with token at attrib name
 
         // Compare szAttrib
         if (token.Match(szAttrib)) nAttrib = nCount;
@@ -512,7 +525,8 @@ std::string CMarkup::x_GetAttrib(int iPos, const char* szAttrib) const {
     return "";
 
   if (szAttrib && x_FindAttrib(token, szAttrib))
-    return x_TextFromDoc(token.nL, token.nR - ((token.nR < (int)(m_csDoc.length())) ? 0 : 1));
+    return x_TextFromDoc(
+        token.nL, token.nR - ((token.nR < (int)(m_csDoc.length())) ? 0 : 1));
   return "";
 }
 
@@ -562,7 +576,8 @@ std::string CMarkup::x_GetData(int iPos) const {
     // See if it is a CDATA section
     const char* szDoc = (const char*)(m_csDoc.c_str());
     int nChar = m_aPos[iPos].nStartR + 1;
-    if (x_FindAny(szDoc, nChar) && szDoc[nChar] == '<' && nChar + 11 < m_aPos[iPos].nEndL &&
+    if (x_FindAny(szDoc, nChar) && szDoc[nChar] == '<' &&
+        nChar + 11 < m_aPos[iPos].nEndL &&
         strncmp(&szDoc[nChar], "<![CDATA[", 9) == 0) {
       nChar += 9;
       int nEndCDATA = (int)m_csDoc.find("]]>", nChar);
@@ -589,7 +604,8 @@ std::string CMarkup::x_TextToDoc(const char* szText, bool bAttrib) const {
   // &apos; apostrophe or single quote
   // &quot; double quote
   //
-  static const char* szaReplace[] = {"&lt;", "&amp;", "&gt;", "&apos;", "&quot;"};
+  static const char* szaReplace[] = {"&lt;", "&amp;", "&gt;", "&apos;",
+                                     "&quot;"};
   const char* pFind = bAttrib ? "<&>\'\"" : "<&>";
   std::string csText;
   const char* pSource = szText;
@@ -626,8 +642,9 @@ std::string CMarkup::x_TextToDoc(const char* szText, bool bAttrib) const {
 
 std::string CMarkup::x_TextFromDoc(int nLeft, int nRight) const {
   // Convert XML friendly text to text as seen outside XML document
-  // ampersand escape codes replaced with special characters e.g. convert "6&gt;7" to "6>7"
-  // Conveniently the result is always the same or shorter in byte length
+  // ampersand escape codes replaced with special characters e.g. convert
+  // "6&gt;7" to "6>7" Conveniently the result is always the same or shorter in
+  // byte length
   //
   static const char* szaCode[] = {"lt;", "amp;", "gt;", "apos;", "quot;"};
   static int anCodeLen[] = {3, 4, 3, 5, 5};
@@ -645,7 +662,8 @@ std::string CMarkup::x_TextFromDoc(int nLeft, int nRight) const {
       bool bCodeConverted = false;
       for (int nMatch = 0; nMatch < 5; ++nMatch) {
         if (nChar <= nRight - anCodeLen[nMatch] &&
-            strncmp(szaCode[nMatch], &pSource[nChar + 1], anCodeLen[nMatch]) == 0) {
+            strncmp(szaCode[nMatch], &pSource[nChar + 1], anCodeLen[nMatch]) ==
+                0) {
           // Insert symbol and increment index past ampersand semi-colon
           pDest[nLen++] = szSymbol[nMatch];
           nChar += anCodeLen[nMatch] + 1;
@@ -671,7 +689,8 @@ std::string CMarkup::x_TextFromDoc(int nLeft, int nRight) const {
   return csText;
 }
 
-void CMarkup::x_DocChange(int nLeft, int nReplace, const std::string& csInsert) {
+void CMarkup::x_DocChange(int nLeft, int nReplace,
+                          const std::string& csInsert) {
   // Insert csInsert int m_csDoc at nLeft replacing nReplace chars
   // Do this with only one buffer reallocation if it grows
   //
@@ -689,7 +708,8 @@ void CMarkup::x_DocChange(int nLeft, int nReplace, const std::string& csInsert) 
 
   // Move part of old doc that goes after insert
   if (nLeft + nReplace < nDocLength)
-    memmove(&pDoc[nLeft + nInsLength], &pDoc[nLeft + nReplace], (nDocLength - nLeft - nReplace) * sizeof(char));
+    memmove(&pDoc[nLeft + nInsLength], &pDoc[nLeft + nReplace],
+            (nDocLength - nLeft - nReplace) * sizeof(char));
 
   // Copy insert
   memcpy(&pDoc[nLeft], csInsert.c_str(), nInsLength * sizeof(char));
@@ -740,7 +760,8 @@ void CMarkup::x_Adjust(int iPos, int nShift, bool bAfterPos) {
   }
 }
 
-void CMarkup::x_LocateNew(int iPosParent, int& iPosRel, int& nOffset, int nLength, int nFlags) {
+void CMarkup::x_LocateNew(int iPosParent, int& iPosRel, int& nOffset,
+                          int nLength, int nFlags) {
   // Determine where to insert new element or node
   //
   bool bInsert = (nFlags & 1) ? true : false;
@@ -790,7 +811,8 @@ void CMarkup::x_LocateNew(int iPosParent, int& iPosRel, int& nOffset, int nLengt
       int iPosPrev = m_aPos[iPosParent].iElemChild;
       if (iPosPrev != iPosRel) {
         // Find previous sibling of iPosRel
-        while (m_aPos[iPosPrev].iElemNext != iPosRel) iPosPrev = m_aPos[iPosPrev].iElemNext;
+        while (m_aPos[iPosPrev].iElemNext != iPosRel)
+          iPosPrev = m_aPos[iPosPrev].iElemNext;
         iPosBefore = iPosPrev;
       }
     } else {
@@ -813,7 +835,8 @@ void CMarkup::x_LocateNew(int iPosParent, int& iPosRel, int& nOffset, int nLengt
   iPosRel = iPosBefore;
 }
 
-bool CMarkup::x_AddElem(const char* szName, const char* szValue, bool bInsert, bool bAddChild) {
+bool CMarkup::x_AddElem(const char* szName, const char* szValue, bool bInsert,
+                        bool bAddChild) {
   if (bAddChild) {
     // Adding a child element under main position
     if (!m_iPos) return false;
@@ -836,8 +859,9 @@ bool CMarkup::x_AddElem(const char* szName, const char* szValue, bool bInsert, b
   }
   int nFlags = bInsert ? 1 : 0;
   x_LocateNew(iPosParent, iPosBefore, nOffset, nLength, nFlags);
-  // LocateNew: in case of an empty parent it finds the end of the start tag (sort of)
-  // in case of a non-empty parent it finds the char before the start of the end tag.
+  // LocateNew: in case of an empty parent it finds the end of the start tag
+  // (sort of) in case of a non-empty parent it finds the char before the start
+  // of the end tag.
 
   // Find out the indent we need:
   int nTopParent = iPosParent;
@@ -850,10 +874,12 @@ bool CMarkup::x_AddElem(const char* szName, const char* szValue, bool bInsert, b
   mtIndent[nIndentChars] = 0;
 
   bool bEmptyParent = m_aPos[iPosParent].IsEmptyElement();
-  if (bEmptyParent || m_aPos[iPosParent].nStartR + 1 == m_aPos[iPosParent].nEndL) {
+  if (bEmptyParent ||
+      m_aPos[iPosParent].nStartR + 1 == m_aPos[iPosParent].nEndL) {
     nOffset += 2;
   } else {
-    if ((nOffset < (int)(m_csDoc.length())) && (0 < nOffset) && (' ' == m_csDoc[nOffset - 1])) {
+    if ((nOffset < (int)(m_csDoc.length())) && (0 < nOffset) &&
+        (' ' == m_csDoc[nOffset - 1])) {
       while ((0 < nOffset) && (' ' == m_csDoc[nOffset - 1])) --nOffset;
     }
   }
@@ -999,7 +1025,8 @@ std::string CMarkup::Mid(const std::string& tStr, int nFirst) const {
   return Mid(tStr, nFirst, (int)tStr.length() - nFirst);
 }
 
-std::string CMarkup::Mid(const std::string& tStr, int nFirst, int nCount) const {
+std::string CMarkup::Mid(const std::string& tStr, int nFirst,
+                         int nCount) const {
   if (nFirst < 0) {
     nFirst = 0;
   }
@@ -1029,7 +1056,9 @@ char* CMarkup::GetBuffer(std::string& tStr, int nMinLen) const {
     tStr.resize(nMinLen);
   }
 
-  return const_cast<char*>(tStr.c_str());  // tStr.empty() ? const_cast<char*>(tStr.c_str()) : &(tStr.at(0));
+  return const_cast<char*>(
+      tStr.c_str());  // tStr.empty() ? const_cast<char*>(tStr.c_str()) :
+                      // &(tStr.at(0));
 }
 
 void CMarkup::ReleaseBuffer(std::string& tStr, int nNewLen) const {
@@ -1038,5 +1067,6 @@ void CMarkup::ReleaseBuffer(std::string& tStr, int nNewLen) const {
 
 bool CMarkup::TokenPos::Match(const char* szName) const {
   int nLen = nR - nL + 1;
-  return ((strncmp(&szDoc[nL], szName, nLen) == 0) && (szName[nLen] == '\0' || strchr(" =/[", szName[nLen])));
+  return ((strncmp(&szDoc[nL], szName, nLen) == 0) &&
+          (szName[nLen] == '\0' || strchr(" =/[", szName[nLen])));
 }

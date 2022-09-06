@@ -35,13 +35,13 @@
 /* --- INCLUDE --------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
+#include <dynamic-graph/linear-algebra.h>
 #include <dynamic-graph/signal-helper.h>
 
 #include <map>
-#include "boost/assign.hpp"
-
 #include <sot/core/matrix-geometry.hh>
-#include <dynamic-graph/linear-algebra.h>
+
+#include "boost/assign.hpp"
 
 namespace dynamicgraph {
 namespace sot {
@@ -51,7 +51,8 @@ namespace talos_balance {
 /* --- CLASS ----------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-class POSEQUATERNIONTOMATRIXHOMO_EXPORT PoseQuaternionToMatrixHomo : public ::dynamicgraph::Entity {
+class POSEQUATERNIONTOMATRIXHOMO_EXPORT PoseQuaternionToMatrixHomo
+    : public ::dynamicgraph::Entity {
   DYNAMIC_GRAPH_ENTITY_DECL();
 
  public:

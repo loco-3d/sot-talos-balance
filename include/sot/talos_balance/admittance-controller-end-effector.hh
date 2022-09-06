@@ -29,19 +29,20 @@
 /* --- INCLUDE --------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-#include <pinocchio/fwd.hpp>
-#include <sot/core/robot-utils.hh>
 #include <dynamic-graph/signal-helper.h>
-#include <map>
-#include "boost/assign.hpp"
 
-#include <pinocchio/parsers/urdf.hpp>
-#include <pinocchio/multibody/model.hpp>
-#include "pinocchio/spatial/se3.hpp"
-#include "pinocchio/spatial/motion.hpp"
-#include <pinocchio/algorithm/kinematics.hpp>
-#include <pinocchio/algorithm/frames.hpp>
+#include <map>
 #include <pinocchio/algorithm/center-of-mass.hpp>
+#include <pinocchio/algorithm/frames.hpp>
+#include <pinocchio/algorithm/kinematics.hpp>
+#include <pinocchio/fwd.hpp>
+#include <pinocchio/multibody/model.hpp>
+#include <pinocchio/parsers/urdf.hpp>
+#include <sot/core/robot-utils.hh>
+
+#include "boost/assign.hpp"
+#include "pinocchio/spatial/motion.hpp"
+#include "pinocchio/spatial/se3.hpp"
 
 namespace dynamicgraph {
 namespace sot {
@@ -60,7 +61,8 @@ namespace talos_balance {
  *  w_dq = integral(Kp(w_forceDes-w_force)) + Kd (w_dq)
  *
  */
-class ADMITTANCECONTROLLERENDEFFECTOR_EXPORT AdmittanceControllerEndEffector : public ::dynamicgraph::Entity {
+class ADMITTANCECONTROLLERENDEFFECTOR_EXPORT AdmittanceControllerEndEffector
+    : public ::dynamicgraph::Entity {
   DYNAMIC_GRAPH_ENTITY_DECL();
 
  public:
@@ -100,7 +102,8 @@ class ADMITTANCECONTROLLERENDEFFECTOR_EXPORT AdmittanceControllerEndEffector : p
    *             used in the pinocchio model
    * @param[in]  endeffectorName  Name of the endEffectorJoint
    */
-  void init(const double &dt, const std::string &sensorFrameName, const std::string &endeffectorName);
+  void init(const double &dt, const std::string &sensorFrameName,
+            const std::string &endeffectorName);
 
   /**
    * @brief      Reset the velocity

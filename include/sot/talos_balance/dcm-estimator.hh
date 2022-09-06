@@ -28,18 +28,20 @@
 /* --- INCLUDE --------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-#include <pinocchio/fwd.hpp>
-#include <sot/core/robot-utils.hh>
 #include <dynamic-graph/signal-helper.h>
-#include <sot/core/matrix-geometry.hh>
-#include <map>
-#include "boost/assign.hpp"
+
 #include <boost/math/distributions/normal.hpp>  // for normal_distribution
+#include <map>
+#include <pinocchio/fwd.hpp>
+#include <sot/core/matrix-geometry.hh>
+#include <sot/core/robot-utils.hh>
+
+#include "boost/assign.hpp"
 
 /* Pinocchio */
+#include <pinocchio/algorithm/kinematics.hpp>
 #include <pinocchio/multibody/model.hpp>
 #include <pinocchio/parsers/urdf.hpp>
-#include <pinocchio/algorithm/kinematics.hpp>
 
 namespace dynamicgraph {
 namespace sot {
@@ -80,12 +82,15 @@ class DCMESTIMATOR_EXPORT DcmEstimator : public ::dynamicgraph::Entity {
   virtual void display(std::ostream& os) const;
 
  protected:
-  bool m_initSucceeded;  /// true if the entity has been successfully initialized
+  bool
+      m_initSucceeded;  /// true if the entity has been successfully initialized
   RobotUtilShrPtr m_robot_util;
-  pinocchio::Data m_data;    /// Pinocchio robot data
-  Eigen::VectorXd m_q_pin;   /// robot configuration according to pinocchio convention
-  Eigen::VectorXd m_v_pin;   /// robot velocities according to pinocchio convention
-  double m_dt;               /// sampling time step
+  pinocchio::Data m_data;  /// Pinocchio robot data
+  Eigen::VectorXd
+      m_q_pin;  /// robot configuration according to pinocchio convention
+  Eigen::VectorXd
+      m_v_pin;  /// robot velocities according to pinocchio convention
+  double m_dt;  /// sampling time step
   pinocchio::Model m_model;  /// Pinocchio robot model
 
 };  // class DCMEstimator

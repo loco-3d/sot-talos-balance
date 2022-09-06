@@ -5,15 +5,17 @@
  * T. Flayols
  */
 
-#include <sot/talos_balance/ft-calibration.hh>
-#include <sot/core/debug.hh>
+#include <dynamic-graph/all-commands.h>
 #include <dynamic-graph/factory.h>
 
-#include <dynamic-graph/all-commands.h>
+#include <sot/core/debug.hh>
 #include <sot/core/stop-watch.hh>
+#include <sot/talos_balance/ft-calibration.hh>
 #include <sot/talos_balance/utils/statistics.hh>
 
-#define CALIB_ITER_TIME 1000  // Iteration needed for sampling and averaging the FT sensors while calibrating
+#define CALIB_ITER_TIME \
+  1000  // Iteration needed for sampling and averaging the FT sensors while
+        // calibrating
 
 namespace dynamicgraph {
 namespace sot {
@@ -40,25 +42,34 @@ FtCalibration::FtCalibration(const std::string &name)
     : Entity(name),
       CONSTRUCT_SIGNAL_IN(right_foot_force_in, dynamicgraph::Vector),
       CONSTRUCT_SIGNAL_IN(left_foot_force_in, dynamicgraph::Vector),
-      CONSTRUCT_SIGNAL_OUT(right_foot_force_out, dynamicgraph::Vector, m_right_foot_force_inSIN),
-      CONSTRUCT_SIGNAL_OUT(left_foot_force_out, dynamicgraph::Vector, m_left_foot_force_inSIN),
+      CONSTRUCT_SIGNAL_OUT(right_foot_force_out, dynamicgraph::Vector,
+                           m_right_foot_force_inSIN),
+      CONSTRUCT_SIGNAL_OUT(left_foot_force_out, dynamicgraph::Vector,
+                           m_left_foot_force_inSIN),
       m_robot_util(RefVoidRobotUtil()),
       m_initSucceeded(false) {
   Entity::signalRegistration(INPUT_SIGNALS << OUTPUT_SIGNALS);
 
   /* Commands. */
-  addCommand("init", makeCommandVoid1(*this, &FtCalibration::init,
-                                      docCommandVoid1("Initialize the entity.", "Robot reference (string)")));
+  addCommand("init",
+             makeCommandVoid1(*this, &FtCalibration::init,
+                              docCommandVoid1("Initialize the entity.",
+                                              "Robot reference (string)")));
   addCommand("setRightFootWeight",
-             makeCommandVoid1(*this, &FtCalibration::setRightFootWeight,
-                              docCommandVoid1("Set the weight of the right foot underneath the sensor",
-                                              "Vector of default forces in Newton")));
+             makeCommandVoid1(
+                 *this, &FtCalibration::setRightFootWeight,
+                 docCommandVoid1(
+                     "Set the weight of the right foot underneath the sensor",
+                     "Vector of default forces in Newton")));
   addCommand("setLeftFootWeight",
-             makeCommandVoid1(*this, &FtCalibration::setLeftFootWeight,
-                              docCommandVoid1("Set the weight of the left foot underneath the sensor",
-                                              "Vector of default forces in Newton")));
-  addCommand("calibrateFeetSensor", makeCommandVoid0(*this, &FtCalibration::calibrateFeetSensor,
-                                                     docCommandVoid0("Calibrate the feet senors")));
+             makeCommandVoid1(
+                 *this, &FtCalibration::setLeftFootWeight,
+                 docCommandVoid1(
+                     "Set the weight of the left foot underneath the sensor",
+                     "Vector of default forces in Newton")));
+  addCommand("calibrateFeetSensor",
+             makeCommandVoid0(*this, &FtCalibration::calibrateFeetSensor,
+                              docCommandVoid0("Calibrate the feet senors")));
 }
 
 void FtCalibration::init(const std::string &robotRef) {
@@ -90,7 +101,8 @@ DEFINE_SIGNAL_OUT_FUNCTION(right_foot_force_out, dynamicgraph::Vector) {
 
   const Vector &right_foot_force = m_right_foot_force_inSIN(iter);
 
-  assert(right_foot_force.size() == 6 && "Unexpected size of signal right_foot_force_in, should be 6.");
+  assert(right_foot_force.size() == 6 &&
+         "Unexpected size of signal right_foot_force_in, should be 6.");
 
   // do offset calibration if needed
   if (m_right_calibration_iter > 0) {
@@ -98,7 +110,8 @@ DEFINE_SIGNAL_OUT_FUNCTION(right_foot_force_out, dynamicgraph::Vector) {
     m_right_calibration_iter--;
   } else if (m_right_calibration_iter == 0) {
     SEND_INFO_STREAM_MSG("Calibrating ft sensors...");
-    m_right_FT_offset = m_right_FT_offset_calibration_sum / CALIB_ITER_TIME;  // todo copy
+    m_right_FT_offset =
+        m_right_FT_offset_calibration_sum / CALIB_ITER_TIME;  // todo copy
   }
 
   // remove offset and foot weight
@@ -116,7 +129,8 @@ DEFINE_SIGNAL_OUT_FUNCTION(left_foot_force_out, dynamicgraph::Vector) {
 
   const Vector &left_foot_force = m_left_foot_force_inSIN(iter);
 
-  assert(left_foot_force.size() == 6 && "Unexpected size of signal left_foot_force_in, should be 6.");
+  assert(left_foot_force.size() == 6 &&
+         "Unexpected size of signal left_foot_force_in, should be 6.");
 
   // do offset calibration if needed
   if (m_left_calibration_iter > 0) {
@@ -134,7 +148,8 @@ DEFINE_SIGNAL_OUT_FUNCTION(left_foot_force_out, dynamicgraph::Vector) {
 
 void FtCalibration::setRightFootWeight(const double &rightW) {
   if (!m_initSucceeded) {
-    SEND_WARNING_STREAM_MSG("Cannot set right foot weight before initialization!");
+    SEND_WARNING_STREAM_MSG(
+        "Cannot set right foot weight before initialization!");
     return;
   }
   m_right_foot_weight << 0, 0, rightW, 0, 0, 0;
@@ -142,7 +157,8 @@ void FtCalibration::setRightFootWeight(const double &rightW) {
 
 void FtCalibration::setLeftFootWeight(const double &leftW) {
   if (!m_initSucceeded) {
-    SEND_WARNING_STREAM_MSG("Cannot set left foot weight before initialization!");
+    SEND_WARNING_STREAM_MSG(
+        "Cannot set left foot weight before initialization!");
     return;
   }
   m_left_foot_weight << 0, 0, leftW, 0, 0, 0;
@@ -150,14 +166,16 @@ void FtCalibration::setLeftFootWeight(const double &leftW) {
 
 void FtCalibration::calibrateFeetSensor() {
   SEND_WARNING_STREAM_MSG(
-      "Sampling FT sensor for offset calibration... Robot should be in the air, with horizontal feet.");
+      "Sampling FT sensor for offset calibration... Robot should be in the "
+      "air, with horizontal feet.");
   m_right_calibration_iter = CALIB_ITER_TIME;
   m_left_calibration_iter = CALIB_ITER_TIME;
   m_right_FT_offset_calibration_sum << 0, 0, 0, 0, 0, 0;
   m_left_FT_offset_calibration_sum << 0, 0, 0, 0, 0, 0;
 }
 
-/* --- PROTECTED MEMBER METHODS ---------------------------------------------------------- */
+/* --- PROTECTED MEMBER METHODS
+ * ---------------------------------------------------------- */
 /* ------------------------------------------------------------------- */
 /* --- ENTITY -------------------------------------------------------- */
 /* ------------------------------------------------------------------- */

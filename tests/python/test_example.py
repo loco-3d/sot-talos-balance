@@ -1,13 +1,16 @@
 from __future__ import print_function
 
 import dynamic_graph.sot_talos_balance.talos.parameter_server_conf as param_server_conf
-from dynamic_graph.sot_talos_balance.create_entities_utils import Example, create_parameter_server
+from dynamic_graph.sot_talos_balance.create_entities_utils import (
+    Example,
+    create_parameter_server,
+)
 
 # --- Parameter server ---
 print("--- Parameter server ---")
 
 dt = 1e-3
-robot_name = 'robot'
+robot_name = "robot"
 param_server = create_parameter_server(param_server_conf, dt)
 
 # --- Example ---

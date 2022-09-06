@@ -16,11 +16,11 @@
 
 #include "sot/talos_balance/dcm-com-controller.hh"
 
-#include <sot/core/debug.hh>
-#include <dynamic-graph/factory.h>
-#include <dynamic-graph/command-bind.h>
-
 #include <dynamic-graph/all-commands.h>
+#include <dynamic-graph/command-bind.h>
+#include <dynamic-graph/factory.h>
+
+#include <sot/core/debug.hh>
 #include <sot/core/stop-watch.hh>
 
 namespace dynamicgraph {
@@ -30,14 +30,17 @@ namespace dg = ::dynamicgraph;
 using namespace dg;
 using namespace dg::command;
 
-// Size to be aligned                                   "-------------------------------------------------------"
-#define PROFILE_DCMCOMCONTROLLER_DDCOMREF_COMPUTATION "DcmComController: ddcomRef computation                 "
-#define PROFILE_DCMCOMCONTROLLER_ZMPREF_COMPUTATION "DcmComController: zmpRef computation                   "
-#define PROFILE_DCMCOMCONTROLLER_WRENCHREF_COMPUTATION "DcmComController: wrenchRef computation                "
+// Size to be aligned "-------------------------------------------------------"
+#define PROFILE_DCMCOMCONTROLLER_DDCOMREF_COMPUTATION \
+  "DcmComController: ddcomRef computation                 "
+#define PROFILE_DCMCOMCONTROLLER_ZMPREF_COMPUTATION \
+  "DcmComController: zmpRef computation                   "
+#define PROFILE_DCMCOMCONTROLLER_WRENCHREF_COMPUTATION \
+  "DcmComController: wrenchRef computation                "
 
-#define INPUT_SIGNALS                                                                                         \
-  m_KpSIN << m_KiSIN << m_decayFactorSIN << m_omegaSIN << m_massSIN << m_dcmSIN << m_dcmDesSIN << m_comDesSIN \
-          << m_ddcomDesSIN
+#define INPUT_SIGNALS                                               \
+  m_KpSIN << m_KiSIN << m_decayFactorSIN << m_omegaSIN << m_massSIN \
+          << m_dcmSIN << m_dcmDesSIN << m_comDesSIN << m_ddcomDesSIN
 
 #define OUTPUT_SIGNALS m_ddcomRefSOUT << m_zmpRefSOUT << m_wrenchRefSOUT
 
@@ -63,35 +66,55 @@ DcmComController::DcmComController(const std::string& name)
       CONSTRUCT_SIGNAL_IN(comDes, dynamicgraph::Vector),
       CONSTRUCT_SIGNAL_IN(ddcomDes, dynamicgraph::Vector),
       CONSTRUCT_SIGNAL_OUT(ddcomRef, dynamicgraph::Vector, INPUT_SIGNALS),
-      CONSTRUCT_SIGNAL_OUT(zmpRef, dynamicgraph::Vector, m_ddcomRefSOUT << m_comDesSIN << m_omegaSIN),
-      CONSTRUCT_SIGNAL_OUT(wrenchRef, dynamicgraph::Vector, m_ddcomRefSOUT << m_comDesSIN << m_massSIN),
+      CONSTRUCT_SIGNAL_OUT(zmpRef, dynamicgraph::Vector,
+                           m_ddcomRefSOUT << m_comDesSIN << m_omegaSIN),
+      CONSTRUCT_SIGNAL_OUT(wrenchRef, dynamicgraph::Vector,
+                           m_ddcomRefSOUT << m_comDesSIN << m_massSIN),
       m_initSucceeded(false) {
   Entity::signalRegistration(INPUT_SIGNALS << OUTPUT_SIGNALS);
 
   /* Commands. */
-  addCommand("init",
-             makeCommandVoid1(*this, &DcmComController::init, docCommandVoid1("Initialize the entity.", "time step")));
-  addCommand("resetDcmIntegralError", makeCommandVoid0(*this, &DcmComController::resetDcmIntegralError,
-                                                       docCommandVoid0("Set dcm integral error to zero.")));
+  addCommand("init", makeCommandVoid1(*this, &DcmComController::init,
+                                      docCommandVoid1("Initialize the entity.",
+                                                      "time step")));
+  addCommand(
+      "resetDcmIntegralError",
+      makeCommandVoid0(*this, &DcmComController::resetDcmIntegralError,
+                       docCommandVoid0("Set dcm integral error to zero.")));
 }
 
 void DcmComController::init(const double& dt) {
-  if (!m_KpSIN.isPlugged()) return SEND_MSG("Init failed: signal Kp is not plugged", MSG_TYPE_ERROR);
-  if (!m_KiSIN.isPlugged()) return SEND_MSG("Init failed: signal Ki is not plugged", MSG_TYPE_ERROR);
-  if (!m_decayFactorSIN.isPlugged()) return SEND_MSG("Init failed: signal decayFactor is not plugged", MSG_TYPE_ERROR);
-  if (!m_omegaSIN.isPlugged()) return SEND_MSG("Init failed: signal omega is not plugged", MSG_TYPE_ERROR);
-  if (!m_massSIN.isPlugged()) return SEND_MSG("Init failed: signal mass is not plugged", MSG_TYPE_ERROR);
-  if (!m_dcmSIN.isPlugged()) return SEND_MSG("Init failed: signal dcm is not plugged", MSG_TYPE_ERROR);
-  if (!m_dcmDesSIN.isPlugged()) return SEND_MSG("Init failed: signal dcmDes is not plugged", MSG_TYPE_ERROR);
-  if (!m_comDesSIN.isPlugged()) return SEND_MSG("Init failed: signal comDes is not plugged", MSG_TYPE_ERROR);
-  if (!m_ddcomDesSIN.isPlugged()) return SEND_MSG("Init failed: signal ddcomDes is not plugged", MSG_TYPE_ERROR);
+  if (!m_KpSIN.isPlugged())
+    return SEND_MSG("Init failed: signal Kp is not plugged", MSG_TYPE_ERROR);
+  if (!m_KiSIN.isPlugged())
+    return SEND_MSG("Init failed: signal Ki is not plugged", MSG_TYPE_ERROR);
+  if (!m_decayFactorSIN.isPlugged())
+    return SEND_MSG("Init failed: signal decayFactor is not plugged",
+                    MSG_TYPE_ERROR);
+  if (!m_omegaSIN.isPlugged())
+    return SEND_MSG("Init failed: signal omega is not plugged", MSG_TYPE_ERROR);
+  if (!m_massSIN.isPlugged())
+    return SEND_MSG("Init failed: signal mass is not plugged", MSG_TYPE_ERROR);
+  if (!m_dcmSIN.isPlugged())
+    return SEND_MSG("Init failed: signal dcm is not plugged", MSG_TYPE_ERROR);
+  if (!m_dcmDesSIN.isPlugged())
+    return SEND_MSG("Init failed: signal dcmDes is not plugged",
+                    MSG_TYPE_ERROR);
+  if (!m_comDesSIN.isPlugged())
+    return SEND_MSG("Init failed: signal comDes is not plugged",
+                    MSG_TYPE_ERROR);
+  if (!m_ddcomDesSIN.isPlugged())
+    return SEND_MSG("Init failed: signal ddcomDes is not plugged",
+                    MSG_TYPE_ERROR);
 
   m_dt = dt;
   resetDcmIntegralError();
   m_initSucceeded = true;
 }
 
-void DcmComController::resetDcmIntegralError() { m_dcmIntegralError.setZero(3); }
+void DcmComController::resetDcmIntegralError() {
+  m_dcmIntegralError.setZero(3);
+}
 
 /* ------------------------------------------------------------------- */
 /* --- SIGNALS ------------------------------------------------------- */
@@ -99,7 +122,8 @@ void DcmComController::resetDcmIntegralError() { m_dcmIntegralError.setZero(3); 
 
 DEFINE_SIGNAL_OUT_FUNCTION(ddcomRef, dynamicgraph::Vector) {
   if (!m_initSucceeded) {
-    SEND_WARNING_STREAM_MSG("Cannot compute signal ddcomRef before initialization!");
+    SEND_WARNING_STREAM_MSG(
+        "Cannot compute signal ddcomRef before initialization!");
     return s;
   }
   if (s.size() != 3) s.resize(3);
@@ -122,8 +146,9 @@ DEFINE_SIGNAL_OUT_FUNCTION(ddcomRef, dynamicgraph::Vector) {
 
   const Eigen::Vector3d dcmError = dcmDes - dcm;
 
-  const Eigen::Vector3d ddcomRef =
-      ddcomDes + omega * Kp.cwiseProduct(dcmError) + omega * Ki.cwiseProduct(m_dcmIntegralError);
+  const Eigen::Vector3d ddcomRef = ddcomDes +
+                                   omega * Kp.cwiseProduct(dcmError) +
+                                   omega * Ki.cwiseProduct(m_dcmIntegralError);
 
   // update the integrator (AFTER using its value)
   m_dcmIntegralError += (dcmError - decayFactor * m_dcmIntegralError) * m_dt;
@@ -137,7 +162,8 @@ DEFINE_SIGNAL_OUT_FUNCTION(ddcomRef, dynamicgraph::Vector) {
 
 DEFINE_SIGNAL_OUT_FUNCTION(zmpRef, dynamicgraph::Vector) {
   if (!m_initSucceeded) {
-    SEND_WARNING_STREAM_MSG("Cannot compute signal zmpRef before initialization!");
+    SEND_WARNING_STREAM_MSG(
+        "Cannot compute signal zmpRef before initialization!");
     return s;
   }
   if (s.size() != 3) s.resize(3);
@@ -163,7 +189,8 @@ DEFINE_SIGNAL_OUT_FUNCTION(zmpRef, dynamicgraph::Vector) {
 
 DEFINE_SIGNAL_OUT_FUNCTION(wrenchRef, dynamicgraph::Vector) {
   if (!m_initSucceeded) {
-    SEND_WARNING_STREAM_MSG("Cannot compute signal wrenchRef before initialization!");
+    SEND_WARNING_STREAM_MSG(
+        "Cannot compute signal wrenchRef before initialization!");
     return s;
   }
   if (s.size() != 6) s.resize(6);

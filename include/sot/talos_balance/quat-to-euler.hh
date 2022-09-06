@@ -35,13 +35,13 @@
 /* --- INCLUDE --------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
+#include <dynamic-graph/linear-algebra.h>
 #include <dynamic-graph/signal-helper.h>
 
 #include <map>
-#include "boost/assign.hpp"
-
 #include <sot/core/matrix-geometry.hh>
-#include <dynamic-graph/linear-algebra.h>
+
+#include "boost/assign.hpp"
 
 namespace dynamicgraph {
 namespace sot {

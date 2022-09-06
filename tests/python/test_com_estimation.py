@@ -2,8 +2,12 @@ import dynamic_graph.sot_talos_balance.talos.base_estimator_conf as base_estimat
 import dynamic_graph.sot_talos_balance.talos.parameter_server_conf as param_server_conf
 import numpy as np
 import pinocchio as pin
-from dynamic_graph.sot_talos_balance.create_entities_utils import (DcmEstimator, TalosBaseEstimator,
-                                                                   create_parameter_server, plug)
+from dynamic_graph.sot_talos_balance.create_entities_utils import (
+    DcmEstimator,
+    TalosBaseEstimator,
+    create_parameter_server,
+    plug,
+)
 from dynamic_graph.sot_talos_balance.euler_to_quat import EulerToQuat
 from numpy.testing import assert_almost_equal
 
@@ -11,49 +15,51 @@ from numpy.testing import assert_almost_equal
 print("--- General ---")
 
 dt = 0.001
-robot_name = 'robot'
+robot_name = "robot"
 
-halfSitting = np.array([
-    0.0,
-    0.0,
-    1.018213,
-    0.00,
-    0.0,
-    0.0,
-    1.0,  # Free flyer
-    0.0,
-    0.0,
-    -0.411354,
-    0.859395,
-    -0.448041,
-    -0.001708,  # Left Leg
-    0.0,
-    0.0,
-    -0.411354,
-    0.859395,
-    -0.448041,
-    -0.001708,  # Right Leg
-    0.0,
-    0.006761,  # Chest
-    0.25847,
-    0.173046,
-    -0.0002,
-    -0.525366,
-    0.0,
-    -0.0,
-    0.1,
-    -0.005,  # Left Arm
-    -0.25847,
-    -0.173046,
-    0.0002,
-    -0.525366,
-    0.0,
-    0.0,
-    0.1,
-    -0.005,  # Right Arm
-    0.,
-    0.  # Head
-])
+halfSitting = np.array(
+    [
+        0.0,
+        0.0,
+        1.018213,
+        0.00,
+        0.0,
+        0.0,
+        1.0,  # Free flyer
+        0.0,
+        0.0,
+        -0.411354,
+        0.859395,
+        -0.448041,
+        -0.001708,  # Left Leg
+        0.0,
+        0.0,
+        -0.411354,
+        0.859395,
+        -0.448041,
+        -0.001708,  # Right Leg
+        0.0,
+        0.006761,  # Chest
+        0.25847,
+        0.173046,
+        -0.0002,
+        -0.525366,
+        0.0,
+        -0.0,
+        0.1,
+        -0.005,  # Left Arm
+        -0.25847,
+        -0.173046,
+        0.0002,
+        -0.525366,
+        0.0,
+        0.0,
+        0.1,
+        -0.005,  # Right Arm
+        0.0,
+        0.0,  # Head
+    ]
+)
 
 q = halfSitting
 print("q:", q)
@@ -70,13 +76,13 @@ m = data.mass[0]
 print("com:")
 print(com.flatten().tolist()[0])
 
-leftName = param_server_conf.footFrameNames['Left']
+leftName = param_server_conf.footFrameNames["Left"]
 leftId = model.getFrameId(leftName)
 leftPos = data.oMf[leftId]
 print("%s: %d" % (leftName, leftId))
 print(leftPos)
 
-rightName = param_server_conf.footFrameNames['Right']
+rightName = param_server_conf.footFrameNames["Right"]
 rightId = model.getFrameId(rightName)
 rightPos = data.oMf[rightId]
 print("%s: %d" % (rightName, rightId))
@@ -91,8 +97,9 @@ tauy = -fz * lever
 wrenchLeft = np.array(forceLeft + [0.0, tauy, 0.0])
 wrenchRight = np.array(forceRight + [0.0, tauy, 0.0])
 
-centerTranslation = (data.oMf[rightId].translation + data.oMf[leftId].translation) / 2 + np.array(
-    param_server_conf.rightFootSoleXYZ)
+centerTranslation = (
+    data.oMf[rightId].translation + data.oMf[leftId].translation
+) / 2 + np.array(param_server_conf.rightFootSoleXYZ)
 
 centerPos = pin.SE3(rightPos.rotation, centerTranslation)
 print("Center of feet:")
@@ -111,7 +118,7 @@ param_server = create_parameter_server(param_server_conf, dt)
 print("--- Base estimator ---")
 
 conf = base_estimator_conf
-base_estimator = TalosBaseEstimator('base_estimator')
+base_estimator = TalosBaseEstimator("base_estimator")
 base_estimator.init(dt, robot_name)
 
 base_estimator.joint_positions.value = halfSitting[7:]
@@ -128,7 +135,7 @@ base_estimator.K_fb_feet_poses.value = conf.K_fb_feet_poses
 base_estimator.w_lf_in.value = conf.w_lf_in
 base_estimator.w_rf_in.value = conf.w_rf_in
 # base_estimator.set_imu_weight(conf.w_imu) # TEMP!
-base_estimator.set_imu_weight(0.)
+base_estimator.set_imu_weight(0.0)
 base_estimator.set_stiffness_right_foot(np.array(conf.K))
 base_estimator.set_stiffness_left_foot(np.array(conf.K))
 base_estimator.set_zmp_std_dev_right_foot(conf.std_dev_zmp)
@@ -152,7 +159,7 @@ print(len(base_estimator.v.value))
 # --- Conversion ---
 print("--- Conversion ---")
 
-e2q = EulerToQuat('e2q')
+e2q = EulerToQuat("e2q")
 plug(base_estimator.q, e2q.euler)
 e2q.quaternion.recompute(0)
 print(e2q.quaternion.value)
@@ -174,7 +181,7 @@ print(data2.oMf[leftId])
 # --- DCM estimator ---
 print("--- DCM estimator ---")
 
-dcm_estimator = DcmEstimator('dcm_estimator')
+dcm_estimator = DcmEstimator("dcm_estimator")
 dcm_estimator.init(dt, robot_name)
 plug(e2q.quaternion, dcm_estimator.q)
 plug(base_estimator.v, dcm_estimator.v)

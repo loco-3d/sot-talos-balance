@@ -35,12 +35,13 @@
 /* --- INCLUDE --------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-#include <dynamic-graph/signal-helper.h>
-#include <map>
-#include "boost/assign.hpp"
-
-#include <sot/core/matrix-geometry.hh>
 #include <dynamic-graph/linear-algebra.h>
+#include <dynamic-graph/signal-helper.h>
+
+#include <map>
+#include <sot/core/matrix-geometry.hh>
+
+#include "boost/assign.hpp"
 
 namespace dynamicgraph {
 namespace sot {
@@ -50,7 +51,8 @@ namespace talos_balance {
 /* --- CLASS ----------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-class FOOT_FORCE_DIFFERENCE_CONTROLLER_EXPORT FootForceDifferenceController : public ::dynamicgraph::Entity {
+class FOOT_FORCE_DIFFERENCE_CONTROLLER_EXPORT FootForceDifferenceController
+    : public ::dynamicgraph::Entity {
   DYNAMIC_GRAPH_ENTITY_DECL();
 
  public:
@@ -98,10 +100,13 @@ class FOOT_FORCE_DIFFERENCE_CONTROLLER_EXPORT FootForceDifferenceController : pu
   virtual void display(std::ostream& os) const;
 
  protected:
-  Eigen::Vector3d calcSwingAdmittance(const dynamicgraph::Vector& wrench, const dynamicgraph::Vector& swingAdmittance);
+  Eigen::Vector3d calcSwingAdmittance(
+      const dynamicgraph::Vector& wrench,
+      const dynamicgraph::Vector& swingAdmittance);
 
   double m_eps;
-  bool m_initSucceeded;  /// true if the entity has been successfully initialized
+  bool
+      m_initSucceeded;  /// true if the entity has been successfully initialized
 
 };  // class FootForceDifferenceController
 

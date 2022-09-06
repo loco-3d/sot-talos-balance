@@ -16,9 +16,10 @@
 
 #include "sot/talos_balance/boolean-identity.hh"
 
-#include <sot/core/debug.hh>
-#include <dynamic-graph/factory.h>
 #include <dynamic-graph/all-commands.h>
+#include <dynamic-graph/factory.h>
+
+#include <sot/core/debug.hh>
 
 namespace dynamicgraph {
 namespace sot {
@@ -42,11 +43,15 @@ DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(BooleanIdentity, "BooleanIdentity");
 /* --- CONSTRUCTION -------------------------------------------------- */
 /* ------------------------------------------------------------------- */
 BooleanIdentity::BooleanIdentity(const std::string& name)
-    : Entity(name), CONSTRUCT_SIGNAL_IN(sin, bool), CONSTRUCT_SIGNAL_OUT(sout, bool, INPUT_SIGNALS) {
+    : Entity(name),
+      CONSTRUCT_SIGNAL_IN(sin, bool),
+      CONSTRUCT_SIGNAL_OUT(sout, bool, INPUT_SIGNALS) {
   Entity::signalRegistration(INPUT_SIGNALS << OUTPUT_SIGNALS);
 
   /* Commands. */
-  addCommand("init", makeCommandVoid0(*this, &BooleanIdentity::init, docCommandVoid0("Initialize the entity.")));
+  addCommand("init",
+             makeCommandVoid0(*this, &BooleanIdentity::init,
+                              docCommandVoid0("Initialize the entity.")));
 }
 
 /* ------------------------------------------------------------------- */

@@ -34,10 +34,12 @@
 /* --------------------------------------------------------------------- */
 /* --- INCLUDE --------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
-#include <sot/core/robot-utils.hh>
 #include <dynamic-graph/signal-helper.h>
-#include <sot/core/matrix-geometry.hh>
+
 #include <map>
+#include <sot/core/matrix-geometry.hh>
+#include <sot/core/robot-utils.hh>
+
 #include "boost/assign.hpp"
 
 namespace dynamicgraph {
@@ -66,7 +68,8 @@ std::ostream& operator<<(std::ostream& os, const CtrlMode& s) {
   return os;
 }
 
-class TALOS_CONTROL_MANAGER_EXPORT TalosControlManager : public ::dynamicgraph::Entity {
+class TALOS_CONTROL_MANAGER_EXPORT TalosControlManager
+    : public ::dynamicgraph::Entity {
   typedef Eigen::VectorXd::Index Index;
   typedef TalosControlManager EntityClassName;
   DYNAMIC_GRAPH_ENTITY_DECL();
@@ -81,10 +84,13 @@ class TALOS_CONTROL_MANAGER_EXPORT TalosControlManager : public ::dynamicgraph::
   void init(const double& dt, const std::string& robotRef);
 
   /* --- SIGNALS --- */
-  std::vector<dynamicgraph::SignalPtr<dynamicgraph::Vector, int>*> m_ctrlInputsSIN;
+  std::vector<dynamicgraph::SignalPtr<dynamicgraph::Vector, int>*>
+      m_ctrlInputsSIN;
   std::vector<dynamicgraph::SignalPtr<bool, int>*>
-      m_emergencyStopVector;  /// emergency stop inputs. If one is true, control is set to zero forever
-  std::vector<dynamicgraph::Signal<dynamicgraph::Vector, int>*> m_jointsCtrlModesSOUT;
+      m_emergencyStopVector;  /// emergency stop inputs. If one is true, control
+                              /// is set to zero forever
+  std::vector<dynamicgraph::Signal<dynamicgraph::Vector, int>*>
+      m_jointsCtrlModesSOUT;
 
   DECLARE_SIGNAL_IN(u_max, dynamicgraph::Vector);    /// max motor control
   DECLARE_SIGNAL_OUT(u, dynamicgraph::Vector);       /// raw motor control
@@ -103,7 +109,8 @@ class TALOS_CONTROL_MANAGER_EXPORT TalosControlManager : public ::dynamicgraph::
 
   /// Commands related to joint name and joint id
   // void setNameToId(const std::string& jointName, const double & jointId);
-  // void setJointLimitsFromId(const double &jointId, const double &lq, const double &uq);
+  // void setJointLimitsFromId(const double &jointId, const double &lq, const
+  // double &uq);
 
   /// Set the mapping between urdf and sot.
   // void setJoints(const dynamicgraph::Vector &);
@@ -119,18 +126,25 @@ class TALOS_CONTROL_MANAGER_EXPORT TalosControlManager : public ::dynamicgraph::
  protected:
   RobotUtilShrPtr m_robot_util;
   size_t m_numDofs;
-  bool m_initSucceeded;             /// true if the entity has been successfully initialized
-  double m_dt;                      /// control loop time period
-  bool m_emergency_stop_triggered;  /// true if an emergency condition as been triggered either by an other entity, or
+  bool
+      m_initSucceeded;  /// true if the entity has been successfully initialized
+  double m_dt;          /// control loop time period
+  bool m_emergency_stop_triggered;  /// true if an emergency condition as been
+                                    /// triggered either by an other entity, or
                                     /// by control limit violation
-  bool m_is_first_iter;             /// true at the first iteration, false otherwise
+  bool m_is_first_iter;  /// true at the first iteration, false otherwise
   int m_iter;
-  double m_sleep_time;  /// time to sleep at every iteration (to slow down simulation)
+  double m_sleep_time;  /// time to sleep at every iteration (to slow down
+                        /// simulation)
 
-  std::vector<std::string> m_ctrlModes;             /// existing control modes
-  std::vector<CtrlMode> m_jointCtrlModes_current;   /// control mode of the joints
-  std::vector<CtrlMode> m_jointCtrlModes_previous;  /// previous control mode of the joints
-  std::vector<int> m_jointCtrlModesCountDown;       /// counters used for the transition between two ctrl modes
+  std::vector<std::string> m_ctrlModes;  /// existing control modes
+  std::vector<CtrlMode>
+      m_jointCtrlModes_current;  /// control mode of the joints
+  std::vector<CtrlMode>
+      m_jointCtrlModes_previous;  /// previous control mode of the joints
+  std::vector<int>
+      m_jointCtrlModesCountDown;  /// counters used for the transition between
+                                  /// two ctrl modes
 
   bool convertStringToCtrlMode(const std::string& name, CtrlMode& cm);
   bool convertJointNameToJointId(const std::string& name, unsigned int& id);

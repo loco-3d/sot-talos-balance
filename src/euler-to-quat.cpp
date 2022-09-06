@@ -16,12 +16,12 @@
 
 #include "sot/talos_balance/euler-to-quat.hh"
 
-#include <sot/core/debug.hh>
-#include <dynamic-graph/factory.h>
 #include <dynamic-graph/all-commands.h>
-#include <sot/core/stop-watch.hh>
+#include <dynamic-graph/factory.h>
 
 #include <Eigen/Core>
+#include <sot/core/debug.hh>
+#include <sot/core/stop-watch.hh>
 
 namespace dynamicgraph {
 namespace sot {
@@ -30,8 +30,9 @@ namespace dg = ::dynamicgraph;
 using namespace dg;
 using namespace dg::command;
 
-// Size to be aligned                       "-------------------------------------------------------"
-#define PROFILE_EULERTOQUAT_COMPUTATION "EulerToQuat computation                                  "
+// Size to be aligned "-------------------------------------------------------"
+#define PROFILE_EULERTOQUAT_COMPUTATION \
+  "EulerToQuat computation                                  "
 
 #define INPUT_SIGNALS m_eulerSIN
 
@@ -54,7 +55,9 @@ EulerToQuat::EulerToQuat(const std::string& name)
   Entity::signalRegistration(INPUT_SIGNALS << OUTPUT_SIGNALS);
 
   /* Commands. */
-  addCommand("init", makeCommandVoid0(*this, &EulerToQuat::init, docCommandVoid0("Initialize the entity.")));
+  addCommand("init",
+             makeCommandVoid0(*this, &EulerToQuat::init,
+                              docCommandVoid0("Initialize the entity.")));
 }
 
 /* ------------------------------------------------------------------- */
@@ -75,7 +78,8 @@ DEFINE_SIGNAL_OUT_FUNCTION(quaternion, dynamicgraph::Vector) {
   const double yaw = euler[2];
 
   Eigen::Quaterniond quat;
-  quat = Eigen::AngleAxisd(yaw, Eigen::Vector3d::UnitZ()) * Eigen::AngleAxisd(pitch, Eigen::Vector3d::UnitY()) *
+  quat = Eigen::AngleAxisd(yaw, Eigen::Vector3d::UnitZ()) *
+         Eigen::AngleAxisd(pitch, Eigen::Vector3d::UnitY()) *
          Eigen::AngleAxisd(roll, Eigen::Vector3d::UnitX());
 
   s.head<3>() = input.head<3>();

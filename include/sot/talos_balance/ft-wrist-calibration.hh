@@ -27,23 +27,23 @@
 /* --- INCLUDE --------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-#include <pinocchio/fwd.hpp>
-#include <sot/core/robot-utils.hh>
-#include <dynamic-graph/signal-helper.h>
 #include <dynamic-graph/real-time-logger.h>
-#include <sot/core/matrix-geometry.hh>
+#include <dynamic-graph/signal-helper.h>
+
 #include <map>
-#include "boost/assign.hpp"
-
-#include <pinocchio/parsers/urdf.hpp>
-#include <pinocchio/multibody/model.hpp>
-#include <pinocchio/spatial/se3.hpp>
-#include <pinocchio/spatial/motion.hpp>
-#include <pinocchio/algorithm/kinematics.hpp>
-#include <pinocchio/algorithm/frames.hpp>
 #include <pinocchio/algorithm/center-of-mass.hpp>
-
+#include <pinocchio/algorithm/frames.hpp>
+#include <pinocchio/algorithm/kinematics.hpp>
+#include <pinocchio/fwd.hpp>
+#include <pinocchio/multibody/model.hpp>
+#include <pinocchio/parsers/urdf.hpp>
+#include <pinocchio/spatial/motion.hpp>
+#include <pinocchio/spatial/se3.hpp>
+#include <sot/core/matrix-geometry.hh>
+#include <sot/core/robot-utils.hh>
 #include <sot/talos_balance/robot/robot-wrapper.hh>
+
+#include "boost/assign.hpp"
 
 namespace dynamicgraph {
 namespace sot {
@@ -53,7 +53,8 @@ namespace talos_balance {
 /* --- CLASS ----------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-class SOTFTWRISTCALIBRATION_EXPORT FtWristCalibration : public ::dynamicgraph::Entity {
+class SOTFTWRISTCALIBRATION_EXPORT FtWristCalibration
+    : public ::dynamicgraph::Entity {
   // typedef FtCalibration EntityClassName;
   DYNAMIC_GRAPH_ENTITY_DECL();
 
@@ -78,7 +79,8 @@ class SOTFTWRISTCALIBRATION_EXPORT FtWristCalibration : public ::dynamicgraph::E
   void setRightHandConf(const double &rightW, const Vector &rightLeverArm);
   void setLeftHandConf(const double &leftW, const Vector &leftLeverArm);
 
-  /// Command to calibrate the wrist sensors when the robot is in half sitting with the hands aligned
+  /// Command to calibrate the wrist sensors when the robot is in half sitting
+  /// with the hands aligned
   void calibrateWristSensor();
 
   /**
@@ -108,9 +110,11 @@ class SOTFTWRISTCALIBRATION_EXPORT FtWristCalibration : public ::dynamicgraph::E
   pinocchio::FrameIndex m_rightSensorId;
   /// Id of the joint of the end-effector
   pinocchio::FrameIndex m_leftSensorId;
-  /// Number of iteration for right calibration (-2 = not calibrated, -1 = caibration done)
+  /// Number of iteration for right calibration (-2 = not calibrated, -1 =
+  /// caibration done)
   int m_rightCalibrationIter = -2;
-  /// Number of iteration for right calibration (-2 = not calibrated, -1 = caibration done)
+  /// Number of iteration for right calibration (-2 = not calibrated, -1 =
+  /// caibration done)
   int m_leftCalibrationIter = -2;
   /// Offset or bias to be removed from Right FT sensor
   Vector6d m_right_FT_offset;

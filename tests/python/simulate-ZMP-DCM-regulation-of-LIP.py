@@ -1,15 +1,15 @@
 import matplotlib.pyplot as plt
 
-w = 3.
-A = 8.
+w = 3.0
+A = 8.0
 N = 100000
 a = 1
-Kp = 8.
+Kp = 8.0
 w2 = w * w
 dt = 0.0001
 # initial conditions
-c = 1.
-dc = 0.
+c = 1.0
+dc = 0.0
 ddc = 10
 log_c = []
 z = c - 1 / w2 * ddc

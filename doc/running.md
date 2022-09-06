@@ -12,7 +12,7 @@ roslaunch talos_gazebo talos_gazebo.launch
 ```
 
 Notice that this will spawn Talos at configuration zero. This is not always what you want.
-The package sot-talos-balance offers different launch files to spawn it at different configurations. 
+The package sot-talos-balance offers different launch files to spawn it at different configurations.
 
 Most commonly, you might want to spawn the robot in the half-sitting position
 ```
@@ -23,7 +23,7 @@ If you ever need a different configuration, all you have to do is taking talos_g
 
 ## Start the SoT in position mode
 
-To start the SoT in simulation in position mode: 
+To start the SoT in simulation in position mode:
 ```
 roslaunch roscontrol_sot_talos sot_talos_controller_gazebo.launch
 ```
@@ -115,5 +115,3 @@ rosrun dynamic_graph_bridge run_command
 ## Other
 
 More information on how to use the SoT and how to work on Talos can be found <a href="https://wiki.laas.fr/robots/Pyrene">in the robot wiki page</a> (you need LAAS permissions to access this).
-
-
