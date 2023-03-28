@@ -30,7 +30,6 @@ class message:
 
 
 def extract_data():
-
     jointnames = (
         "torso_1",
         "torso_2",

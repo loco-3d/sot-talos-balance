@@ -18,7 +18,7 @@ class Bunch:
 
     def __str__(self, prefix=""):
         res = ""
-        for (key, value) in self.__dict__.iteritems():
+        for key, value in self.__dict__.iteritems():
             if (
                 isinstance(value, np.ndarray)
                 and len(value.shape) == 2
