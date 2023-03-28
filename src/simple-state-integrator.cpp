@@ -24,7 +24,7 @@
 #include <pinocchio/multibody/liegroup/special-euclidean.hpp>
 #include <sot/core/debug.hh>
 #include <sot/core/stop-watch.hh>
-//#include "pinocchio/math/quaternion.hpp"
+// #include "pinocchio/math/quaternion.hpp"
 
 namespace dynamicgraph {
 namespace sot {
