@@ -50,6 +50,7 @@ endif(BUILD_PYTHON_INTERFACE)
 
 if(BUILD_TESTING)
   find_package(Boost REQUIRED COMPONENTS unit_test_framework)
+  find_package(example-robot-data REQUIRED)
 endif(BUILD_TESTING)
 
 if(Boost_VERSION GREATER 107299 OR Boost_VERSION_MACRO GREATER 107299)
