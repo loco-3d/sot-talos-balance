@@ -26,14 +26,34 @@ set(CUSTOM_HEADER_DIR "sot/talos_balance")
 set(CXX_DISABLE_WERROR TRUE)
 set(DOXYGEN_USE_MATHJAX YES)
 
-# JRL-cmakemodule setup
-include(cmake/base.cmake)
-include(cmake/boost.cmake)
+# Check if the submodule cmake have been initialized
+set(JRL_CMAKE_MODULES "${CMAKE_CURRENT_LIST_DIR}/cmake")
+if(NOT EXISTS "${CMAKE_SOURCE_DIR}/cmake/base.cmake")
+  if(${CMAKE_VERSION} VERSION_LESS "3.14.0")
+    message(
+      FATAL_ERROR
+        "\nPlease run the following command first:\ngit submodule update --init\n"
+    )
+  else()
+    message(STATUS "JRL cmakemodules not found. Let's fetch it.")
+    include(FetchContent)
+    FetchContent_Declare(
+      "jrl-cmakemodules"
+      GIT_REPOSITORY "https://github.com/jrl-umi3218/jrl-cmakemodules.git")
+    FetchContent_MakeAvailable("jrl-cmakemodules")
+    FetchContent_GetProperties("jrl-cmakemodules" SOURCE_DIR JRL_CMAKE_MODULES)
+  endif()
+endif()
+
+include("${JRL_CMAKE_MODULES}/base.cmake")
+include("${JRL_CMAKE_MODULES}/boost.cmake")
+
+set_default_cmake_build_type("RelWithDebInfo")
 
 # Project definition
 compute_project_args(PROJECT_ARGS LANGUAGES CXX C)
 project(${PROJECT_NAME} ${PROJECT_ARGS})
-check_minimal_cxx_standard(11 REQUIRED)
+check_minimal_cxx_standard(14 REQUIRED)
 
 if(INITIALIZE_WITH_NAN)
   message(STATUS "Initialize with NaN all the Eigen entries.")
