@@ -22,7 +22,9 @@ foreach(test ${tests})
     ${test} PRIVATE $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>)
 endforeach(test)
 
-target_link_libraries(test_distribute PRIVATE eiquadprog::eiquadprog)
+target_link_libraries(
+  test_distribute PRIVATE eiquadprog::eiquadprog
+                          example-robot-data::example-robot-data)
 
 if(BUILD_PYTHON_INTERFACE)
   add_subdirectory(python)
