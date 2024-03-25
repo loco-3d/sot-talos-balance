@@ -1,4 +1,5 @@
 """Test feet admittance control"""
+
 from dynamic_graph.sot_talos_balance.utils.run_test_utils import (
     run_ft_calibration,
     run_test,

@@ -1,5 +1,6 @@
 """Test CoM admittance control without using the ZMP, with CoM computed as implemented
 in reference code."""
+
 from time import sleep
 
 import matplotlib.pyplot as plt

@@ -1,4 +1,5 @@
 """Test CoM admittance control as described in paper."""
+
 from time import sleep
 
 from dynamic_graph.sot_talos_balance.utils.run_test_utils import (
