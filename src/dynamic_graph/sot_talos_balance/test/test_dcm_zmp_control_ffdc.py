@@ -1,4 +1,5 @@
 """Test CoM admittance control as described in paper"""
+
 from sys import argv
 from time import sleep
 

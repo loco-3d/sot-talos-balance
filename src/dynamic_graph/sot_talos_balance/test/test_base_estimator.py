@@ -1,4 +1,5 @@
 """Test CoM admittance control as described in paper, with pre-loaded movements"""
+
 from sys import argv
 from time import sleep
 
