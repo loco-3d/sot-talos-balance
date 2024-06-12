@@ -31,7 +31,7 @@ class CMarkup {
   CMarkup(const char* szDoc) { SetDoc(szDoc); };
   CMarkup(const CMarkup& markup) { *this = markup; };
   void operator=(const CMarkup& markup);
-  virtual ~CMarkup(){};
+  virtual ~CMarkup() {};
 
   // Settings
   void SetIndent(int nIndent = 4);

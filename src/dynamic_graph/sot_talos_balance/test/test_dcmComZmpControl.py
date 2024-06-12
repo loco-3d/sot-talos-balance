@@ -1,4 +1,5 @@
 """Test CoM admittance control as implemented in reference code."""
+
 from time import sleep
 
 import matplotlib.pyplot as plt
