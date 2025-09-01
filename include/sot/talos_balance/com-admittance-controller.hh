@@ -57,13 +57,13 @@ class COMADMITTANCECONTROLLER_EXPORT ComAdmittanceController
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
   /* --- CONSTRUCTOR ---- */
-  ComAdmittanceController(const std::string &name);
+  ComAdmittanceController(const std::string& name);
 
-  void init(const double &dt);
+  void init(const double& dt);
 
-  void setPosition(const dynamicgraph::Vector &);
-  void setVelocity(const dynamicgraph::Vector &);
-  void setState(const dynamicgraph::Vector &, const dynamicgraph::Vector &);
+  void setPosition(const dynamicgraph::Vector&);
+  void setVelocity(const dynamicgraph::Vector&);
+  void setState(const dynamicgraph::Vector&, const dynamicgraph::Vector&);
 
   /* --- SIGNALS --- */
   DECLARE_SIGNAL_IN(Kp, dynamicgraph::Vector);
@@ -80,7 +80,7 @@ class COMADMITTANCECONTROLLER_EXPORT ComAdmittanceController
 
   /* --- COMMANDS --- */
   /* --- ENTITY INHERITANCE --- */
-  virtual void display(std::ostream &os) const;
+  virtual void display(std::ostream& os) const;
 
  protected:
   bool

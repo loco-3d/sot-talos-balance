@@ -61,9 +61,9 @@ class SOTFTWRISTCALIBRATION_EXPORT FtWristCalibration
 
  public:
   /* --- CONSTRUCTOR ---- */
-  FtWristCalibration(const std::string &name);
+  FtWristCalibration(const std::string& name);
   /// Initialize
-  void init(const std::string &robotRef);
+  void init(const std::string& robotRef);
 
   /* --- SIGNALS --- */
   DECLARE_SIGNAL_IN(rightWristForceIn, dynamicgraph::Vector);
@@ -77,8 +77,8 @@ class SOTFTWRISTCALIBRATION_EXPORT FtWristCalibration
   /* --- COMMANDS --- */
 
   /// Commands for setting the hand weight
-  void setRightHandConf(const double &rightW, const Vector &rightLeverArm);
-  void setLeftHandConf(const double &leftW, const Vector &leftLeverArm);
+  void setRightHandConf(const double& rightW, const Vector& rightLeverArm);
+  void setLeftHandConf(const double& leftW, const Vector& leftLeverArm);
 
   /// Command to calibrate the wrist sensors when the robot is in half sitting
   /// with the hands aligned
@@ -89,12 +89,12 @@ class SOTFTWRISTCALIBRATION_EXPORT FtWristCalibration
    *
    * @param[in] removeWeight  Boolean used to remove the weight
    */
-  void setRemoveWeight(const bool &removeWeight);
+  void setRemoveWeight(const bool& removeWeight);
 
   void displayRobotUtil();
 
   /* --- ENTITY INHERITANCE --- */
-  virtual void display(std::ostream &os) const;
+  virtual void display(std::ostream& os) const;
 
   /* --- TYPEDEFS ---- */
   typedef Eigen::Matrix<double, 6, 1> Vector6d;
@@ -106,7 +106,7 @@ class SOTFTWRISTCALIBRATION_EXPORT FtWristCalibration
   /// Pinocchio robot model
   pinocchio::Model m_model;
   /// Pinocchio robot data
-  pinocchio::Data *m_data;
+  pinocchio::Data* m_data;
   /// Id of the force sensor frame
   pinocchio::FrameIndex m_rightSensorId;
   /// Id of the joint of the end-effector

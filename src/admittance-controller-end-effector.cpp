@@ -53,7 +53,7 @@ DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(AdmittanceControllerEndEffector,
 /* --- CONSTRUCTION -------------------------------------------------- */
 /* ------------------------------------------------------------------- */
 AdmittanceControllerEndEffector::AdmittanceControllerEndEffector(
-    const std::string &name)
+    const std::string& name)
     : Entity(name),
       CONSTRUCT_SIGNAL_IN(Kp, dynamicgraph::Vector),
       CONSTRUCT_SIGNAL_IN(Kd, dynamicgraph::Vector),
@@ -84,9 +84,9 @@ AdmittanceControllerEndEffector::AdmittanceControllerEndEffector(
                               docCommandVoid0("resetDq")));
 }
 
-void AdmittanceControllerEndEffector::init(const double &dt,
-                                           const std::string &sensorFrameName,
-                                           const std::string &endEffectorName) {
+void AdmittanceControllerEndEffector::init(const double& dt,
+                                           const std::string& sensorFrameName,
+                                           const std::string& endEffectorName) {
   if (!m_dqSaturationSIN.isPlugged())
     return SEND_MSG("Init failed: signal dqSaturation is not plugged",
                     MSG_TYPE_ERROR);
@@ -124,7 +124,7 @@ void AdmittanceControllerEndEffector::init(const double &dt,
 
     m_endEffectorId = m_model.getJointId(endEffectorName);
     m_sensorFrameId = m_model.getFrameId(sensorFrameName);
-  } catch (const std::exception &e) {
+  } catch (const std::exception& e) {
     std::cout << e.what();
     SEND_MSG("Init failed: Could load URDF :" + m_robot_util->m_urdf_filename,
              MSG_TYPE_ERROR);
@@ -153,8 +153,8 @@ DEFINE_SIGNAL_INNER_FUNCTION(w_force, dynamicgraph::Vector) {
   getProfiler().start(
       PROFILE_ADMITTANCECONTROLLERENDEFFECTOR_WFORCE_COMPUTATION);
 
-  const Vector &force = m_forceSIN(iter);
-  const Vector &q = m_qSIN(iter);
+  const Vector& force = m_forceSIN(iter);
+  const Vector& q = m_qSIN(iter);
   assert(force.size() == m_n && "Unexpected size of signal force");
   assert(q.size() == m_model.nq && "Unexpected size of signal q");
 
@@ -180,11 +180,11 @@ DEFINE_SIGNAL_INNER_FUNCTION(w_dq, dynamicgraph::Vector) {
 
   getProfiler().start(PROFILE_ADMITTANCECONTROLLERENDEFFECTOR_WDQ_COMPUTATION);
 
-  const Vector &w_forceDes = m_w_forceDesSIN(iter);
-  const Vector &w_force = m_w_forceSINNER(iter);
-  const Vector &Kp = m_KpSIN(iter);
-  const Vector &Kd = m_KdSIN(iter);
-  const Vector &dqSaturation = m_dqSaturationSIN(iter);
+  const Vector& w_forceDes = m_w_forceDesSIN(iter);
+  const Vector& w_force = m_w_forceSINNER(iter);
+  const Vector& Kp = m_KpSIN(iter);
+  const Vector& Kd = m_KdSIN(iter);
+  const Vector& dqSaturation = m_dqSaturationSIN(iter);
   assert(w_force.size() == m_n && "Unexpected size of signal force");
   assert(w_forceDes.size() == m_n && "Unexpected size of signal w_forceDes");
   assert(Kp.size() == m_n && "Unexpected size of signal Kp");
@@ -216,7 +216,7 @@ DEFINE_SIGNAL_OUT_FUNCTION(dq, dynamicgraph::Vector) {
 
   getProfiler().start(PROFILE_ADMITTANCECONTROLLERENDEFFECTOR_DQ_COMPUTATION);
 
-  const Vector &w_dq = m_w_dqSINNER(iter);
+  const Vector& w_dq = m_w_dqSINNER(iter);
   assert(w_dq.size() == m_n && "Unexpected size of signal w_dq");
 
   // Get endEffectorPlacement
@@ -234,7 +234,7 @@ DEFINE_SIGNAL_OUT_FUNCTION(dq, dynamicgraph::Vector) {
 /* ------------------------------------------------------------------- */
 /* --- ENTITY -------------------------------------------------------- */
 /* ------------------------------------------------------------------- */
-void AdmittanceControllerEndEffector::display(std::ostream &os) const {
+void AdmittanceControllerEndEffector::display(std::ostream& os) const {
   os << "AdmittanceControllerEndEffector " << getName();
   try {
     getProfiler().report_all(3, os);
