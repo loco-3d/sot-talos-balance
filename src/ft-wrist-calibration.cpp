@@ -40,7 +40,7 @@ DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(FtWristCalibration, "FtWristCalibration");
 /* ------------------------------------------------------------------- */
 /* --- CONSTRUCTION -------------------------------------------------- */
 /* ------------------------------------------------------------------- */
-FtWristCalibration::FtWristCalibration(const std::string &name)
+FtWristCalibration::FtWristCalibration(const std::string& name)
     : Entity(name),
       CONSTRUCT_SIGNAL_IN(rightWristForceIn, dynamicgraph::Vector),
       CONSTRUCT_SIGNAL_IN(leftWristForceIn, dynamicgraph::Vector),
@@ -87,7 +87,7 @@ FtWristCalibration::FtWristCalibration(const std::string &name)
                  docCommandVoid1("set RemoveWeight", "desired removeWeight")));
 }
 
-void FtWristCalibration::init(const std::string &robotRef) {
+void FtWristCalibration::init(const std::string& robotRef) {
   dgADD_OSTREAM_TO_RTLOG(std::cout);
   std::string localName(robotRef);
   if (!isNameInRobotUtil(localName)) {
@@ -125,12 +125,12 @@ DEFINE_SIGNAL_INNER_FUNCTION(rightWeight, dynamicgraph::Vector) {
   }
   if (s.size() != 6) s.resize(6);
 
-  const Vector &q = m_qSIN(iter);
+  const Vector& q = m_qSIN(iter);
   assert(q.size() == m_model.nq && "Unexpected size of signal q");
 
   // Get sensorPlacement
   pinocchio::framesForwardKinematics(m_model, *m_data, q);
-  const pinocchio::SE3 &sensorPlacement = m_data->oMf[m_rightSensorId];
+  const pinocchio::SE3& sensorPlacement = m_data->oMf[m_rightSensorId];
 
   Eigen::Vector3d leverArm = sensorPlacement.rotation() * m_rightLeverArm;
 
@@ -157,11 +157,11 @@ DEFINE_SIGNAL_INNER_FUNCTION(leftWeight, dynamicgraph::Vector) {
   }
   if (s.size() != 6) s.resize(6);
 
-  const Vector &q = m_qSIN(iter);
+  const Vector& q = m_qSIN(iter);
   assert(q.size() == m_model.nq && "Unexpected size of signal q");
 
   pinocchio::framesForwardKinematics(m_model, *m_data, q);
-  const pinocchio::SE3 &sensorPlacement = m_data->oMf[m_leftSensorId];
+  const pinocchio::SE3& sensorPlacement = m_data->oMf[m_leftSensorId];
 
   Eigen::Vector3d leverArm = sensorPlacement.rotation() * m_leftLeverArm;
 
@@ -186,10 +186,10 @@ DEFINE_SIGNAL_OUT_FUNCTION(rightWristForceOut, dynamicgraph::Vector) {
     return s;
   }
   if (s.size() != 6) s.resize(6);
-  const Vector &rightWristForce = m_rightWristForceInSIN(iter);
+  const Vector& rightWristForce = m_rightWristForceInSIN(iter);
   assert(rightWristForce.size() == 6 &&
          "Unexpected size of signal rightWristForceIn, should be 6.");
-  const Vector &rightWeight = m_rightWeightSINNER(iter);
+  const Vector& rightWeight = m_rightWeightSINNER(iter);
   assert(rightWeight.size() == 6 &&
          "Unexpected size of signal rightWeight, should be 6.");
 
@@ -219,10 +219,10 @@ DEFINE_SIGNAL_OUT_FUNCTION(leftWristForceOut, dynamicgraph::Vector) {
     return s;
   }
   if (s.size() != 6) s.resize(6);
-  const Vector &leftWristForce = m_leftWristForceInSIN(iter);
+  const Vector& leftWristForce = m_leftWristForceInSIN(iter);
   assert(leftWristForce.size() == 6 &&
          "Unexpected size of signal leftWristForceIn, should be 6.");
-  const Vector &leftWeight = m_leftWeightSINNER(iter);
+  const Vector& leftWeight = m_leftWeightSINNER(iter);
   assert(leftWeight.size() == 6 &&
          "Unexpected size of signal leftWeight, should be 6.");
 
@@ -247,8 +247,8 @@ DEFINE_SIGNAL_OUT_FUNCTION(leftWristForceOut, dynamicgraph::Vector) {
 
 /* --- COMMANDS ---------------------------------------------------------- */
 
-void FtWristCalibration::setRightHandConf(const double &rightW,
-                                          const Vector &rightLeverArm) {
+void FtWristCalibration::setRightHandConf(const double& rightW,
+                                          const Vector& rightLeverArm) {
   if (!m_initSucceeded) {
     SEND_WARNING_STREAM_MSG(
         "Cannot set right hand weight before initialization!");
@@ -258,8 +258,8 @@ void FtWristCalibration::setRightHandConf(const double &rightW,
   m_rightLeverArm << rightLeverArm[0], rightLeverArm[1], rightLeverArm[2];
 }
 
-void FtWristCalibration::setLeftHandConf(const double &leftW,
-                                         const Vector &leftLeverArm) {
+void FtWristCalibration::setLeftHandConf(const double& leftW,
+                                         const Vector& leftLeverArm) {
   if (!m_initSucceeded) {
     SEND_WARNING_STREAM_MSG(
         "Cannot set left hand weight before initialization!");
@@ -279,7 +279,7 @@ void FtWristCalibration::calibrateWristSensor() {
   m_left_FT_offset_calibration_sum << 0, 0, 0, 0, 0, 0;
 }
 
-void FtWristCalibration::setRemoveWeight(const bool &removeWeight) {
+void FtWristCalibration::setRemoveWeight(const bool& removeWeight) {
   m_removeWeight = removeWeight;
 }
 
@@ -289,7 +289,7 @@ void FtWristCalibration::setRemoveWeight(const bool &removeWeight) {
 /* --- ENTITY -------------------------------------------------------- */
 /* ------------------------------------------------------------------- */
 
-void FtWristCalibration::display(std::ostream &os) const {
+void FtWristCalibration::display(std::ostream& os) const {
   os << "FtWristCalibration " << getName();
   try {
     getProfiler().report_all(3, os);

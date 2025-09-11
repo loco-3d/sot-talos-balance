@@ -49,7 +49,7 @@ DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(Saturation, "Saturation");
 /* ------------------------------------------------------------------- */
 /* --- CONSTRUCTION -------------------------------------------------- */
 /* ------------------------------------------------------------------- */
-Saturation::Saturation(const std::string &name)
+Saturation::Saturation(const std::string& name)
     : Entity(name),
       CONSTRUCT_SIGNAL_IN(x, dynamicgraph::Vector),
       CONSTRUCT_SIGNAL_IN(y, dynamicgraph::Vector),
@@ -67,12 +67,12 @@ Saturation::Saturation(const std::string &name)
 DEFINE_SIGNAL_OUT_FUNCTION(yOut, dynamicgraph::Vector) {
   getProfiler().start(PROFILE_SATURATION_SOUT_COMPUTATION);
 
-  const double &x = m_xSIN(iter)[0];
+  const double& x = m_xSIN(iter)[0];
   s = m_ySIN(iter);
-  const double &y = s[0];
-  const double &k = m_kSIN(iter);
-  const double &xLim = m_xLimSIN(iter)[0];
-  const double &yLim = m_yLimSIN(iter)[0];
+  const double& y = s[0];
+  const double& k = m_kSIN(iter);
+  const double& xLim = m_xLimSIN(iter)[0];
+  const double& yLim = m_yLimSIN(iter)[0];
 
   double r = y;
 
@@ -104,7 +104,7 @@ DEFINE_SIGNAL_OUT_FUNCTION(yOut, dynamicgraph::Vector) {
 /* --- ENTITY -------------------------------------------------------- */
 /* ------------------------------------------------------------------- */
 
-void Saturation::display(std::ostream &os) const {
+void Saturation::display(std::ostream& os) const {
   os << "Saturation " << getName();
   try {
     getProfiler().report_all(3, os);

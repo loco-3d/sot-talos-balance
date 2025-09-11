@@ -70,7 +70,7 @@ class ADMITTANCECONTROLLERENDEFFECTOR_EXPORT AdmittanceControllerEndEffector
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
   /* --- CONSTRUCTOR ---- */
-  AdmittanceControllerEndEffector(const std::string &name);
+  AdmittanceControllerEndEffector(const std::string& name);
 
   /* --- SIGNALS --- */
   /// \brief  Gain (6d) for the integration of the error on the force
@@ -103,8 +103,8 @@ class ADMITTANCECONTROLLERENDEFFECTOR_EXPORT AdmittanceControllerEndEffector
    *             used in the pinocchio model
    * @param[in]  endeffectorName  Name of the endEffectorJoint
    */
-  void init(const double &dt, const std::string &sensorFrameName,
-            const std::string &endeffectorName);
+  void init(const double& dt, const std::string& sensorFrameName,
+            const std::string& endeffectorName);
 
   /**
    * @brief      Reset the velocity
@@ -112,7 +112,7 @@ class ADMITTANCECONTROLLERENDEFFECTOR_EXPORT AdmittanceControllerEndEffector
   void resetDq();
 
   /* --- ENTITY INHERITANCE --- */
-  virtual void display(std::ostream &os) const;
+  virtual void display(std::ostream& os) const;
 
  protected:
   /// Dimension of the force signals and of the output
@@ -131,7 +131,7 @@ class ADMITTANCECONTROLLERENDEFFECTOR_EXPORT AdmittanceControllerEndEffector
   /// Pinocchio robot model
   pinocchio::Model m_model;
   /// Pinocchio robot data
-  pinocchio::Data *m_data;
+  pinocchio::Data* m_data;
   /// Id of the force sensor frame
   pinocchio::FrameIndex m_sensorFrameId;
   /// Id of the joint of the end-effector

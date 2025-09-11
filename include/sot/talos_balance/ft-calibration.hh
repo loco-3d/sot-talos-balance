@@ -54,9 +54,9 @@ class SOTFTCALIBRATION_EXPORT FtCalibration : public ::dynamicgraph::Entity {
 
  public:
   /* --- CONSTRUCTOR ---- */
-  FtCalibration(const std::string &name);
+  FtCalibration(const std::string& name);
   /// Initialize
-  void init(const std::string &robotRef);
+  void init(const std::string& robotRef);
 
   /* --- SIGNALS --- */
   DECLARE_SIGNAL_IN(right_foot_force_in, dynamicgraph::Vector);
@@ -67,8 +67,8 @@ class SOTFTCALIBRATION_EXPORT FtCalibration : public ::dynamicgraph::Entity {
   /* --- COMMANDS --- */
 
   /// Commands for setting the feet weight
-  void setRightFootWeight(const double &rightW);
-  void setLeftFootWeight(const double &leftW);
+  void setRightFootWeight(const double& rightW);
+  void setLeftFootWeight(const double& leftW);
 
   /// Command to calibrate the foot sensors when the robot is standing in the
   /// air with horizontal feet
@@ -77,7 +77,7 @@ class SOTFTCALIBRATION_EXPORT FtCalibration : public ::dynamicgraph::Entity {
   void displayRobotUtil();
 
   /* --- ENTITY INHERITANCE --- */
-  virtual void display(std::ostream &os) const;
+  virtual void display(std::ostream& os) const;
 
   /* --- TYPEDEFS ---- */
   typedef Eigen::Matrix<double, 6, 1> Vector6d;

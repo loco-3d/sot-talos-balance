@@ -56,7 +56,7 @@ class SATURATION_EXPORT Saturation : public ::dynamicgraph::Entity {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
   /* --- CONSTRUCTOR ---- */
-  Saturation(const std::string &name);
+  Saturation(const std::string& name);
 
   /* --- SIGNALS --- */
   DECLARE_SIGNAL_IN(x, dynamicgraph::Vector);
@@ -70,7 +70,7 @@ class SATURATION_EXPORT Saturation : public ::dynamicgraph::Entity {
   /* --- COMMANDS --- */
 
   /* --- ENTITY INHERITANCE --- */
-  virtual void display(std::ostream &os) const;
+  virtual void display(std::ostream& os) const;
 
 };  // class Saturation
 

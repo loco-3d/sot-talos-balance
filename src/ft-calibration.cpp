@@ -38,7 +38,7 @@ DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(FtCalibration, "FtCalibration");
 /* ------------------------------------------------------------------- */
 /* --- CONSTRUCTION -------------------------------------------------- */
 /* ------------------------------------------------------------------- */
-FtCalibration::FtCalibration(const std::string &name)
+FtCalibration::FtCalibration(const std::string& name)
     : Entity(name),
       CONSTRUCT_SIGNAL_IN(right_foot_force_in, dynamicgraph::Vector),
       CONSTRUCT_SIGNAL_IN(left_foot_force_in, dynamicgraph::Vector),
@@ -72,7 +72,7 @@ FtCalibration::FtCalibration(const std::string &name)
                               docCommandVoid0("Calibrate the feet senors")));
 }
 
-void FtCalibration::init(const std::string &robotRef) {
+void FtCalibration::init(const std::string& robotRef) {
   dgADD_OSTREAM_TO_RTLOG(std::cout);
   std::string localName(robotRef);
   m_initSucceeded = true;
@@ -99,7 +99,7 @@ DEFINE_SIGNAL_OUT_FUNCTION(right_foot_force_out, dynamicgraph::Vector) {
   }
   if (s.size() != 6) s.resize(6);
 
-  const Vector &right_foot_force = m_right_foot_force_inSIN(iter);
+  const Vector& right_foot_force = m_right_foot_force_inSIN(iter);
 
   assert(right_foot_force.size() == 6 &&
          "Unexpected size of signal right_foot_force_in, should be 6.");
@@ -127,7 +127,7 @@ DEFINE_SIGNAL_OUT_FUNCTION(left_foot_force_out, dynamicgraph::Vector) {
   }
   if (s.size() != 6) s.resize(6);
 
-  const Vector &left_foot_force = m_left_foot_force_inSIN(iter);
+  const Vector& left_foot_force = m_left_foot_force_inSIN(iter);
 
   assert(left_foot_force.size() == 6 &&
          "Unexpected size of signal left_foot_force_in, should be 6.");
@@ -146,7 +146,7 @@ DEFINE_SIGNAL_OUT_FUNCTION(left_foot_force_out, dynamicgraph::Vector) {
 }
 /* --- COMMANDS ---------------------------------------------------------- */
 
-void FtCalibration::setRightFootWeight(const double &rightW) {
+void FtCalibration::setRightFootWeight(const double& rightW) {
   if (!m_initSucceeded) {
     SEND_WARNING_STREAM_MSG(
         "Cannot set right foot weight before initialization!");
@@ -155,7 +155,7 @@ void FtCalibration::setRightFootWeight(const double &rightW) {
   m_right_foot_weight << 0, 0, rightW, 0, 0, 0;
 }
 
-void FtCalibration::setLeftFootWeight(const double &leftW) {
+void FtCalibration::setLeftFootWeight(const double& leftW) {
   if (!m_initSucceeded) {
     SEND_WARNING_STREAM_MSG(
         "Cannot set left foot weight before initialization!");
@@ -180,7 +180,7 @@ void FtCalibration::calibrateFeetSensor() {
 /* --- ENTITY -------------------------------------------------------- */
 /* ------------------------------------------------------------------- */
 
-void FtCalibration::display(std::ostream &os) const {
+void FtCalibration::display(std::ostream& os) const {
   os << "FtCalibration " << getName();
   try {
     getProfiler().report_all(3, os);
